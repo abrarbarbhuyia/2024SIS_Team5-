@@ -14,6 +14,24 @@ async function insertDoc(collType, docs) {
   return await coll.insertMany(docs);
 }
 
+async function findDoc(collType, query) {
+  const db = client.db("SIS0");
+  const coll = db.collection(collType);
+  const cursor = coll.find(query);
+  const results = [];
+  for await (const doc of cursor) {
+    results.push(doc);
+  }
+  return results;
+}
+
+async function deleteDoc(collType, query) {
+  const db = client.db("SIS0");
+  const coll = db.collection(collType);
+  return await coll.deleteMany(query);
+}
+
+
 async function testConnection() {
   try{
     await client.connect();
@@ -30,11 +48,20 @@ module.exports = {
     await client.connect();
     let result;
     try {
-      const { docs } = entry;
+      const { docs, query } = entry;
       switch (operationType) {
         case 'insert':
           result = await insertDoc(collType, docs);
           console.log('Insert Doc Result:', result);
+          break;
+        case 'find':
+          result = await findDoc(collType, query);
+          console.log('Find Doc Input', query);
+          console.log('Find Doc Result', result);
+          return result;
+        case 'delete':
+          result = await deleteDoc(collType, query);
+          console.log('Delete Doc Result', result);
           break;
         default:
           console.log("Invalid operation type.");

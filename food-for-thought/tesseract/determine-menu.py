@@ -2,10 +2,10 @@ from PIL import Image
 import pytesseract
 import re
 
-
 def extract_text_from_image(image_path) -> str:
     img = Image.open(image_path)
     extracted_text = pytesseract.image_to_string(img)
+    print(extracted_text)
     return extracted_text
 
 """
@@ -25,15 +25,20 @@ def is_menu(extracted_text: str) -> bool:
     price_pattern = r'\$\d+(\.\d{2})?'
     text_lower = extracted_text.lower()
 
-    # another method of implementation but is potentially less accurate
-    # if(re.search(common_keywords, text_lower) and re.search(price_pattern, text_lower)):
-    #     return True
-    
     common_keyword_count = sum([text_lower.count(keyword.lower()) for keyword in common_keywords])
     price_count = len(re.findall(price_pattern, text_lower))
     
     # is a menu if more than 1 keyword is found & has more than 3 prices on the img
-    if common_keyword_count >= 1 or price_count >= 3:
+    if common_keyword_count >= 1 and price_count >= 3:
+        print("item is a menu")
         return True
     
+    print("item is not a menu")
     return False
+
+# FOR TESTING: DELETE AFTER
+image_path = ""
+extracted_text = extract_text_from_image(image_path)
+print("Extracted Text:")
+print(extracted_text)
+is_menu(extracted_text)

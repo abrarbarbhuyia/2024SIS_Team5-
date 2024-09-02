@@ -5,6 +5,7 @@ import {
   BottomSheetView,
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
+import SearchBar from "@/components/SearchBar";
 
 const Map = () => {
   // ref
@@ -25,6 +26,7 @@ const Map = () => {
   return (
     <BottomSheetModalProvider>
       <View style={styles.container}>
+        <SearchBar/>
         <Button
           onPress={handlePresentModalPress}
           title="Present Modal"
@@ -50,7 +52,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: 'center',
-    // backgroundColor: 'grey',
+    backgroundColor: '#E6D7FA',
   },
   contentContainer: {
     flex: 1,

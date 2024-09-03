@@ -42,7 +42,7 @@ return (
 
 const styles = StyleSheet.create({
   view: {
-    margin: 10,
+    margin: 5,
   },
 });
 

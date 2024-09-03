@@ -2,6 +2,7 @@ import { Card, Text, Icon } from '@rneui/themed';
 import { View, StyleSheet, Dimensions, Image } from "react-native";
 import React from 'react';
 import logo from '../assets/images/logo.png';
+import { router } from 'expo-router';
 
 export default function Header() {
 
@@ -15,7 +16,7 @@ export default function Header() {
             <Card containerStyle={styles.headerCard}>
                 <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 35, marginTop: 7 }}>
-                        <Icon style={{ color: '#000000' }} name='user' type='evilicon' size={35} onPress={() => console.log("Profile click")}/>
+                        <Icon style={{ color: '#000000' }} name='user' type='evilicon' size={35} onPress={() => router.push('/login')}/>
                         <Text style={{ marginLeft: 8 }}>Nep</Text>
                     </View>
                     {/* <Icon name='user' type='evilicon' /> */}

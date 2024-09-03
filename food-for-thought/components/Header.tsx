@@ -24,7 +24,7 @@ export default function Header() {
                     <Card.Image source={logo} style={styles.image} onPress={handleHomePress}/>
                     {/* now two more icons on other side of logo, side by side */}
                     <View style={{ flexDirection: 'row', marginLeft: 35, marginTop: 10}}>
-                        <Icon style={{ color: '#000000', marginRight: 20 }} name='bell' type='fontisto' size={25} onPress={() => console.log("Notifications click")}/>
+                        <Icon style={{ color: '#000000', marginRight: 20 }} name='bell' type='fontisto' size={25} onPress={() => router.push('/restaurant')}/>
                         <Icon style={{ color: '#000000' }} name='spinner-cog' type='fontisto' size={25} onPress={() => console.log("Settings click")}/>
                     </View>
                 </View>

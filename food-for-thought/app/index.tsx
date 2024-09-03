@@ -1,11 +1,12 @@
 import { View, Dimensions, Image, StyleSheet, FlatList } from "react-native";
-//import { SearchBar } from "../components/SearchBar";
 import { Link } from "expo-router";
-import Header from "@/components/Header";
-import { Card, Text, Icon } from '@rneui/themed';
-import pic from '../assets/images/react-logo.png';
+import { Button, Card, Text, Icon } from '@rneui/themed';
+import SearchBar from "@/components/SearchBar";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import Header from "@/components/Header";     
+import pic from '../assets/images/react-logo.png';        
 
-//mock data images for carousel
+        //mock data images for carousel
 const carouselData = [
   { id: '1', image: pic, label: 'Food item', secondLabel: 'Food' },
   { id: '2', image: pic, label: 'Food item', secondLabel: 'Food' },
@@ -15,6 +16,7 @@ const carouselData = [
   { id: '6', image: pic, label: 'Food item', secondLabel: 'Food' },
   { id: '7', image: pic, label: 'Food item', secondLabel: 'Food' },
 ];
+
 
 export default function Index() {
   //carousel view + styling
@@ -29,13 +31,22 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <Header></Header>
+      <Link href={"/login"}>Login</Link>
       {/* Card for the Restaurant finder */}
-      <Card containerStyle={styles.finderCard}>
-        {/* SearchBar */}
-        {/* map snip, for now just link to map */}
-        <Link href={"/map"} >Navigate to Map Display</Link>
-        <Link href={"/login"}>Login</Link>
-      </Card>
+      <TouchableOpacity /* onPress={() => navigation.navigate('map')} */>
+        <Card>
+            <Icon type="feather" name="arrow-right" color="black"></Icon>
+            <SearchBar/>
+          <Card.Image
+              style={{ padding: 0 }}
+              source={{
+                uri:
+                  'https://developers.google.com/static/maps/images/landing/hero_maps_static_api.png',
+              }}
+            />
+        </Card>
+      </TouchableOpacity>
+      <Link href={"/map"}>Click here to see the Map Display</Link>
       {/* Card for recently visited Restaurants */}
       <Card containerStyle={styles.recentCard}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>

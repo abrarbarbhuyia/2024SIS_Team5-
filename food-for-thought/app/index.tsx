@@ -34,6 +34,7 @@ export default function Index() {
         {/* SearchBar */}
         {/* map snip, for now just link to map */}
         <Link href={"/map"} >Navigate to Map Display</Link>
+        <Link href={"/login"}>Login</Link>
       </Card>
       {/* Card for recently visited Restaurants */}
       <Card containerStyle={styles.recentCard}>

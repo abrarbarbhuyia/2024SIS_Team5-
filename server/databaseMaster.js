@@ -1,6 +1,6 @@
 const { MongoClient, Binary } = require("mongodb");
 const path = require("path");
-require("dotenv").config({ path: path.resolve(__dirname, ".env") });
+require("dotenv").config({ path: path.resolve(__dirname, ".env_template") });
 
 const uri = process.env.DATABASE_URI;
 console.log(uri);

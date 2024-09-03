@@ -1,5 +1,5 @@
 import { View, Dimensions, Image, StyleSheet, FlatList } from "react-native";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { Button, Card, Text, Icon } from '@rneui/themed';
 import SearchBar from "@/components/SearchBar";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -31,22 +31,21 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <Header></Header>
-      <Link href={"/login"}>Login</Link>
       {/* Card for the Restaurant finder */}
-      <TouchableOpacity /* onPress={() => navigation.navigate('map')} */>
-        <Card>
-            <Icon type="feather" name="arrow-right" color="black"></Icon>
-            <SearchBar/>
-          <Card.Image
-              style={{ padding: 0 }}
-              source={{
-                uri:
-                  'https://developers.google.com/static/maps/images/landing/hero_maps_static_api.png',
-              }}
-            />
-        </Card>
-      </TouchableOpacity>
-      <Link href={"/map"}>Click here to see the Map Display</Link>
+        <TouchableOpacity onPress={() => router.push('/map')}>
+          <Card containerStyle={styles.finderCard}>
+            <View style={{  }}>
+              <SearchBar/>             
+            </View>
+            <Card.Image
+                style={{ padding: 0, height: 100 }}
+                source={{
+                  uri:
+                    'https://developers.google.com/static/maps/images/landing/hero_maps_static_api.png',
+                }}
+              />
+          </Card>
+        </TouchableOpacity>
       {/* Card for recently visited Restaurants */}
       <Card containerStyle={styles.recentCard}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -69,6 +68,8 @@ export default function Index() {
           <Text h4>Recommendations</Text>
           <Icon name="arrowright" type="antdesign" size={25} onPress={() => console.log("Recommendations arrow clicked")} />
         </View>
+        {/* <Link href={"/login"}>Login</Link>
+        <Link href={"/map"}>Click here to see the Map Display</Link> */}
       </Card>
     </View>
   );
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
   },
   finderCard: {
     width: width - 32,
-    height: 170,
+    height: 200,
     backgroundColor: "#FBF8FF",
     padding: 12,
     borderRadius: 24,
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
   },
   recentCard: {
     width: width - 32,
-    height: 230,
+    height: 220,
     backgroundColor: "#FBF8FF",
     padding: 12,
     borderRadius: 24,
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
   },
   recommendationsCard: {
     width: width - 32,
-    height: 265,
+    height: 250,
     backgroundColor: "#FBF8FF",
     padding: 12,
     borderRadius: 24,

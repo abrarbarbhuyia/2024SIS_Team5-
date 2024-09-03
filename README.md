@@ -1,15 +1,18 @@
-# 2024SIS_Team5-
+# Food for Thought
+A unique restaurant recommendation app to help people with dietary requirements find restaurants by analyisng menu data.
 
-Software Innovation Studio Team 5
+Developed by Team 5, Software Innovation Studio (41129), Spring 2024.
 
-# How to run Food for Thought
+# How to Run the App
 ## Dependencies
-Install the latest version of node and watchman.
+Install the latest version of [NodeJS](https://nodejs.org/en/download) and NPM. Check if it has been installed using `node -v`, `npm -v`.
+
 Install [Expo Go](https://docs.expo.dev/get-started/set-up-your-environment/) for your development environment.
 
 ## Terminal
 ```bash
 cd food-for-thought
+npm install
 npx expo start
 ```
 Then you're good to go! Scan the QR Code via the Expo Go app on an Android Device or via the Camera on iOS.

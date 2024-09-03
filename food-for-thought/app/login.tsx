@@ -1,0 +1,145 @@
+import React, { useCallback, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
+const Login = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = useCallback(() => {
+    if (username === 'Admin' && password === 'testpasswordnotreal') {
+      Alert.alert('Login Successful', `Welcome ${username}!`);
+    } else {
+      Alert.alert('Login Failed', 'Invalid username or password. Try again.');
+    }
+  }, [username, password]);
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.rectangle}>
+        <Image source={require('../assets/images/food-for-thought-logo.png')} style={styles.logo} />
+
+        <Text style={styles.subtitle}>Login</Text>
+        <Text style={styles.supportingText}>New to Food For Thought? Sign up for free.</Text>
+
+        <View style={styles.inputContainer}>
+          <Text style={[styles.label]}>
+            Username
+          </Text>
+          <TextInput
+            style={styles.input}
+            value={username}
+            onChangeText={setUsername}
+          />
+          <Icon name="user" size={20} color="#7E7093" style={styles.icon} />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={[styles.label]}>
+            Password
+          </Text>
+          <TextInput
+            style={styles.input}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+          <Icon name="lock" size={20} color="#7E7093" style={styles.icon} />
+        </View>
+
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>LOGIN</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#E6D7FA',
+    fontFamily: 'Roboto',
+  },
+  rectangle: {
+    width: '90%',
+    padding: '10%',
+    backgroundColor: '#FBF8FF',
+    borderRadius: 20,
+    alignItems: 'center',
+  },
+  logo: {
+    width: 124,
+    height: 59,
+    borderRadius: 5,
+    marginBottom: 20,
+  },
+  subtitle: {
+    fontWeight: '600',
+    fontSize: 24,
+    lineHeight: 32,
+    color: '#1D1B20',
+    marginBottom: 20,
+  },
+  supportingText: {
+    width: '100%',
+    fontWeight: '400',
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
+    color: '#49454F',
+    marginBottom: 30,
+  },
+  inputContainer: {
+    width: '100%',
+    marginBottom: 20,
+    position: 'relative',
+  },
+  label: {
+    position: 'absolute',
+    left: 10,
+    backgroundColor: 'transparent',
+    top: -18,
+    fontSize: 12,
+    color: '#7E7093',
+    fontWeight: 600,
+  },
+  input: {
+    width: '100%',
+    height: 40,
+    borderColor: '#CCCCCC',
+    borderWidth: 1,
+    borderRadius: 4,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 10,
+    fontSize: 16,
+    color: '#808080',
+  },
+  button: {
+    position: 'absolute',
+    width: '50%',
+    height: '10%',
+    left: '40%',
+    top: '105%',
+    backgroundColor: '#5A428F',
+    borderColor: '#484DBE',
+    borderWidth: 1,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  icon: {
+    bottom: 30,
+    right: -10,
+    zIndex: 9000,
+  }
+});
+
+export default Login;

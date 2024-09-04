@@ -1,27 +1,29 @@
 import { Card, Text, Icon } from '@rneui/themed';
 import { View, StyleSheet, Dimensions, Image } from "react-native";
 import React from 'react';
-import logo from '../assets/images/logo.png';
 import { router } from 'expo-router';
 
-export default function Header() {
+export default function Header({homepage=false}) {
 
-    const handleHomePress = () => {
-        //navigate to home page, prob need to clear stack of pages?
-        console.log("Home click");
+    //dont want to clear stack if already at homepage (top of stack)
+    //dont need to pass in prop in any other page as false default is expected functionality
+    const handleHomeRoute = () => {
+        if (!homepage) {
+            router.dismissAll();
+        }
     }
 
     return (
         <View style={styles.container}>
             <Card containerStyle={styles.headerCard}>
-                <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 35, marginTop: 7 }}>
                         <Icon style={{ color: '#000000' }} name='user' type='evilicon' size={35} onPress={() => router.push('/login')}/>
                         <Text style={{ marginLeft: 8 }}>Nep</Text>
                     </View>
                     {/* <Icon name='user' type='evilicon' /> */}
                     {/* also some text alongside the icon */}
-                    <Card.Image source={logo} style={styles.image} onPress={handleHomePress}/>
+                    <Card.Image source={require('../assets/images/food-for-thought-logo.png')} style={styles.image} onPress={handleHomeRoute}/>
                     {/* now two more icons on other side of logo, side by side */}
                     <View style={{ flexDirection: 'row', marginLeft: 35, marginTop: 10}}>
                         <Icon style={{ color: '#000000', marginRight: 20 }} name='bell' type='fontisto' size={25} onPress={() => router.push('/restaurant')}/>
@@ -39,6 +41,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'row',
+        paddingBottom: 12,
     },
     headerCard: {
         width: width - 32,

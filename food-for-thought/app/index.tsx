@@ -30,7 +30,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <Header></Header>
+      <Header homepage={true}></Header>
       {/* Card for the Restaurant finder */}
         <TouchableOpacity onPress={() => router.push('/map')}>
           <Card containerStyle={styles.finderCard}>

@@ -1,9 +1,9 @@
 import Header from "@/components/Header";
-import { View, Image, StyleSheet, Dimensions, FlatList } from "react-native";
+import { View, Image, StyleSheet, Dimensions, FlatList, Modal, TouchableOpacity } from "react-native";
 import { Button, Card, Text, Tab, TabView } from '@rneui/themed';
 import React from "react";
 import { ButtonGroup } from "react-native-elements";
-import pic from '../assets/images/react-logo.png';        
+import pic from '../assets/images/react-logo.png';
 
 //mock images for gallery tab
 const carouselData = [
@@ -19,8 +19,22 @@ const carouselData = [
 export default function Restaurant() {
     //stuff
     const [selectedIndex, setSelectedIndex] = React.useState(0);
+    const [modalVisible, setModalVisible] = React.useState(false);
+    const [selectedImage, setSelectedImage] = React.useState(null);
 
-        // Components to load based on selected index
+    //open and close modal
+    const openModal = (image) => {
+        setSelectedImage(image);
+        setModalVisible(true);
+    }
+
+    const closeModal = () => {
+        setSelectedImage(null);
+        setModalVisible(false);
+    }
+
+
+    // Components to load based on selected index
     const renderContent = () => {
         switch (selectedIndex) {
             case 0:
@@ -36,14 +50,16 @@ export default function Restaurant() {
 
       //carousel view + styling
     const renderItem = ({ item }) => (
-        <View style={styles.imageContainer}>
-        <Image source={item.image} style={styles.image} />
-        </View>
+        <TouchableOpacity onPress={() => openModal(item.image)}>
+            <View style={styles.imageContainer}>
+                <Image source={item.image} style={styles.image} />
+            </View>
+        </TouchableOpacity>
     )
 
     return (
         <View style={styles.pageContainer} >
-            <Header></Header>
+            <Header />
             <View style={styles.detailsContainer}>
                 <Text h4 style={{padding: 20,}}>Restaurant Title</Text>
                 <Card containerStyle={styles.tabContainer}>
@@ -64,6 +80,17 @@ export default function Restaurant() {
                 {renderContent()}
                 </Card>
             </View>
+            
+            {/* Modal for displaying full size image on selection */}
+            <Modal visible={modalVisible} transparent={true} animationType="fade" onRequestClose={closeModal}>
+                    <View style={styles.modalContainer}>
+                        <TouchableOpacity style={styles.modalBackground} onPress={closeModal}>
+                            {selectedImage && (
+                                <Image source={selectedImage} style={styles.fullImage}/>
+                            )}
+                        </TouchableOpacity>
+                    </View>
+            </Modal>
         </View>
     )
 }
@@ -83,7 +110,7 @@ const DescriptionComponent = () => (
 
 const GalleryComponent = ({renderItem}) => (
     <View style={{padding: 10,}}>
-        <Text h4>Gallery Content</Text>
+        <Text h4>Menu</Text>
         <FlatList
           data={carouselData}
           renderItem={renderItem}
@@ -92,7 +119,7 @@ const GalleryComponent = ({renderItem}) => (
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.carousel}
         />
-        <Text h4>Gallery Content</Text>
+        <Text h4>Other</Text>
         <FlatList
           data={carouselData}
           renderItem={renderItem}
@@ -136,17 +163,34 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: 10,
-      },
-      imageContainer: {
+    },
+    imageContainer: {
         marginRight: 10,
         backgroundColor: 'white',
         borderRadius: 8,
         overflow: 'hidden',
         width: 180,
         height: 180,
-      },
-      image: {
+    },
+    image: {
         width: '100%',
         height: '100%'
-      }
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    },
+    modalBackground: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    fullImage: {
+        width: '90%',
+        height: '70%',
+        resizeMode: 'contain',
+    },
 })

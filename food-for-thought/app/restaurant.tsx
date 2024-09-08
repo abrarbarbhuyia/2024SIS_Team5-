@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
         paddingTop: 15,
         width: width,
         height: height,
-        paddingBottom: 125,
+        paddingBottom: 115,
         marginTop: 15,
     },
     tabContainer: {

@@ -25,7 +25,7 @@ export default function Header({homepage=false}) {
                 <Card.Image source={require('../assets/images/food-for-thought-logo.png')} style={styles.image} onPress={handleHomeRoute}/>
                 {/* now two more icons on other side of logo, side by side */}
                 <View style={{ flexDirection: 'row', marginLeft: 35, marginTop: 10}}>
-                    <Icon style={{ color: '#000000', marginRight: 20 }} name='bell' type='fontisto' size={25} onPress={() => router.push('/restaurant')}/>
+                    <Icon style={{ color: '#000000', marginRight: 20 }} name='bell' type='fontisto' size={25} onPress={() => console.log("Notification icon click")}/>
                     <Icon style={{ color: '#000000' }} name='spinner-cog' type='fontisto' size={25} onPress={() => console.log("Settings click")}/>
                 </View>
             </View>
@@ -38,7 +38,7 @@ const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
     headerCard: {
         width: width - 32,
-        height: 100,
+        height: 85,
         backgroundColor: "#FBF8FF",
         padding: 12,
         borderRadius: 24,

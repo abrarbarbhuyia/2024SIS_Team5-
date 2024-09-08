@@ -1,8 +1,20 @@
 import Header from "@/components/Header";
-import { View, ScrollView, StyleSheet, Dimensions, SafeAreaView } from "react-native";
+import { View, Image, StyleSheet, Dimensions, FlatList } from "react-native";
 import { Button, Card, Text, Tab, TabView } from '@rneui/themed';
 import React from "react";
 import { ButtonGroup } from "react-native-elements";
+import pic from '../assets/images/react-logo.png';        
+
+//mock images for gallery tab
+const carouselData = [
+    { id: '1', image: pic },
+    { id: '2', image: pic },
+    { id: '3', image: pic },
+    { id: '4', image: pic },
+    { id: '5', image: pic },
+    { id: '6', image: pic },
+    { id: '7', image: pic },
+  ];
 
 export default function Restaurant() {
     //stuff
@@ -16,20 +28,27 @@ export default function Restaurant() {
             case 1:
                 return <DescriptionComponent />;
             case 2:
-                return <GalleryComponent />;
+                return <GalleryComponent renderItem={renderItem}/>;
             default:
                 return null;
         }
     };
 
+      //carousel view + styling
+    const renderItem = ({ item }) => (
+        <View style={styles.imageContainer}>
+        <Image source={item.image} style={styles.image} />
+        </View>
+    )
+
     return (
-        <ScrollView style={styles.pageContainer} >
+        <View style={styles.pageContainer} >
             <Header></Header>
             <View style={styles.detailsContainer}>
-                <Text h4 style={{padding: 30,}}>Restaurant Title</Text>
+                <Text h4 style={{padding: 20,}}>Restaurant Title</Text>
                 <Card containerStyle={styles.tabContainer}>
                 <ButtonGroup
-                    buttonStyle={{ padding: 10, backgroundColor: '#FBF8FF' }}
+                    buttonStyle={{  backgroundColor: '#FBF8FF' }}
                     selectedButtonStyle={{ backgroundColor: '#E8DEF8' }}
                     buttons={[
                     <Text>Menu</Text>,
@@ -38,14 +57,14 @@ export default function Restaurant() {
                     ]}
                     selectedIndex={selectedIndex}
                     onPress={setSelectedIndex}
-                    containerStyle={{height: 50, borderRadius: 16, alignItems: 'flex-start'}}
+                    containerStyle={{flexGrow: 1, borderRadius: 16, borderWidth: 0, height: 50}}
                 />
                 <Card.Divider/>
                 {/* load in page component or sumn based on selected button? */}
                 {renderContent()}
                 </Card>
             </View>
-        </ScrollView>
+        </View>
     )
 }
 
@@ -62,9 +81,26 @@ const DescriptionComponent = () => (
     </View>
 );
 
-const GalleryComponent = () => (
-    <View>
-        <Text>Gallery Content</Text>
+const GalleryComponent = ({renderItem}) => (
+    <View style={{padding: 10,}}>
+        <Text h4>Gallery Content</Text>
+        <FlatList
+          data={carouselData}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.carousel}
+        />
+        <Text h4>Gallery Content</Text>
+        <FlatList
+          data={carouselData}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.carousel}
+        />
     </View>
 );
 
@@ -73,6 +109,7 @@ const {width, height} = Dimensions.get('window');
 const styles = StyleSheet.create({
     pageContainer: {
         backgroundColor: "#E6D7FA",
+        flex: 1,
     },
     detailsContainer: {
         alignItems: 'center',
@@ -80,18 +117,36 @@ const styles = StyleSheet.create({
         paddingTop: 15,
         width: width,
         height: height,
-        paddingBottom: 135,
+        paddingBottom: 125,
+        marginTop: 15,
     },
     tabContainer: {
         flex: 1,
         backgroundColor: '#FBF8FF',
         width: width - 32,
-        padding: 12,
+        padding: 2,
         borderRadius: 24,
         marginTop: 5,
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 2,
         shadowRadius: 4,
         marginBottom: 15,
-    }
+    },
+    carousel: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10,
+      },
+      imageContainer: {
+        marginRight: 10,
+        backgroundColor: 'white',
+        borderRadius: 8,
+        overflow: 'hidden',
+        width: 180,
+        height: 180,
+      },
+      image: {
+        width: '100%',
+        height: '100%'
+      }
 })

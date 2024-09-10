@@ -4,6 +4,8 @@ import { Button, Card, Text, Icon } from '@rneui/themed';
 import SearchBar from "@/components/SearchBar";
 import Header from "@/components/Header";     
 import pic from '../assets/images/react-logo.png';        
+import { useState } from "react";
+import RecommendedRestaurant from "@/components/RecommendedRestaurant";
 
         //mock data images for carousel
 const carouselData = [
@@ -15,7 +17,6 @@ const carouselData = [
   { id: '6', image: pic, label: 'Restaurant Title', secondLabel: 'Cuisine' },
   { id: '7', image: pic, label: 'Restaurant Title', secondLabel: 'Cuisine' },
 ];
-
 
 export default function Index() {
   //carousel view + styling
@@ -69,37 +70,8 @@ export default function Index() {
           <Text h4 style={{color: '#2E1C47'}}>Recommendations</Text>
           <Icon name="arrowright" type="antdesign" size={25} onPress={() => console.log("Recommendations arrow clicked")} />
         </View>
-
-        {/* to be sectioned off into a component */}
-
-        <TouchableOpacity style={{padding: 3, backgroundColor: 'white', marginBottom: 5, borderRadius: 16}} onPress={() => router.push('/restaurant')}>
-          <View style={{flexDirection: 'row'}}>
-            <Image source={pic} />
-            <View style={{flex: 1, flexDirection: 'column'}}>
-              <Text style={{fontSize: 18, fontWeight: 'bold'}}>Restaurant Title</Text>
-              <Text style={{fontSize: 13}}>Restaurant blurb/quick important information</Text>
-              <View style={{flex: 1, alignItems: 'center', flexDirection: 'row'}}>
-                <Icon name="star-outlined" type="entypo" size={25} onPress={() => console.log("favourite clicked")} />
-                <Text style={{fontSize: 11, padding: 5}}>Add to Favourites</Text>  
-              </View>
-            </View>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={{padding: 3, backgroundColor: 'white', marginBottom: 5, borderRadius: 16}} onPress={() => router.push('/restaurant')}>
-        <View style={{flexDirection: 'row'}}>
-            <Image source={pic} />
-            <View style={{flex: 1, flexDirection: 'column'}}>
-              <Text style={{fontSize: 18, fontWeight: 'bold'}}>Restaurant Title</Text>
-              <Text style={{fontSize: 13}}>Restaurant blurb/quick important information</Text>
-              <View style={{flex: 1, alignItems: 'center', flexDirection: 'row'}}>
-                <Icon name="star-outlined" type="entypo" size={25} onPress={() => console.log("favourite clicked")} />
-                <Text style={{fontSize: 11, padding: 5}}>Add to Favourites</Text>  
-              </View>
-            </View>
-          </View>
-        </TouchableOpacity>
-
-
+        <RecommendedRestaurant />
+        <RecommendedRestaurant />
       </Card>
     </View>
   );

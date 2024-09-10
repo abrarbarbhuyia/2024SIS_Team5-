@@ -9,6 +9,7 @@ import SearchBar from "@/components/SearchBar";
 import { Badge, Icon } from "@rneui/themed";
 import { useState } from "react";
 import { DietaryFilterModal } from '@/components/DietaryFilterModal';
+import Header from '@/components/Header';
 
 const Map = () => {
   const [filterType, setFilterType] = useState<string | undefined>();
@@ -33,6 +34,7 @@ const Map = () => {
   return (
     <BottomSheetModalProvider>
       <View style={styles.container}>
+        <Header></Header>
         <View style={{ backgroundColor: '#FBF8FF', borderRadius: 20, flex: 1, maxHeight: 200 }}>
           <SearchBar />
           <View style={{ flex: 1, maxHeight: 60}}>

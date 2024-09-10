@@ -4,16 +4,17 @@ import * as React from "react";
 
 export type DietaryFilterProps = {
     setShowModal: React.Dispatch<React.SetStateAction<string | undefined>>,
+    setActiveFilters: React.Dispatch<React.SetStateAction<{ type: string, value: string }[]>>,
+    currentFilters: { type: string, value: string }[],
     filterType: string,
   };
 
-export function DietaryFilterModal({ filterType, setShowModal, ...rest }: DietaryFilterProps) {
-  const [filters, setFilters] = React.useState<{type: string, value: string}[]>();
+export function DietaryFilterModal({ filterType, currentFilters, setActiveFilters, setShowModal, ...rest }: DietaryFilterProps) {
   const [newFilter, setNewFilter] = React.useState<string>();
 
   function addFilter(value: string) {
     if (value === null) return;
-    setFilters(filters ? filters.concat([{ type: filterType, value: value }]) : [{ type: filterType, value: value }]);
+    setActiveFilters(currentFilters ? currentFilters.concat([{ type: filterType, value: value }]) : [{ type: filterType, value: value }])
     setNewFilter(undefined);
     return;
   }
@@ -34,7 +35,7 @@ export function DietaryFilterModal({ filterType, setShowModal, ...rest }: Dietar
       </Button>
     </View>
     <Divider style={{ marginBottom: 10}} />
-    {filters && filters.map(f => <ListItem bottomDivider containerStyle={styles.listItem} key={f.value}>
+    {currentFilters?.map(f => <ListItem bottomDivider containerStyle={styles.listItem} key={f.value}>
       <Avatar
         size={32}
         rounded
@@ -48,7 +49,9 @@ export function DietaryFilterModal({ filterType, setShowModal, ...rest }: Dietar
           type='feather'
           iconStyle={styles.badgesCross}
           size={20}
-          onPress={() => null} />
+          onPress={() => currentFilters.length > 0 
+            ? setActiveFilters(currentFilters.filter(filter => !(filter === f))) 
+            : null} />
     </ListItem>)}
   </Overlay>
 }

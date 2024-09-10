@@ -13,8 +13,7 @@ import Header from '@/components/Header';
 
 const Map = () => {
   const [filterType, setFilterType] = useState<string | undefined>();
-  const [activeFilters, setActiveFilters] = useState<{ type: string, value: string }[]>(
-    [{ type: 'diet', value: 'halal' }, { type: 'allergen', value: 'No Nuts' }, { type: 'ingredient', value: 'salmon' }, { type: 'cuisine', value: 'spanish' }]);
+  const [activeFilters, setActiveFilters] = useState<{ type: string, value: string }[]>([]);
   const filterTypes = ['diets', 'allergens', 'ingredients', 'cuisine'];
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -47,8 +46,8 @@ const Map = () => {
                 {activeFilters.length > 0 ? activeFilters.map(f => <Badge 
                   badgeStyle={{ 
                     ...styles.filterBackground, 
-                    backgroundColor: filterColours[f.type].fill, 
-                    borderColor: filterColours[f.type].border }}
+                    backgroundColor: filterColours[f.type]?.fill ?? 'white', 
+                    borderColor: filterColours[f.type]?.border ?? 'white'}}
                   textStyle={styles.filterText}
                   key={`${f.type}-${f.value}`}
                   value={
@@ -60,7 +59,7 @@ const Map = () => {
                         iconStyle={styles.badgesCross}
                         size={15}
                         onPress={() => console.log('hello')} />
-                    </Text>} />) : <Text style={{color: 'grey', fontSize: 12}}>No filters set</Text>}
+                    </Text>} />) : <Text style={{color: 'grey', fontSize: 12, paddingTop: 5}}>No filters set</Text>}
             </View>
             <View style={{...styles.flexContainer, paddingHorizontal: 8}}>
               {filterTypes.map(f =>
@@ -95,7 +94,11 @@ const Map = () => {
           />
         </Card>
       </View>
-      {filterType && <DietaryFilterModal filterType={filterType} setShowModal={setFilterType} />}
+      {filterType && <DietaryFilterModal 
+        filterType={filterType} 
+        currentFilters={activeFilters}
+        setShowModal={setFilterType} 
+        setActiveFilters={setActiveFilters} />}
     </BottomSheetModalProvider>
   );
 };
@@ -105,9 +108,9 @@ function capitaliseFirstLetter(string: string) {
 }
 
 const filterColours: {[key: string]: {fill: string, border: string}} = {
-  'diet': { fill: '#FFE7DC', border: '#FEBFAC' },
-  'allergen': { fill: '#F3D9FF', border: '#D59CEF' },
-  'ingredient': { fill: '#E4EDFF', border: '#A8C1F3' },
+  'diets': { fill: '#FFE7DC', border: '#FEBFAC' },
+  'allergens': { fill: '#F3D9FF', border: '#D59CEF' },
+  'ingredients': { fill: '#E4EDFF', border: '#A8C1F3' },
   'cuisine': { fill: '#E7FFE7', border: '#B1F6B1' },
   'selected': { fill: '#E8DEF8', border: '#BDB0CA' }
 }
@@ -126,7 +129,7 @@ const styles = StyleSheet.create({
   baseCard: {
     maxHeight: 200,
     width: width - 32,
-    height: 200,
+    height: 170,
     backgroundColor: "#FBF8FF",
     padding: 12,
     borderRadius: 24,

@@ -1,5 +1,5 @@
 import { Button, Icon, Overlay, Avatar, ListItem, Divider } from "@rneui/themed";
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { View, StyleSheet, TextInput, ScrollView } from 'react-native';
 import * as React from "react";
 
 export type DietaryFilterProps = {
@@ -35,24 +35,27 @@ export function DietaryFilterModal({ filterType, currentFilters, setActiveFilter
       </Button>
     </View>
     <Divider style={{ marginBottom: 10}} />
-    {currentFilters?.map(f => <ListItem bottomDivider containerStyle={styles.listItem} key={f.value}>
-      <Avatar
-        size={32}
-        rounded
-        title={f.value[0].toUpperCase()}
-        containerStyle={{ backgroundColor: "purple" }} />
-      <ListItem.Content>
-        <ListItem.Title>{f.value}</ListItem.Title>  
-      </ListItem.Content>
-      <Icon
-          name='x'
-          type='feather'
-          iconStyle={styles.badgesCross}
-          size={20}
-          onPress={() => currentFilters.length > 0 
-            ? setActiveFilters(currentFilters.filter(filter => !(filter === f))) 
-            : null} />
-    </ListItem>)}
+
+    <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+      {currentFilters?.map(f => <ListItem bottomDivider containerStyle={styles.listItem} key={f.value}>
+        <Avatar
+          size={32}
+          rounded
+          title={f.value[0].toUpperCase()}
+          containerStyle={{ backgroundColor: "purple" }} />
+        <ListItem.Content>
+          <ListItem.Title>{f.value}</ListItem.Title>  
+        </ListItem.Content>
+        <Icon
+            name='x'
+            type='feather'
+            iconStyle={styles.badgesCross}
+            size={20}
+            onPress={() => currentFilters.length > 0 
+              ? setActiveFilters(currentFilters.filter(filter => !(filter === f))) 
+              : null} />
+      </ListItem>)}
+    </ScrollView>
   </Overlay>
 }
 
@@ -64,17 +67,14 @@ const styles = StyleSheet.create({
       backgroundColor: '#FBF8FF',
       borderRadius: 20,
       width: '90%',
-      maxHeight: 210,
       padding: 15,
-      flex: 1,
     },
     flexFormGroup: {
       justifyContent: 'center',
       alignItems: 'center',
-      width: '90%',
-      paddingHorizontal: 15,
-      paddingTop: 30,
-      flex: 1,
+      width: '100%',
+      padding: 20,
+      paddingHorizontal: 40,
       flexDirection: 'row',
       gap: 15,
     },
@@ -109,5 +109,12 @@ const styles = StyleSheet.create({
     listItem: {
       width: '100%',
       backgroundColor: 'inherit',
+    },
+    scrollView: {
+      maxHeight: 270,
+      width: '100%',
+    },
+    scrollViewContent: {
+      paddingBottom: 10,
     },
   });

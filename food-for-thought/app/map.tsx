@@ -58,14 +58,19 @@ const Map = () => {
                         type='feather'
                         iconStyle={styles.badgesCross}
                         size={15}
-                        onPress={() => console.log('hello')} />
+                        onPress={() => activeFilters.length > 0 
+                          ? setActiveFilters(activeFilters.filter(filter => !(filter === f))) 
+                          : null} />
                     </Text>} />) : <Text style={{color: 'grey', fontSize: 12, paddingTop: 5}}>No filters set</Text>}
             </View>
             <View style={{...styles.flexContainer, paddingHorizontal: 8}}>
               {filterTypes.map(f =>
                 <Badge 
                   badgeStyle={{...styles.typesBackground, 
-                    ...(filterType === f && { backgroundColor: filterColours['selected'].fill, borderColor: filterColours['selected'].border }), 
+                    ...(filterType === f && { 
+                      backgroundColor: filterColours['selected'].fill, 
+                      borderColor: filterColours['selected'].border 
+                    }), 
                   }}
                   textStyle={styles.typesText}
                   // value={capitaliseFirstLetter(f)}

@@ -1,6 +1,7 @@
-import { Button, Icon, Overlay, Avatar, ListItem, Divider } from "@rneui/themed";
+import { Button, Icon, Overlay, Avatar, ListItem, Divider, CheckBox } from "@rneui/themed";
 import { View, StyleSheet, TextInput, ScrollView } from 'react-native';
 import * as React from "react";
+import { capitaliseFirstLetter } from "@/app/map";
 
 export type DietaryFilterProps = {
     setShowModal: React.Dispatch<React.SetStateAction<string | undefined>>,
@@ -11,6 +12,7 @@ export type DietaryFilterProps = {
 
 export function DietaryFilterModal({ filterType, currentFilters, setActiveFilters, setShowModal, ...rest }: DietaryFilterProps) {
   const [newFilter, setNewFilter] = React.useState<string>();
+  const allergens = ['egg', 'fish', 'crustaceans', 'nuts', 'milk', 'peanut', 'sesame', 'soy', 'wheat', 'lupin'];
 
   function addFilter(value: string) {
     if (value === null) return;
@@ -26,16 +28,36 @@ export function DietaryFilterModal({ filterType, currentFilters, setActiveFilter
         placeholder="Type your ingredient..."
         value={newFilter}
         onChangeText={(value) => setNewFilter(value)} />
-        <Button buttonStyle={styles.button} onPress={() => newFilter && addFilter(newFilter)}>
+        {filterType && <Button buttonStyle={styles.button} onPress={() => newFilter && addFilter(newFilter)}>
         <Icon
           name='plus'
           type='feather'
           iconStyle={styles.icon}
           size={22} />
-      </Button>
+      </Button>}
     </View>
     <Divider style={{ marginBottom: 10}} />
-
+    {filterType === 'allergens' ? (
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+          {allergens.map(a => (
+            <ListItem bottomDivider containerStyle={styles.listItem} key={a}>
+              <Avatar
+                size={32}
+                rounded
+                title={a[0].toUpperCase()}
+                containerStyle={{ backgroundColor: "purple" }} />
+              <ListItem.Content>
+                <ListItem.Title>{capitaliseFirstLetter(a)}</ListItem.Title>  
+              </ListItem.Content>
+              <CheckBox
+                key={a}
+                checked={false}
+                onPress={() => null}
+                containerStyle={styles.checkBoxContainer}
+              />
+            </ListItem>))}
+        </ScrollView>
+      ) : (
     <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
       {currentFilters?.map(f => <ListItem bottomDivider containerStyle={styles.listItem} key={f.value}>
         <Avatar
@@ -55,7 +77,7 @@ export function DietaryFilterModal({ filterType, currentFilters, setActiveFilter
               ? setActiveFilters(currentFilters.filter(filter => !(filter === f))) 
               : null} />
       </ListItem>)}
-    </ScrollView>
+    </ScrollView>)}
   </Overlay>
 }
 
@@ -108,7 +130,7 @@ const styles = StyleSheet.create({
     },
     listItem: {
       width: '100%',
-      backgroundColor: 'inherit',
+      backgroundColor: 'inherit'
     },
     scrollView: {
       maxHeight: 270,
@@ -116,5 +138,11 @@ const styles = StyleSheet.create({
     },
     scrollViewContent: {
       paddingBottom: 10,
+    },
+    checkBoxContainer: {
+      backgroundColor: 'transparent',
+      borderWidth: 0,
+      padding: 0,
+      margin: 0,
     },
   });

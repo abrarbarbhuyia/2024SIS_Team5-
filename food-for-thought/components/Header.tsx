@@ -14,7 +14,7 @@ export default function Header() {
     return (
         <View style={styles.container}>
             <Card containerStyle={styles.headerCard}>
-                <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 35, marginTop: 7 }}>
                         <Icon style={{ color: '#000000' }} name='user' type='evilicon' size={35} onPress={() => router.push('/login')}/>
                         <Text style={{ marginLeft: 8 }}>Nep</Text>
@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'row',
+        maxHeight: 150,
     },
     headerCard: {
         width: width - 32,

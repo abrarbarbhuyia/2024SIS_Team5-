@@ -2,16 +2,29 @@ import { router } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import axios from 'axios'; // Import axios for API requests
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = useCallback(() => {
-    if (username === 'Admin' && password === 'testpasswordnotreal') {
+  const handleLogin = useCallback(async () => {
+    try {
+      const response = await axios.post('http://localhost:4000/login', {
+        username,
+        password,
+      });
+
+      const { token } = response.data;
+
+      await AsyncStorage.setItem('token', token);
+
       Alert.alert('Login Successful', `Welcome ${username}!`);
-    } else {
-      Alert.alert('Login Failed', 'Invalid username or password. Try again.');
+
+      router.push('/register'); 
+    } catch (error) {
+      Alert.alert('Login Failed', error.message || 'Invalid username or password. Try again.');
     }
   }, [username, password]);
 
@@ -26,7 +39,7 @@ const Login = () => {
         </Text>
 
         <View style={styles.inputContainer}>
-          <Text style={[styles.label]}>
+          <Text style={styles.label}>
             Username
           </Text>
           <TextInput
@@ -38,7 +51,7 @@ const Login = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={[styles.label]}>
+          <Text style={styles.label}>
             Password
           </Text>
           <TextInput
@@ -59,6 +72,7 @@ const Login = () => {
 };
 
 const styles = StyleSheet.create({
+  // Same styles as before
   container: {
     flex: 1,
     justifyContent: 'center',

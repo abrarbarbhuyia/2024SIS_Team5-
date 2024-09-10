@@ -2,18 +2,31 @@ import { router } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import axios from 'axios'; // Import axios for API requests
 
 const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleRegister = useCallback(() => {
+  const handleRegister = useCallback(async () => {
     if (password !== confirmPassword) {
       Alert.alert('Registration Failed', 'Passwords do not match.');
       return;
     }
-    Alert.alert('Registration Successful', `Welcome ${username}!`);
+
+    try {
+      const response = await axios.post('http://localhost:4000/register', {
+        username,
+        password,
+      });
+
+      Alert.alert('Registration Successful', `Welcome ${username}!`);
+
+      router.push('/login');
+    } catch (error) {
+      Alert.alert('Registration Failed', error.message || 'Unable to register. Try again later.');
+    }
   }, [username, password, confirmPassword]);
 
   return (
@@ -67,6 +80,7 @@ const Register = () => {
 };
 
 const styles = StyleSheet.create({
+  // Same styles as before
   container: {
     flex: 1,
     justifyContent: 'center',

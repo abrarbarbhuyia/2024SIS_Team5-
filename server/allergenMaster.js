@@ -1,4 +1,4 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { callGeminiJSON } = require("./gemini");
 
 async function testSuggestic(query) {
   require("isomorphic-fetch");
@@ -44,18 +44,19 @@ async function testSuggestic(query) {
   }
 }
 
-async function testGemini(query) {
-  // Make sure to include these imports:
-  // import { GoogleGenerativeAI } from "@google/generative-ai";
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+// Takes in a menu string (from OCR) and converts it into a JSON list of menu items extracted from the string
+async function getMeals(query) {
+  const prompt = `In a JSON object response, provide seperate menu items based on the following menu string ${query}. Do not categorise the items at all, and ignore all other information.`
+  return callGeminiJSON(prompt);
+}
+
+// Takes in a query (menu) and returns a JSON Object that contains eaach ingredient and its associated allergens.
+async function getIngredientDetails(query) {
   const dietaryRequirements =
     "ALCOHOL_COCKTAIL,ALCOHOL,CELERY,CRUSTACEAN,DAIRY,DASH,EGG,FISH,FODMAP,GLUTEN,IMMUNO_SUPPORTIVE,KETO_FRIENDLY,KIDNEY_FRIENDLY,KOSHER,LOW_POTASSIUM,LOW_SUGAR,LUPINE,MEDITERRANEAN,MOLLUSK,MUSTARD,NO_OIL_ADDED,PALEO,PEANUT,PESCATARIAN,PORK,RED_MEAT,SESAME,SHELLFISH,SOY,SUGAR_CONSCIOUS,SULPHITE,TREE_NUT,VEGAN,VEGETARIAN,WHEAT";
 
   const prompt = `In only a JSON object response, provide the ingredients for ${query}, inside each ingredient, map a list of allergens to each ingredient. Given these allergens come from the following list ${dietaryRequirements}`;
-
-  const result = await model.generateContent(prompt);
-  console.log(result.response.text());
+  return callGeminiJSON(prompt);
 }
 
-module.exports = { testSuggestic, testGemini };
+module.exports = { testSuggestic, getIngredientDetails, getMeals };

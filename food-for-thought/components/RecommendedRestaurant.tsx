@@ -11,6 +11,7 @@ export default function RecommendedRestaurant() {
     const toggleFavourite = () => {
         setIsFavourite((prev) => !prev);
         console.log("favourited");
+        //store favourited restaurant
     };
 
     return (

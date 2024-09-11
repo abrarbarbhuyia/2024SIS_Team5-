@@ -27,6 +27,7 @@ export default function RecommendedRestaurant() {
                             type="entypo"
                             size={25}
                             onPress={toggleFavourite}
+                            color={isFavourite ? '#FCBE09' : 'black'}
                         />
                         <Text style={{ fontSize: 11, padding: 5 }}>
                             {isFavourite ? "Favourited!" : "Add to Favourites"}

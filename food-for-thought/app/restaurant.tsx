@@ -4,6 +4,8 @@ import { Card, Text } from '@rneui/themed';
 import React from "react";
 import { ButtonGroup } from "react-native-elements";
 import RestaurantGallery from "@/components/RestaurantGallery";
+import RestaurantDescription from "@/components/RestaurantDescription";
+import RestaurantMenu from "@/components/RestaurantMenu";
 
 export default function Restaurant() {
     //stuff
@@ -13,9 +15,9 @@ export default function Restaurant() {
     const renderContent = () => {
         switch (selectedIndex) {
             case 0:
-                return <MenuComponent />;
+                return <RestaurantMenu/>;
             case 1:
-                return <DescriptionComponent />;
+                return <RestaurantDescription/>;
             case 2:
                 return <RestaurantGallery/>;
             default:
@@ -39,7 +41,7 @@ export default function Restaurant() {
                     ]}
                     selectedIndex={selectedIndex}
                     onPress={setSelectedIndex}
-                    containerStyle={{flexGrow: 1, borderRadius: 16, borderWidth: 0, height: 50}}
+                    containerStyle={{borderTopStartRadius: 16, borderTopEndRadius: 16, borderWidth: 0, height: 50}}
                 />
                 <Card.Divider/>
                 {/* load in page component or sumn based on selected button? */}
@@ -49,19 +51,6 @@ export default function Restaurant() {
         </View>
     )
 }
-
-// Example components
-const MenuComponent = () => (
-    <View>
-        <Text>Menu Content</Text>
-    </View>
-);
-
-const DescriptionComponent = () => (
-    <View>
-        <Text>Description Content</Text>
-    </View>
-);
 
 const {width, height} = Dimensions.get('window');
 
@@ -84,6 +73,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FBF8FF',
         width: width - 32,
         padding: 2,
+        paddingTop: 0,
         borderRadius: 24,
         marginTop: 5,
         shadowOffset: {width: 0, height: 2},

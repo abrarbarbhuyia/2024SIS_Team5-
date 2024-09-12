@@ -30,6 +30,11 @@ async function deleteDoc(collType, query) {
   return await coll.deleteMany(query);
 }
 
+async function updateDoc(collType, query, docs) {
+  const db = client.db("SIS0");
+  const coll = db.collection(collType);
+  return await coll.updateMany(query, docs);
+}
 
 async function testConnection() {
   try{
@@ -61,6 +66,10 @@ module.exports = {
         case 'delete':
           result = await deleteDoc(collType, query);
           console.log('Delete Doc Result', result);
+          break;
+        case 'update':
+          result = await updateDoc(collType, query, docs);
+          console.log('Update Doc Result:', result);
           break;
         default:
           console.log("Invalid operation type.");

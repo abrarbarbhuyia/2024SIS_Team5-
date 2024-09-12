@@ -67,26 +67,36 @@ async function createMeals(body) {
   // access array by doing uperHeroes["members"][1]["powers"][2];
   const JSONbody = JSON.parse(body);
   const menuItems = JSONbody.menu_items;
-  console.log(body.menu_items);
+  console.log(menuItems);
 
   //Extract each menu item and post in a loop
-  menuItems.forEach(async (item) => {
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+  const axiosInstance = axios.create({
+    timeout: 10000, // Timeout in milliseconds
+});
+  console.log("Length of menu items: ", menuItems.length)
+  for (let i = 0; i < menuItems.length; i++) {
     const requestBody = {
-      mealId: 1,
-      name: item,
-      diet: ["test"],
-      menuId: 2,
+      mealId: i + 1,
+      name: menuItems[i],
+      // diet: ["test"],
+      // menuId: 2,
     };
     try {
-      const response = await axios.post(
-        process.env.BACKEND_URL + `/createMeal/`,
+      const response = await axiosInstance.post(
+        process.env.BACKEND_URL + `/meal/createMeal/`,
         requestBody
       );
       console.log("Create Meal Reponse: ", response.data);
+      // await delay(10000);
     } catch (error) {
       console.error(error);
     }
-  });
+  }
+  // menuItems.forEach(async (item) => {
+  // });
   // mealId: req.body.mealId, - we need to generate this
   // name: req.body.name, - we have this
   // diet: req.body.diet, - we can get this but it's inside of getIngredientDetails (maybe populate with an update?)

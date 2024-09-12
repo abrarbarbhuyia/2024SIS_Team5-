@@ -5,8 +5,11 @@ const port = 4000;
 const { testConnection } = require('./databaseMaster');
 const { getMenu } = require('./menu');
 const { testSuggestic, getIngredientDetails, getMeals, createMeals } = require('./allergenMaster');
+const mealRoutes = require('./routes/meal');
 
 app.use(cors());
+app.use(express.json());
+app.use('/meal', mealRoutes);
 
 app.get('/api/menu', async (req, res) => {
   try {

@@ -2,6 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/userModel');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
 
 router.post('/', [
     body('username').not().isEmpty().withMessage('Username is required'),
@@ -9,7 +10,7 @@ router.post('/', [
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        res.status(400).json({ errors: errors.array() });
     }
 
     const { username, password } = req.body;
@@ -17,13 +18,15 @@ router.post('/', [
     try {
         let user = await User.findOne({ username });
         if (user) {
-            return res.status(400).json({ message: 'User already exists' });
+            res.status(400).json({ message: `${username} already exists` });
         }
 
-        user = new User({ username, password });
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        user = new User({ username, password: hashedPassword });
         await user.save();
 
-        res.status(201).json({ message: 'User registered successfully' });
+        res.status(201).json({ message: `${username} registered successfully`});
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

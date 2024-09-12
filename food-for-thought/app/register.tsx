@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import axios from 'axios'; // Import axios for API requests
+import axios from 'axios';
 
 const Register = () => {
   const [username, setUsername] = useState('');

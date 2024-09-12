@@ -32,7 +32,7 @@ export default function Index() {
     <View style={styles.container}>
       <Header></Header>
       {/* Card for the Restaurant finder */}
-        {/* <TouchableOpacity onPress={() => router.push('/map')}>
+        <TouchableOpacity onPress={() => router.push('/map')}>
           <Card containerStyle={styles.finderCard}>
             <View style={{  }}>
               <SearchBar/>             
@@ -45,7 +45,7 @@ export default function Index() {
                 }}
               />
           </Card>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       {/* Card for recently visited Restaurants */}
       <Card containerStyle={styles.recentCard}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>

@@ -62,6 +62,12 @@ async function getIngredientDetails(query) {
   return callGeminiJSON(prompt);
 }
 
+//Takes in menu and restaurant Ids to create a menu object in the database
+async function createMenu(body) {
+  // Still not sure how this model fits into other areas 
+  const   
+}
+
 // Takes in the meals JSON object and creates the meals in the database
 async function createMeals(body) {
   // access array by doing uperHeroes["members"][1]["powers"][2];
@@ -69,14 +75,7 @@ async function createMeals(body) {
   const menuItems = JSONbody.menu_items;
   console.log(menuItems);
 
-  //Extract each menu item and post in a loop
-  function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-  const axiosInstance = axios.create({
-    timeout: 10000, // Timeout in milliseconds
-});
-  console.log("Length of menu items: ", menuItems.length)
+  //Extract each menu item in a loop, check if it exists. If not, post it. 
   for (let i = 0; i < menuItems.length; i++) {
     const requestBody = {
       mealId: i + 1,
@@ -84,15 +83,31 @@ async function createMeals(body) {
       // diet: ["test"],
       // menuId: 2,
     };
+
+    //Before posting, check if the menuItem already exists in the DB
     try {
-      const response = await axiosInstance.post(
+      const response = await axios.get(
+        process.env.BACKEND_URL + `/meal/getMealByName/${requestBody.name}`,
+        requestBody
+      );
+      //If it exists (Response array is longer than 1), do not post and continue to next iteration
+      if (response.data.length > 0) {
+        console.log("Menu item already exists: ", response.data);
+        continue;  
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+
+    //After checking, post menu items that do not already exist
+    try {
+      const response = await axios.post(
         process.env.BACKEND_URL + `/meal/createMeal/`,
         requestBody
       );
-      console.log("Create Meal Reponse: ", response.data);
-      // await delay(10000);
+      console.log("Created Menu Item: ", response.data);
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
     }
   }
   // menuItems.forEach(async (item) => {
@@ -104,3 +119,24 @@ async function createMeals(body) {
 }
 
 module.exports = { testSuggestic, getIngredientDetails, getMeals, createMeals };
+
+/*
+ Flow:
+  FRONTEND
+   1) User searches with filters
+  BACKEND
+   2) Check if restaurants exist in current location (hard coded) - If not call foursquare
+   3) Foursquare returns list of restaurants -> Save all the data to Restaurant Model
+   4) Check if restaurants have an associated menu object. 
+      a) If yes -> Assume menu, meals and ingredients already exist. END
+      b) If no -> Go to step 5
+   5) Create menu object with Foursquare restaurant id. --> createMenu function
+   6) Call Foursquare menu api with provided FSQid to retrieve menu image/s.
+      a) If menu found -> Run OCR on it
+      b) If no menu found -> Manual upload -> Run OCR on it
+   6) Call Gemini to clean up OCR into list of menuItems --> 
+   7) Check if menuItems exist in DB --> createMeals function
+      a) If yes -> Continue
+      b) If no -> Create menuItems that do not exist (With menu id)
+   8) 
+*/

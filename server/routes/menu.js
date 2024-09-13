@@ -52,7 +52,7 @@ router.get('/getMenuString/:restaurantId', async(req,res) => {
     
   
     try {
-        //retrieve menu images by calling foursquare's place photo request using the menu id
+        //retrieve menu images by calling foursquare's place photo request using the restaurant id
         const response = await axios.get(url, {
             headers: {
                 Authorization: `${process.env.FOURSQUARE_API_KEY}`
@@ -73,8 +73,8 @@ router.get('/getMenuString/:restaurantId', async(req,res) => {
               //check if the image is an menu
               const is_menu_flag = await isMenu(cleaned_string);
               if(is_menu_flag == true) {
-                //add translated text to the menu string
-                menu_string += cleaned_string;
+                //add translated text (with line breaks) to the menu string
+                menu_string += result.data.text;
               }
             }
         console.log(menu_string);
@@ -86,9 +86,9 @@ router.get('/getMenuString/:restaurantId', async(req,res) => {
 });
 
 async function isMenu(extractedText) {
-    const commonKeywords = ['appetizers', 'appetizer', 'appetiser', 'appetisers', 'main course', 'dessert',  'desserts', 'starter',  'starters',
+    const commonKeywords = ['appetizers', 'appetizer', 'appetiser', 'appetisers', 'main course', 'dessert',  'desserts', 'starter',  'starters', 'salad', 
                             'salads', 'drink', 'drinks', 'entree', 'entrees', 'side',  'sides', 'beverage', 'beverages', 'soup', 'soups', 'main',
-                            'mains', 'lunch', 'menu', 'vegetables',  'breakfast', 'seafood', 'meat', 'noodle', 'noodles'];
+                            'mains', 'lunch', 'menu', 'vegetable', 'vegetables',  'breakfast', 'seafood', 'meat', 'chicken', 'fish', 'noodle', 'noodles'];
     
     // Regular expression for price pattern
     const pricePattern = /\d+(\.\d{2})?/g;

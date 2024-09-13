@@ -45,8 +45,8 @@ router.delete('/deleteFavourite/:menuId', async (req, res) => {
     }
 });
 
-router.get('/getMenuString/:menuId', async(req,res) => {
-    const placeId = req.params.menuId;
+router.get('/getMenuString/:restaurantId', async(req,res) => {
+    const placeId = req.params.restaurantId;
     //const placeId = '4e4a1510483b16676e3a760f';
     const url = `https://api.foursquare.com/v3/places/${placeId}/photos?classifications=menu`;
     

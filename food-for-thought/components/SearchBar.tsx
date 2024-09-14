@@ -34,7 +34,13 @@ return (
       placeholder={placeholder}
       onChangeText={updateSearch}
       value={search}
-      lightTheme={true}
+      searchIcon={{color: '#28005D'}}
+      placeholderTextColor='#CAC4D0'
+      round={true}
+      containerStyle={styles.searchBarContainer}
+      inputContainerStyle={styles.inputContainer}
+      inputStyle={styles.input}
+      platform="default"
     />
   </View>
 );
@@ -43,6 +49,22 @@ return (
 const styles = StyleSheet.create({
   view: {
     margin: 5,
+  },
+  searchBarContainer: {
+    backgroundColor: 'transparent', // remove default component background
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+  },
+  inputContainer: {
+    backgroundColor: '#F5F5F5', // change background of input container
+    borderColor: '#E6D7FA',
+    borderWidth: 1,
+    alignContent: 'center',
+    borderBottomWidth: 1,
+  },
+  input: {
+    fontFamily: 'Roboto',
+    fontSize: 18, // placeholder font size
   },
 });
 

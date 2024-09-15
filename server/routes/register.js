@@ -10,7 +10,7 @@ router.post('/', [
 ], async (req, res) => {
     const validationFailures = validationResult(req);
     if (!validationFailures.isEmpty()) {
-        return res.status(400).json({ validationFailures: validationFailures.array() });
+        return res.status(400).json({ message: validationFailures.array() });
     }
 
     const { username, password } = req.body;

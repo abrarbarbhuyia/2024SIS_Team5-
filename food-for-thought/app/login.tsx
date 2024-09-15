@@ -4,6 +4,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } fro
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { HOST_IP } from '@env';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -11,20 +12,12 @@ const Login = () => {
 
   const handleLogin = useCallback(async () => {
     try {
-      const response = await axios.post('http://localhost:4000/login', {
-        username,
-        password,
-      });
-
-      const { token } = response.data;
-
-      await AsyncStorage.setItem('token', token);
-
+      const response = await axios.post(`http://${HOST_IP}:4000/login`, { username, password });
+      await AsyncStorage.setItem('token', response.data.token);
       Alert.alert('Login Successful', `Welcome ${username}!`);
-
-      router.push('/register'); 
-    } catch (error) {
-      Alert.alert('Login Failed', error.message || 'Invalid username or password. Try again.');
+      router.push('/'); 
+    } catch (error: any) {
+      Alert.alert('Login Failed', error.response.data.message || 'Invalid username or password. Try again.');
     }
   }, [username, password]);
 
@@ -72,7 +65,6 @@ const Login = () => {
 };
 
 const styles = StyleSheet.create({
-  // Same styles as before
   container: {
     flex: 1,
     justifyContent: 'center',

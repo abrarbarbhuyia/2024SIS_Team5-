@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, Button, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Button, Dimensions, ScrollView } from 'react-native';
 import {
   BottomSheetModal,
   BottomSheetView,
@@ -43,25 +43,27 @@ const Map = () => {
                 type='font-awesome'
                 iconStyle={styles.icon}
                 size={20} />
-                {activeFilters.length > 0 ? activeFilters.map(f => <Badge 
-                  badgeStyle={{ 
-                    ...styles.filterBackground, 
-                    backgroundColor: filterColours[f.type]?.fill ?? 'white', 
-                    borderColor: filterColours[f.type]?.border ?? 'white'}}
-                  textStyle={styles.filterText}
-                  key={`${f.type}-${f.value}`}
-                  value={
-                    <Text style={styles.filterText}>
-                      {capitaliseFirstLetter(f.value)}
-                      <Icon
-                        name='x'
-                        type='feather'
-                        iconStyle={styles.badgesCross}
-                        size={15}
-                        onPress={() => activeFilters.length > 0 
-                          ? setActiveFilters(activeFilters.filter(filter => !(filter === f))) 
-                          : null} />
-                    </Text>} />) : <Text style={{color: 'grey', fontSize: 12, paddingTop: 5}}>No filters set</Text>}
+                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.badgeScrollView}>
+                  {activeFilters.length > 0 ? activeFilters.map(f => <Badge 
+                    badgeStyle={{ 
+                      ...styles.filterBackground, 
+                      backgroundColor: filterColours[f.type]?.fill ?? 'white', 
+                      borderColor: filterColours[f.type]?.border ?? 'white'}}
+                    textStyle={styles.filterText}
+                    key={`${f.type}-${f.value}`}
+                    value={
+                      <Text style={styles.filterText}>
+                        {capitaliseFirstLetter(f.value)}
+                        <Icon
+                          name='x'
+                          type='feather'
+                          iconStyle={styles.badgesCross}
+                          size={15}
+                          onPress={() => activeFilters.length > 0 
+                            ? setActiveFilters(activeFilters.filter(filter => !(filter === f))) 
+                            : null} />
+                    </Text>} />) : <Text style={{color: 'grey', fontSize: 12, paddingTop: 5}}>No filters set</Text>} 
+                  </ScrollView>
             </View>
             <View style={{...styles.flexContainer, paddingHorizontal: 8}}>
               {filterTypes.map(f =>
@@ -152,7 +154,7 @@ const styles = StyleSheet.create({
     gap: 4,
     height: 20,
     minHeight: 30,
-    width: '100%'
+    width: '100%',
 
   },
   typesBackground: {
@@ -162,7 +164,7 @@ const styles = StyleSheet.create({
     paddingRight: 4,
     borderStyle: 'solid',
     borderColor: '#79747E',  
-    width: 85
+    width: 85,
   },
   typesText: {
     color: '#281554',
@@ -186,16 +188,20 @@ const styles = StyleSheet.create({
     color: '#DADADA',
     paddingLeft: 4,
     height: 12,
-    width: 20
+    width: 20,
   },
   card: {
     backgroundColor: '#FBF8FF',
     padding: 20,
-    borderRadius: 20
+    borderRadius: 20,
   },
   icon: {
     color:'#534072',
     paddingHorizontal: 8,
+  },
+  badgeScrollView: {
+    flexDirection: 'row',
+    gap: 4,
   },
 });
 

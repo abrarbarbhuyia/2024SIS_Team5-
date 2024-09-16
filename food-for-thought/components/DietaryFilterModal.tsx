@@ -12,11 +12,21 @@ export type DietaryFilterProps = {
 
 export function DietaryFilterModal({ filterType, currentFilters, setActiveFilters, setShowModal, ...rest }: DietaryFilterProps) {
   const [newFilter, setNewFilter] = React.useState<string>();
-  const allergens = ['egg', 'fish', 'crustaceans', 'nuts', 'milk', 'peanut', 'sesame', 'soy', 'wheat', 'lupin'];
+  const allergens = ['nuts', 'eggs', 'soy', 'crustaceans', 'fish',  'milk', 'peanuts', 'sesame', 'wheat', 'lupin'];
+  const diets = ['vegetarian', 'vegan', 'halal', 'gluten-free', 'keto', 'fodmap', 'lactose-free', 'low-sugar', 'pescatarian'];
+  const cuisines = ['thai', 'indian', 'italian', 'chinese', 'japanese', 'mexican', 'korean', 'french', 'greek', 'turkish', 'vietnamese'];
+
 
   function addFilter(value: string) {
     if (value === null) return;
-    setActiveFilters(currentFilters ? currentFilters.concat([{ type: filterType, value: value }]) : [{ type: filterType, value: value }])
+    const formattedValue = value.trim().toLowerCase();
+    if (currentFilters.length > 0) {
+      !(currentFilters.find(cur => (cur.type === filterType) && (cur.value === formattedValue)))
+      ? setActiveFilters(currentFilters.concat([{ type: filterType, value: formattedValue }])) 
+      : null;
+    } else {
+      setActiveFilters([{ type: filterType, value: formattedValue }]);
+    }
     setNewFilter(undefined);
     return;
   }
@@ -37,47 +47,86 @@ export function DietaryFilterModal({ filterType, currentFilters, setActiveFilter
       </Button>}
     </View>
     <Divider style={{ marginBottom: 10}} />
-    {filterType === 'allergens' ? (
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
-          {allergens.map(a => (
-            <ListItem bottomDivider containerStyle={styles.listItem} key={a}>
-              <Avatar
-                size={32}
-                rounded
-                title={a[0].toUpperCase()}
-                containerStyle={{ backgroundColor: "purple" }} />
-              <ListItem.Content>
-                <ListItem.Title>{capitaliseFirstLetter(a)}</ListItem.Title>  
-              </ListItem.Content>
-              <CheckBox
-                key={a}
-                checked={false}
-                onPress={() => null}
-                containerStyle={styles.checkBoxContainer}
-              />
-            </ListItem>))}
-        </ScrollView>
-      ) : (
-    <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
-      {currentFilters?.map(f => <ListItem bottomDivider containerStyle={styles.listItem} key={f.value}>
-        <Avatar
-          size={32}
-          rounded
-          title={f.value[0].toUpperCase()}
-          containerStyle={{ backgroundColor: "purple" }} />
-        <ListItem.Content>
-          <ListItem.Title>{f.value}</ListItem.Title>  
-        </ListItem.Content>
-        <Icon
-            name='x'
-            type='feather'
-            iconStyle={styles.badgesCross}
-            size={20}
-            onPress={() => currentFilters.length > 0 
-              ? setActiveFilters(currentFilters.filter(filter => !(filter === f))) 
-              : null} />
-      </ListItem>)}
-    </ScrollView>)}
+    {filterType === 'allergens' ? 
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+        {allergens.map(a => (
+          <ListItem bottomDivider containerStyle={styles.listItem} key={a}>
+            <Avatar
+              size={32}
+              rounded
+              title={a[0].toUpperCase()}
+              containerStyle={{ backgroundColor: "purple" }} />
+            <ListItem.Content>
+              <ListItem.Title>{capitaliseFirstLetter(a)}</ListItem.Title>  
+            </ListItem.Content>
+            <CheckBox
+              key={a}
+              checked={false}
+              onPress={() => null}
+              containerStyle={styles.checkBoxContainer}
+            />
+          </ListItem>))}
+      </ScrollView>
+      : filterType === 'diets' ? 
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+        {diets.map(a => (
+          <ListItem bottomDivider containerStyle={styles.listItem} key={a}>
+            <Avatar
+              size={32}
+              rounded
+              title={a[0].toUpperCase()}
+              containerStyle={{ backgroundColor: "purple" }} />
+            <ListItem.Content>
+              <ListItem.Title>{capitaliseFirstLetter(a)}</ListItem.Title>  
+            </ListItem.Content>
+            <CheckBox
+              key={a}
+              checked={false}
+              onPress={() => null}
+              containerStyle={styles.checkBoxContainer}
+            />
+          </ListItem>))}
+      </ScrollView>
+      : filterType === 'cuisine' ? 
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+        {cuisines.map(a => (
+          <ListItem bottomDivider containerStyle={styles.listItem} key={a}>
+            <Avatar
+              size={32}
+              rounded
+              title={a[0].toUpperCase()}
+              containerStyle={{ backgroundColor: "purple" }} />
+            <ListItem.Content>
+              <ListItem.Title>{capitaliseFirstLetter(a)}</ListItem.Title>  
+            </ListItem.Content>
+            <CheckBox
+              key={a}
+              checked={false}
+              onPress={() => null}
+              containerStyle={styles.checkBoxContainer}
+            />
+          </ListItem>))}
+      </ScrollView>
+      : <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+        {currentFilters?.map(f => <ListItem bottomDivider containerStyle={styles.listItem} key={f.value}>
+          <Avatar
+            size={32}
+            rounded
+            title={f.value[0].toUpperCase()}
+            containerStyle={{ backgroundColor: "purple" }} />
+          <ListItem.Content>
+            <ListItem.Title>{capitaliseFirstLetter(f.value)}</ListItem.Title>  
+          </ListItem.Content>
+          <Icon
+              name='x'
+              type='feather'
+              iconStyle={styles.badgesCross}
+              size={20}
+              onPress={() => currentFilters.length > 0 
+                ? setActiveFilters(currentFilters.filter(filter => !(filter === f))) 
+                : null} />
+        </ListItem>)}
+      </ScrollView>}
   </Overlay>
 }
 

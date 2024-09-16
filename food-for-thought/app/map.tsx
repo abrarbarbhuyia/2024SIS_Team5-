@@ -10,6 +10,7 @@ import { Badge, Card, Icon } from "@rneui/themed";
 import { useState } from "react";
 import { DietaryFilterModal } from '@/components/DietaryFilterModal';
 import Header from '@/components/Header';
+import { capitaliseFirstLetter } from '@/utils';
 
 const Map = () => {
   const [filterType, setFilterType] = useState<string | undefined>();
@@ -110,10 +111,6 @@ const Map = () => {
   );
 };
 
-export function capitaliseFirstLetter(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 const filterColours: {[key: string]: {fill: string, border: string}} = {
   'diets': { fill: '#FFE7DC', border: '#FEBFAC' },
   'allergens': { fill: '#F3D9FF', border: '#D59CEF' },
@@ -180,12 +177,12 @@ const styles = StyleSheet.create({
   },
   filterText: {
     color: '#281554',
-    fontWeight: '500',
-    fontSize: 10,
+    fontWeight: '300',
+    fontSize: 12,
     textAlign: 'center',
   },
   badgesCross: {
-    color: '#DADADA',
+    color: '#BCBCBC',
     paddingLeft: 4,
     height: 12,
     width: 20,

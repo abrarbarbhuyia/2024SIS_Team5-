@@ -3,13 +3,12 @@ const cors = require('cors');
 const app = express();
 const port = 4000;
 const { testConnection } = require('./databaseMaster');
-const { getMenu } = require('./menu');
-const { testSuggestic, getIngredientDetails, getMeals, createMeals, createMenu, createIngredient, createMealIngredient } = require('./allergenMaster');
+const { testSuggestic, getIngredientDetails, getMeals, createMeals, createMenu, createIngredient, createMealIngredient, getMenuImage } = require('./allergenMaster');
 const mealRoutes = require('./routes/meal');
 const menuRoutes = require('./routes/menu');
 const ingredientRoutes = require('./routes/ingredient');
 const mealIngredientRoutes = require('./routes/mealIngredient');
-const { runTests } = require('./allergenTest');
+// const { runTests } = require('./allergenTest');
 
 app.use(cors());
 app.use(express.json());

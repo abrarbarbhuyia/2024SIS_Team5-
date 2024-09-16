@@ -48,8 +48,23 @@ async function testSuggestic(query) {
 }
 
 // Takes in a menu string (from OCR) and converts it into a JSON list of menu items extracted from the string
+async function getMenuImage(fsqId) {
+  // temp hard coded id
+  const fsqIdTemp = '4e4a1510483b16676e3a760f';
+  try {
+    const response = await axios.get(
+      process.env.BACKEND_URL + `/menu/getMenuString/${fsqIdTemp}`
+    );
+    console.log("Menu String: ", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(error.message);
+  }  
+}
+
+// Takes in a menu string (from OCR) and converts it into a JSON list of menu items extracted from the string
 async function getMeals(query) {
-  const prompt = `In a JSON object response, provide seperate menu items based on the following menu string ${query}. Do not categorise the items at all, and ignore all other information. The different menu items should be under "menu_items". Do not include your answer inside a string, just a JSON Code block.`;
+  const prompt = `In a JSON object response, provide seperate menu items based on the following menu string ${query}. This is from an OCR reading, do your best to extract actual menu items from this OCR string. Do not categorise the items at all, and ignore all other information. The different menu items should be under "menu_items". Do not include your answer inside a string, just a JSON Code block.`;
   return callGeminiJSON(prompt);
 }
 
@@ -58,7 +73,7 @@ async function getIngredientDetails(query) {
   const dietaryRequirements =
     "ALCOHOL_COCKTAIL,ALCOHOL,CELERY,CRUSTACEAN,DAIRY,DASH,EGG,FISH,FODMAP,GLUTEN,IMMUNO_SUPPORTIVE,KETO_FRIENDLY,KIDNEY_FRIENDLY,KOSHER,LOW_POTASSIUM,LOW_SUGAR,LUPINE,MEDITERRANEAN,MOLLUSK,MUSTARD,NO_OIL_ADDED,PALEO,PEANUT,PESCATARIAN,PORK,RED_MEAT,SESAME,SHELLFISH,SOY,SUGAR_CONSCIOUS,SULPHITE,TREE_NUT,VEGAN,VEGETARIAN,WHEAT";
 
-  const prompt = `In only a JSON object response, provide the ingredients for ${query}, inside each ingredient, map a list of allergens to each ingredient. Given these allergens come from the following list ${dietaryRequirements}. Do not include your answer inside a string, just a JSON Code block.`;
+  const prompt = `In only a JSON object response, provide the ingredients for ${query}, inside each ingredient, map a list of allergens to each ingredient. Given these allergens come from the following list ${dietaryRequirements}. Do not include your answer inside a string, just a JSON Code block. Be very accurate with the ingredients you list, ensuring to take inspiration from the dish name. Do not list the amount of ingredients, simply identify them.`;
   return callGeminiJSON(prompt);
 }
 
@@ -210,7 +225,7 @@ async function createMealIngredient(body) {
   }
 }
 
-module.exports = { testSuggestic, getIngredientDetails, getMeals, createMeals, createMenu, createIngredient, createMealIngredient };
+module.exports = { testSuggestic, getIngredientDetails, getMeals, createMeals, createMenu, createIngredient, createMealIngredient, getMenuImage };
 
 /*
  Flow:
@@ -226,13 +241,13 @@ module.exports = { testSuggestic, getIngredientDetails, getMeals, createMeals, c
    6) Call Foursquare menu api with provided FSQid to retrieve menu image/s.
       a) If menu found -> Run OCR on it
       b) If no menu found -> Manual upload -> Run OCR on it
-   6) Call Gemini to clean up OCR into list of menuItems --> getMeals function
-   7) Check if menuItems exist in DB --> createMeals function
+   7) Call Gemini to clean up OCR into list of menuItems --> getMeals function
+   8) Check if menuItems exist in DB --> createMeals function
       a) If yes -> Continue
       b) If no -> Create menuItems that do not exist (With menu id)
-   8) For each menuItem, get the list of ingredients from Gemini --> getIngredientDetails
-   9) Check if ingredients exist in DB --> createIngredients function
+   9) For each menuItem, get the list of ingredients from Gemini --> getIngredientDetails
+   10) Check if ingredients exist in DB --> createIngredients function
       a) If yes -> Continue
       b) If no -> Create ingredients that do not exist
-   10) Create mealIngredient (with corresponding meal and ingredient ids) - needs to be integrated when we start geenrating IDs.
+   11) Create mealIngredient (with corresponding meal and ingredient ids) - needs to be integrated when we start geenrating IDs.
 */

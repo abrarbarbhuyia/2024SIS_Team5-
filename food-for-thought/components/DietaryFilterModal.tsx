@@ -5,9 +5,10 @@ import * as React from "react";
 export type DietaryFilterProps = {
     setShowModal: React.Dispatch<React.SetStateAction<string | undefined>>,
     filterType: string,
+    onAddFilter: (filter: {type: string, value: string}) => void;
   };
 
-export function DietaryFilterModal({ filterType, setShowModal, ...rest }: DietaryFilterProps) {
+export function DietaryFilterModal({ filterType, setShowModal, onAddFilter,...rest }: DietaryFilterProps) {
   const [filters, setFilters] = React.useState<{type: string, value: string}[]>();
   const [newFilter, setNewFilter] = React.useState<string>();
 
@@ -15,6 +16,8 @@ export function DietaryFilterModal({ filterType, setShowModal, ...rest }: Dietar
     if (value === null) return;
     setFilters(filters ? filters.concat([{ type: filterType, value: value }]) : [{ type: filterType, value: value }]);
     setNewFilter(undefined);
+    console.log(filterType);
+    onAddFilter({ type: filterType, value: value }); 
     return;
   }
   return <Overlay overlayStyle={styles.modal} isVisible={true}

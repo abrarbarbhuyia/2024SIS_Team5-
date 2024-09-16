@@ -15,10 +15,14 @@ import { HOST_IP } from '@env';
 const Map = () => {
   const [filterType, setFilterType] = useState<string | undefined>();
   const [activeFilters, setActiveFilters] = useState<{ type: string, value: string }[]>([]);
-  const [restaurants, setRestaurants] = useState<any[]>([]); // Stores the fetched restaurant data
+  const [restaurants, setRestaurants] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const filterTypes = ['diets', 'allergens', 'ingredients', 'cuisine'];
+  const handleAddFilter = (newFilter: { type: string, value: string }) => {
+    setActiveFilters(prevFilters => [...prevFilters, newFilter]);
+  };
+
+  const filterTypes = ['diets', 'allergens', 'ingredients'];
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -36,14 +40,15 @@ const Map = () => {
     try {
       const response = await axios.get(`http://${HOST_IP}:4000/search`, {
         params: {
-          ingredientFilter: searchTerm,
-          allergens: activeFilters.filter(f => f.type === 'allergen').map(f => f.value),
-          diets: activeFilters.filter(f => f.type === 'diet').map(f => f.value),
+          ingredientFilter: activeFilters?.filter(f => f.type === 'ingredients').map(f => f.value) || [],
+          allergensFilter: activeFilters?.filter(f => f.type === 'allergens').map(f => f.value) || [],
+          dietsFilter: activeFilters?.filter(f => f.type === 'diets').map(f => f.value) || [],
         },
       });
+      console.log(response)
       setRestaurants(response.data);
-    } catch (error) {
-      console.error('Error fetching restaurants:', error);
+    } catch (error: any) {
+      console.error(error.response.data?.message || 'Error searching resturants. Try again.');
     }
   };
 
@@ -113,7 +118,7 @@ const Map = () => {
           />
         </View>
       </View>
-      {filterType && <DietaryFilterModal filterType={filterType} setShowModal={setFilterType} />}
+      {filterType && <DietaryFilterModal filterType={filterType} setShowModal={setFilterType} onAddFilter={handleAddFilter}  />}
     </BottomSheetModalProvider>
   );
 };
@@ -123,10 +128,9 @@ function capitaliseFirstLetter(string: string) {
 }
 
 const filterColours: { [key: string]: { fill: string, border: string } } = {
-  'diet': { fill: '#FFE7DC', border: '#FEBFAC' },
-  'allergen': { fill: '#F3D9FF', border: '#D59CEF' },
-  'ingredient': { fill: '#E4EDFF', border: '#A8C1F3' },
-  'cuisine': { fill: '#E7FFE7', border: '#B1F6B1' },
+  'diets': { fill: '#FFE7DC', border: '#FEBFAC' },
+  'allergens': { fill: '#F3D9FF', border: '#D59CEF' },
+  'ingredients': { fill: '#E4EDFF', border: '#A8C1F3' },
   'selected': { fill: '#E8DEF8', border: '#BDB0CA' }
 };
 

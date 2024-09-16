@@ -4,12 +4,12 @@ const databaseMaster = require('../databaseMaster');
 
 router.get('/', async (req, res) => {
     try {
-        const ingredientFilter = req.query.ingredientFilter;
+        const ingredientFilter = req.query.ingredientFilter || [];
         const allergensFilter = req.query.allergens || [];
         const dietsFilter = req.query.diets || [];
 
         let ingredientQuery = {
-            name: { $regex: ingredientFilter, $options: 'i' } // construct core query for ingredients - "name" will always return
+            name: { $regex: ingredientFilter.join('|'), $options: 'i' }  // construct core query for ingredients - "name" will always return
         };
 
         if (allergensFilter.length > 0) { // only add the allergens filter if it's not empty
@@ -52,7 +52,7 @@ router.get('/', async (req, res) => {
         res.json(restaurantResults);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ message: error.message || 'Internal Server Error' });
     }
 });
 

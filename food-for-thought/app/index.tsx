@@ -35,7 +35,9 @@ export default function Index() {
         <TouchableOpacity onPress={() => router.push('/map')}>
           <Card containerStyle={styles.finderCard}>
             <View style={{  }}>
-              <SearchBar/>             
+              <SearchBar onSearch={function (searchTerm: string): void {
+              throw new Error("Function not implemented.");
+            } }/>             
             </View>
             <Card.Image
                 style={{ padding: 0, height: 100 }}

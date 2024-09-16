@@ -4,7 +4,7 @@ import { View, StyleSheet } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 
 type SearchBarComponentProps = {
-  onSearch: (searchTerm: string) => void; // Pass a callback to trigger search in the parent component
+  onSearch: (searchTerm: string) => void;
 };
 
 const SearchBarComponent: React.FunctionComponent<SearchBarComponentProps> = ({ onSearch }) => {
@@ -26,7 +26,7 @@ const SearchBarComponent: React.FunctionComponent<SearchBarComponentProps> = ({ 
 
   const updateSearch = (search: string) => {
     setSearch(search);
-    onSearch(search);  // Trigger the API search with the updated term
+    onSearch(search);
   };
 
   return (

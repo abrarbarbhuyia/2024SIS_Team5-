@@ -3,6 +3,8 @@ const router = express.Router();
 const Meal = require('../models/mealModel');
 const databaseMaster = require('../databaseMaster');
 
+const { v4: uuidv4 } = require('uuid');
+
 /* Get all meals from a menuId */
 router.get('/getMealByMenuId/:menuId', async (req, res) => {
     try {
@@ -58,8 +60,10 @@ router.get('/getDiets/:mealId', async (req, res) => {
 /* Create a meal */
 router.post('/createMeal', async (req, res) => {
     try {
+        const mealId = uuidv4();
+
         const meal = new Meal({
-            mealId: req.body.mealId,
+            mealId: mealId,
             name: req.body.name,
             diet: req.body.diet,
             menuId: req.body.menuId

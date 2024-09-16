@@ -9,7 +9,8 @@
     "isomorphic-fetch": "^3.0.0",
     "mongodb": "^6.8.0",
     "mongoose": "^8.6.2",
-    "node-fetch": "^2.7.0"
+    "node-fetch": "^2.7.0",
+    "uuid": "^10.0.0"
   },
   "name": "server",
   "version": "1.0.0",

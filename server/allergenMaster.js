@@ -65,12 +65,29 @@ async function getIngredientDetails(query) {
 //Takes in menu and restaurant Ids to create a menu object in the database
 async function createMenu(body) {
   // Still not sure how this model fits into other areas 
-  const   
+  
+  // Need to get restaurant ID from foursquare
+  const restaurantId = "1"
+  //Need to also check if a menu exists by looking at restaurant ids first
+
+  const requestBody = {
+    restaurantId: restaurantId,
+    menuString: body,
+  }
+
+  try {
+    const response = await axios.post(
+      process.env.BACKEND_URL + `/menu/createMenu/`,
+      requestBody
+    );
+    console.log("Created Menu: ", response.data);
+  } catch (error) {
+    console.error(error.message);
+  }
 }
 
 // Takes in the meals JSON object and creates the meals in the database
 async function createMeals(body) {
-  // access array by doing uperHeroes["members"][1]["powers"][2];
   const JSONbody = JSON.parse(body);
   const menuItems = JSONbody.menu_items;
   console.log(menuItems);
@@ -78,7 +95,6 @@ async function createMeals(body) {
   //Extract each menu item in a loop, check if it exists. If not, post it. 
   for (let i = 0; i < menuItems.length; i++) {
     const requestBody = {
-      mealId: i + 1,
       name: menuItems[i],
       // diet: ["test"],
       // menuId: 2,
@@ -117,15 +133,91 @@ async function createMeals(body) {
   // diet: req.body.diet, - we can get this but it's inside of getIngredientDetails (maybe populate with an update?)
   // menuId: req.body.menuId - we need to generate this or get thiss
 }
+// Takes in ingredient name and allergens and creates the ingredient in the database
+async function createIngredient(body) {
+  const JSONbody = JSON.parse(body);
+  const ingredients = JSONbody.ingredients;
+  console.log(ingredients);
 
-module.exports = { testSuggestic, getIngredientDetails, getMeals, createMeals };
+  for (let i = 0; i < ingredients.length; i++) {
+    const requestBody = {
+      // ingredientId: "1",
+      name: ingredients[i].name,
+      allergens: ingredients[i].allergens
+    };
+
+    //Before posting, check if the ingredient already exists in the DB
+    try {
+      const response = await axios.get(
+        process.env.BACKEND_URL + `/ingredient/getIngredientByName/${requestBody.name}`,
+        requestBody
+      );
+      //If it exists (Response array is longer than 1), do not post and continue to next iteration
+      if (response.data.length > 0) {
+        console.log("Ingredient item already exists: ", response.data);
+        continue;  
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+
+    //After checking, post ingredients that do not already exist
+    try {
+      const response = await axios.post(
+        process.env.BACKEND_URL + `/ingredient/createIngredient/`,
+        requestBody
+      );
+      console.log("Created Ingredient Item: ", response.data);
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+}
+
+// After front-end is developed, this function will be called
+async function createMealIngredient(body) {
+  const mealId = body.mealId;
+  const ingredientId = body.ingredientId;
+
+  const requestBody = {
+    mealId: mealId,
+    ingredientId: ingredientId
+  };
+
+  //Before posting, check if the meal ingredient already exists in the DB
+  try {
+    const response = await axios.get(
+      process.env.BACKEND_URL + `/mealIngredient/getMealIngredient/${requestBody.mealid}`,
+      requestBody
+    );
+    //If it exists (Response array is longer than 1), do not post and continue to next iteration
+    if (response.data.length > 0) {
+      console.log("MealIngredient item already exists: ", response.data);
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+
+  //After checking, post meal ingredients that do not already exist
+  try {
+    const response = await axios.post(
+      process.env.BACKEND_URL + `/mealIngredient/createMealIngredient/`,
+      requestBody
+    );
+    console.log("Created MealIngredient Item: ", response.data);
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+module.exports = { testSuggestic, getIngredientDetails, getMeals, createMeals, createMenu, createIngredient, createMealIngredient };
 
 /*
  Flow:
   FRONTEND
    1) User searches with filters
   BACKEND
-   2) Check if restaurants exist in current location (hard coded) - If not call foursquare
+   2) Check if restaurants exist in current location (hard coded) - If not call foursquare API
    3) Foursquare returns list of restaurants -> Save all the data to Restaurant Model
    4) Check if restaurants have an associated menu object. 
       a) If yes -> Assume menu, meals and ingredients already exist. END
@@ -134,9 +226,13 @@ module.exports = { testSuggestic, getIngredientDetails, getMeals, createMeals };
    6) Call Foursquare menu api with provided FSQid to retrieve menu image/s.
       a) If menu found -> Run OCR on it
       b) If no menu found -> Manual upload -> Run OCR on it
-   6) Call Gemini to clean up OCR into list of menuItems --> 
+   6) Call Gemini to clean up OCR into list of menuItems --> getMeals function
    7) Check if menuItems exist in DB --> createMeals function
       a) If yes -> Continue
       b) If no -> Create menuItems that do not exist (With menu id)
-   8) 
+   8) For each menuItem, get the list of ingredients from Gemini --> getIngredientDetails
+   9) Check if ingredients exist in DB --> createIngredients function
+      a) If yes -> Continue
+      b) If no -> Create ingredients that do not exist
+   10) Create mealIngredient (with corresponding meal and ingredient ids) - needs to be integrated when we start geenrating IDs.
 */

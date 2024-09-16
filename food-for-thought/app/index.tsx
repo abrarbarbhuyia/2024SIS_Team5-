@@ -4,7 +4,7 @@ import { Button, Card, Text, Icon } from '@rneui/themed';
 import SearchBar from "@/components/SearchBar";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Header from "@/components/Header";     
-import pic from '../assets/images/react-logo.png';        
+import pic from '../assets/images/react-logo.png';    
 
         //mock data images for carousel
 const carouselData = [

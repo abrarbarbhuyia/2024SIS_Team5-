@@ -11,16 +11,13 @@ import { DietaryFilterModal } from '@/components/DietaryFilterModal';
 import Header from '@/components/Header';
 import axios from 'axios';
 import { HOST_IP } from '@env';
+import { capitaliseFirstLetter } from '@/utils';
 
 const Map = () => {
   const [filterType, setFilterType] = useState<string | undefined>();
   const [activeFilters, setActiveFilters] = useState<{ type: string, value: string }[]>([]);
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
-
-  const handleAddFilter = (newFilter: { type: string, value: string }) => {
-    setActiveFilters(prevFilters => [...prevFilters, newFilter]);
-  };
 
   const filterTypes = ['diets', 'allergens', 'ingredients'];
 
@@ -41,11 +38,11 @@ const Map = () => {
       const response = await axios.get(`http://${HOST_IP}:4000/search`, {
         params: {
           ingredientFilter: activeFilters?.filter(f => f.type === 'ingredients').map(f => f.value) || [],
-          allergensFilter: activeFilters?.filter(f => f.type === 'allergens').map(f => f.value) || [],
-          dietsFilter: activeFilters?.filter(f => f.type === 'diets').map(f => f.value) || [],
+          allergens: activeFilters?.filter(f => f.type === 'allergens').map(f => f.value) || [],
+          diets: activeFilters?.filter(f => f.type === 'diets').map(f => f.value) || [],
+          searchQuery: searchTerm
         },
       });
-      console.log(response)
       setRestaurants(response.data);
     } catch (error: any) {
       console.error(error.response.data?.message || 'Error searching resturants. Try again.');
@@ -118,14 +115,14 @@ const Map = () => {
           />
         </View>
       </View>
-      {filterType && <DietaryFilterModal filterType={filterType} setShowModal={setFilterType} onAddFilter={handleAddFilter}  />}
+      {filterType && <DietaryFilterModal 
+        filterType={filterType} 
+        currentFilters={activeFilters}
+        setShowModal={setFilterType} 
+        setActiveFilters={setActiveFilters} />}
     </BottomSheetModalProvider>
   );
 };
-
-function capitaliseFirstLetter(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
 
 const filterColours: { [key: string]: { fill: string, border: string } } = {
   'diets': { fill: '#FFE7DC', border: '#FEBFAC' },

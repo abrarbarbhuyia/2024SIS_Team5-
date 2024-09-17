@@ -7,9 +7,10 @@ router.get('/', async (req, res) => {
         const ingredientFilter = req.query.ingredientFilter || [];
         const allergensFilter = req.query.allergens || [];
         const dietsFilter = req.query.diets || [];
+        const searchQuery = req.query.searchQuery || '';
 
         let ingredientQuery = {
-            name: { $regex: ingredientFilter.join('|'), $options: 'i' }  // construct core query for ingredients - "name" will always return
+            name: { $regex: ingredientFilter, $options: 'i' }  // construct core query for ingredients - "name" will always return
         };
 
         if (allergensFilter.length > 0) { // only add the allergens filter if it's not empty
@@ -40,11 +41,15 @@ router.get('/', async (req, res) => {
 
         const menuIds = mealResults.map(meal => meal.menuId);
 
-        let restaurantResults = await databaseMaster.dbOp('find', 'RestaurantDetails', {
-            query: {
-                menuId: { $in: menuIds }
-            }
-        });
+        let restaurantQuery = {
+            menuId: { $in: menuIds }
+        };
+
+        if (searchQuery !== '' && searchQuery !== null) {
+            restaurantQuery.name = { $regex: searchQuery, $options: 'i' };
+        }
+      
+        let restaurantResults = await databaseMaster.dbOp('find', 'RestaurantDetails', { query: restaurantQuery });
 
         const restaurantIds = restaurantResults.map(restaurant => restaurant.restaurantId);
         console.log(`restaurantIds that match applied filters ${restaurantIds}`);

@@ -23,7 +23,7 @@ const Map = () => {
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-  const snapPoints = useMemo(() => ['25%', '50%'], []);
+  const snapPoints = useMemo(() => ['25%', '50%', '75%'], []);
 
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
@@ -37,15 +37,16 @@ const Map = () => {
     try {
       const response = await axios.get(`http://${HOST_IP}:4000/search`, {
         params: {
-          ingredientFilter: activeFilters?.filter(f => f.type === 'ingredients').map(f => f.value) || [],
-          allergens: activeFilters?.filter(f => f.type === 'allergens').map(f => f.value) || [],
-          diets: activeFilters?.filter(f => f.type === 'diets').map(f => f.value) || [],
+          ingredientFilter: (activeFilters?.filter(f => f.type === 'ingredients') || []).map(f => f.value)[0] || "",
+          allergens: (activeFilters?.filter(f => f.type === 'allergens') || []).map(f => f.value) || [],
+          diets: (activeFilters?.filter(f => f.type === 'diets') || []).map(f => f.value) || [],
           searchQuery: searchTerm
         },
       });
       setRestaurants(response.data);
+      bottomSheetModalRef.current?.present();
     } catch (error: any) {
-      console.error(error.response.data?.message || 'Error searching resturants. Try again.');
+      console.error(error.response.data?.message || 'Error searching restaurants. Try again.');
     }
   };
 
@@ -69,11 +70,10 @@ const Map = () => {
     <BottomSheetModalProvider>
       <View style={styles.container}>
         <Header />
-        <View style={{ backgroundColor: '#FBF8FF', borderRadius: 20, flex: 1, maxHeight: 200 }}>
+        <View style={styles.searchContainer}>
           <SearchBarComponent onSearch={handleSearch} />
-          <View style={{ flex: 1, maxHeight: 60 }}>
+          <View style={styles.filterContainer}>
             <View style={styles.flexContainer}>
-              <Icon name='sliders' type='font-awesome' iconStyle={styles.icon} size={20} />
               {activeFilters.map(f => (
                 <Badge
                   badgeStyle={{ ...styles.filterBackground, backgroundColor: filterColours[f.type].fill, borderColor: filterColours[f.type].border }}
@@ -88,7 +88,7 @@ const Map = () => {
                 />
               ))}
             </View>
-            <View style={{ ...styles.flexContainer, paddingHorizontal: 8 }}>
+            <View style={styles.flexContainer}>
               {filterTypes.map(f => (
                 <Badge
                   badgeStyle={{ ...styles.typesBackground, ...(filterType === f && { backgroundColor: filterColours['selected'].fill, borderColor: filterColours['selected'].border }) }}
@@ -100,20 +100,26 @@ const Map = () => {
               ))}
             </View>
           </View>
-          <Button onPress={handlePresentModalPress} title="Present Modal" color="black" />
-          <BottomSheetModal ref={bottomSheetModalRef} index={1} snapPoints={snapPoints} onChange={handleSheetChanges}>
-            <BottomSheetView style={styles.contentContainer}>
-              <Text>Awesome 🎉</Text>
-            </BottomSheetView>
-          </BottomSheetModal>
         </View>
-        <View style={styles.restaurantListContainer}>
-          <FlatList
-            data={restaurants}
-            renderItem={renderRestaurant}
-            keyExtractor={item => item.restaurantId}
-          />
-        </View>
+        <Button onPress={handlePresentModalPress} title="Show Restaurants" color="black" />
+        <BottomSheetModal 
+          ref={bottomSheetModalRef} 
+          index={1} 
+          snapPoints={snapPoints} 
+          onChange={handleSheetChanges}
+        >
+          <BottomSheetView style={styles.contentContainer}>
+            {restaurants.length > 0 ? (
+              <FlatList
+                data={restaurants}
+                renderItem={renderRestaurant}
+                keyExtractor={item => item.restaurantId}
+              />
+            ) : (
+              <Text style={styles.noResultsText}>No restaurants found.</Text>
+            )}
+          </BottomSheetView>
+        </BottomSheetModal>
       </View>
       {filterType && <DietaryFilterModal 
         filterType={filterType} 
@@ -132,18 +138,20 @@ const filterColours: { [key: string]: { fill: string, border: string } } = {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', backgroundColor: '#E6D7FA' },
-  contentContainer: { flex: 1, alignItems: 'center' },
-  flexContainer: { flex: 1, flexDirection: 'row', gap: 4 },
+  container: { flex: 1, backgroundColor: '#E6D7FA' },
+  searchContainer: { backgroundColor: '#FBF8FF', borderRadius: 20, padding: 10 },
+  filterContainer: { marginVertical: 10 },
+  flexContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, padding: 4 },
   typesBackground: { backgroundColor: '#FBF8FF', height: 28, paddingLeft: 4, paddingRight: 4, borderRadius: 8, borderColor: '#D7CEE4', borderWidth: 1 },
   typesText: { color: '#625B71', fontFamily: 'Roboto' },
   filterBackground: { backgroundColor: '#E8DEF8', height: 28, paddingLeft: 4, paddingRight: 4, borderRadius: 8, borderWidth: 1 },
-  filterText: { color: '#28005D', fontSize: 13, fontFamily: 'Roboto' },
-  restaurantListContainer: { flex: 1, marginTop: 20, paddingHorizontal: 20 },
+  filterText: { color: '#28005D', fontSize: 13 },
   restaurantItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#EEE' },
-  restaurantName: { fontSize: 18, fontWeight: 'bold' },
+  restaurantName: { fontSize: 18 },
   icon: { color: '#28005D' },
   badgesCross: { color: '#28005D', marginLeft: 8 },
+  contentContainer: { flex: 1, padding: 10 },
+  noResultsText: { textAlign: 'center', color: '#888', marginTop: 20 }
 });
 
 export default Map;

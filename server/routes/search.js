@@ -4,7 +4,7 @@ const databaseMaster = require('../databaseMaster');
 
 router.get('/', async (req, res) => {
     try {
-        const ingredientFilter = req.query.ingredientFilter || [];
+        const ingredientFilter = req.query.ingredientFilter;
         const allergensFilter = req.query.allergens || [];
         const dietsFilter = req.query.diets || [];
         const searchQuery = req.query.searchQuery || '';

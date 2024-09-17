@@ -54,7 +54,7 @@ const Map = () => {
                     key={`${f.type}-${f.value}`}
                     value={
                       <Text style={styles.filterText}>
-                        {capitaliseFirstLetter(f.value)}
+                        {`${f.type === 'allergens' ? 'No' : ''} ${capitaliseFirstLetter(f.value)}`}
                         <Icon
                           name='x'
                           type='feather'
@@ -66,20 +66,31 @@ const Map = () => {
                     </Text>} />) : <Text style={{color: 'grey', fontSize: 12, paddingTop: 5}}>No filters set</Text>} 
                   </ScrollView>
             </View>
-            <View style={{...styles.flexContainer, paddingHorizontal: 8}}>
+            <View style={{...styles.flexContainer, paddingHorizontal: 4}}>
               {filterTypes.map(f =>
                 <Badge 
+                  containerStyle={{ flex: 1 }}
                   badgeStyle={{...styles.typesBackground, 
-                    ...(filterType === f && { 
+                    width: '100%',
+                    ...((filterType === f || activeFilters.map(f => f.type).includes(f)) && { 
                       backgroundColor: filterColours['selected'].fill, 
                       borderColor: filterColours['selected'].border 
                     }), 
                   }}
-                  textStyle={styles.typesText}
-                  // value={capitaliseFirstLetter(f)}
-                  value={f.toUpperCase()}
+                  // textStyle={styles.typesText}
+                  value={<View style={styles.filterBadgeContainer}>
+                    {activeFilters.map(f => f.type).includes(f) && <Icon
+                      name='check'
+                      type='feather'
+                      iconStyle={styles.filterCheck}
+                      size={13} />}
+                    <Text style={styles.typesText}>
+                      {capitaliseFirstLetter(f)}
+                    </Text>
+                  </View>}
                   key={f}
                   onPress={() => setFilterType(f)} />)}
+                  
             </View>
             <BottomSheetModal
               ref={bottomSheetModalRef}
@@ -145,6 +156,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 5,
   },
+  filterBadgeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
   flexContainer: {
     flex: 1,
     flexDirection: 'row',
@@ -160,13 +177,20 @@ const styles = StyleSheet.create({
     paddingLeft: 4,
     paddingRight: 4,
     borderStyle: 'solid',
-    borderColor: '#79747E',  
-    width: 85,
+    borderColor: '#79747E',
+    // width: '100%',
+    // flex: 1,
   },
   typesText: {
     color: '#281554',
-    fontWeight: '500',
-    fontSize: 9,
+    fontWeight: '400',
+    fontSize: 11,
+    letterSpacing: -0.4,
+  },
+  filterCheck: {
+    color:'#534072',
+    // fontSize: 12,
+    marginRight: 5,
   },
   filterBackground: {
     backgroundColor: '#FBF8FF',
@@ -178,7 +202,7 @@ const styles = StyleSheet.create({
   filterText: {
     color: '#281554',
     fontWeight: '300',
-    fontSize: 12,
+    fontSize: 11,
     textAlign: 'center',
   },
   badgesCross: {

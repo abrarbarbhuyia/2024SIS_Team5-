@@ -24,6 +24,7 @@ router.post('/createMealIngredient', async (req, res) => {
             ingredientId: req.body.ingredientId
         });
         await databaseMaster.dbOp('insert', 'MealIngredientDetails', { docs: [mealIngredient] });
+        res.status(201).json(mealIngredient);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });

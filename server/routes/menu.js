@@ -7,6 +7,8 @@ const axios = require('axios');
 const Tesseract = require('tesseract.js');
 
 
+const { v4: uuidv4 } = require('uuid');
+
 /* Get a menu associated with a restaurantId */
 router.get('/getMenu/:restaurantId', async (req, res) => {
     try {
@@ -23,11 +25,15 @@ router.get('/getMenu/:restaurantId', async (req, res) => {
 /* Create a menu */
 router.post('/createMenu', async (req, res) => {
     try {
+        const menuId = uuidv4();
+
         const menu = new Menu({
-            menuId: req.body.menuId,
-            restaurantId: req.body.restaurantId
+            menuId: menuId,
+            restaurantId: req.body.restaurantId,
+            menuString: req.body.menuString
         });
         await databaseMaster.dbOp('insert', 'MenuDetails', { docs: [menu] });
+        res.status(201).json(menu)
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });

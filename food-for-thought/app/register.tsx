@@ -3,39 +3,41 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 // import { HOST_IP } from '@env';
 
-const Login = () => {
+const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleLogin = useCallback(async () => {
+  const handleRegister = useCallback(async () => {
+    if (password !== confirmPassword) {
+      Alert.alert('Registration Failed', 'Passwords do not match.');
+      return;
+    }
+
     try {
       const HOST_IP = '' // add your IP address here
-      const response = await axios.post(`http://${HOST_IP}:4000/login`, { username, password });
-      await AsyncStorage.setItem('token', response.data.token);
-      Alert.alert('Login Successful', `Welcome ${username}!`);
-      router.push('/'); 
+      const response = await axios.post(`http://${HOST_IP}:4000/register`, { username, password });
+      Alert.alert('Registration Successful', `Welcome ${username}!`);
+      router.push('/login');
     } catch (error: any) {
-      Alert.alert('Login Failed', error.response.data.message || 'Invalid username or password. Try again.');
+      Alert.alert('Registration Failed', error.response.data.message || 'Unable to register. Try again later.');
     }
-  }, [username, password]);
+  }, [username, password, confirmPassword]);
 
   return (
     <View style={styles.container}>
       <View style={styles.rectangle}>
         <Image source={require('../assets/images/food-for-thought-logo.png')} style={styles.logo} />
 
-        <Text style={styles.subtitle}>Login</Text>
-        <Text style={styles.supportingText}>New to Food For Thought?{' '}
-          <Text style={styles.registerText} onPress={() => router.push('/register')}>Sign up for free.</Text>
+        <Text style={styles.subtitle}>Create an Account</Text>
+        <Text style={styles.supportingText}>Already have an account?{' '}
+          <Text style={styles.registerText} onPress={() => router.push('/login')}>Log in here.</Text>
         </Text>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>
-            Username
-          </Text>
+          <Text style={styles.label}>Username</Text>
           <TextInput
             style={styles.input}
             value={username}
@@ -45,9 +47,7 @@ const Login = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>
-            Password
-          </Text>
+          <Text style={styles.label}>Password</Text>
           <TextInput
             style={styles.input}
             value={password}
@@ -57,8 +57,19 @@ const Login = () => {
           <Icon name="lock" size={20} color="#7E7093" style={styles.icon} />
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>LOGIN</Text>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Confirm Password</Text>
+          <TextInput
+            style={styles.input}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+          />
+          <Icon name="lock" size={20} color="#7E7093" style={styles.icon} />
+        </View>
+
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
+          <Text style={styles.buttonText}>SIGN UP</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -66,12 +77,12 @@ const Login = () => {
 };
 
 const styles = StyleSheet.create({
+  // Same styles as before
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#E6D7FA',
-    fontFamily: 'Roboto',
   },
   rectangle: {
     width: '90%',
@@ -128,11 +139,8 @@ const styles = StyleSheet.create({
     color: '#808080',
   },
   button: {
-    position: 'absolute',
     width: '50%',
     height: '10%',
-    left: '40%',
-    top: '105%',
     backgroundColor: '#5A428F',
     borderColor: '#484DBE',
     borderWidth: 1,
@@ -156,4 +164,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Login;
+export default Register;

@@ -7,6 +7,7 @@ const {
   getIngredientDetails,
   getMeals,
   getMenuImage,
+  addDiet,
 } = require("./allergenMaster");
 const menuString =
   "Mango Lush, Salt Lassi, Cokamint Crush Detox, Mixed Fruit Saruwath, Faluda, Elephant House Sri Lankan Soft Drinks, Ginger Beer, Cream Soda, Necto, Orange Crush, Coca-Cola, Coke No Sugar, Diet Coke, Fanta, Sprite, Lemon Lime Bitters, Plunger Coffee Infused with Cardamom Pods, Masala Tea, Ceylon Black Tea, Cinnamon Tea, Jasmine Green Tea, Hot Butter Calamari, Chilli Garlic Prawns, Sri Lankan Fish Pan Rolls, Cutlets, Chicken Pan Roll, Vegetarian Pan Rolls, Combination of Red and White String Hoppers";
@@ -115,20 +116,22 @@ async function testFlow() {
     for (let i = 0; i < menuItems.length; i++) {
       const ingredientDetails = await getIngredientDetails(menuItems[i]);
       const JSONIngredients = JSON.parse(ingredientDetails);
+      const mealId = mealIdArray[i];
       for (let j = 0; j < JSONIngredients.ingredients.length; j++) {
         const createIngredientRequestBody = {name: JSONIngredients.ingredients[j].name, allergens: JSONIngredients.ingredients[j].allergens}
+        // grab ingredient for mealIngredient creation
         const ingredient = await createIngredient(createIngredientRequestBody);
-        console.log(ingredient);
+        // grab mealId for mealIngredient creation
+        // create mealingredient object
+        const mealIngredientRequestBody = {ingredientId: ingredient.ingredientId, mealId: mealId};
+        await createMealIngredient(mealIngredientRequestBody);
       }
+      // add diet logic
+      const addDietRequestBody = {mealId: mealId};
+      await addDiet(addDietRequestBody);
     }
     
   }
-  // Get menu string with OCR and create menu -- FOR NOW we just get the OCR result from hard coded fsqid
-
-  // if exists -> skip all steps, if doesnt exist -> run createMenu() to make menu with 
-  // Create meals in db with Gemini
-  // Create ingredients & allergens in db with gemini 
-  
 }
 
 async function runTests() {

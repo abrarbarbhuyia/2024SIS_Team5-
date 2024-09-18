@@ -73,7 +73,7 @@ async function getMeals(query) {
 // Takes in a query (menu) and returns a JSON Object that contains eaach ingredient and its associated allergens.
 async function getIngredientDetails(query) {
   const dietaryRequirements =
-    "ALCOHOL_COCKTAIL,ALCOHOL,CELERY,CRUSTACEAN,DAIRY,DASH,EGG,FISH,FODMAP,GLUTEN,IMMUNO_SUPPORTIVE,KETO_FRIENDLY,KIDNEY_FRIENDLY,KOSHER,LOW_POTASSIUM,LOW_SUGAR,LUPINE,MEDITERRANEAN,MOLLUSK,MUSTARD,NO_OIL_ADDED,PALEO,PEANUT,PESCATARIAN,PORK,RED_MEAT,SESAME,SHELLFISH,SOY,SUGAR_CONSCIOUS,SULPHITE,TREE_NUT,VEGAN,VEGETARIAN,WHEAT";
+  "ALCOHOL,CELERY,CRUSTACEAN,DAIRY,DASH,EGG,FISH,FODMAP,GLUTEN,IMMUNO_SUPPORTIVE,NON_KETO_FRIENDLY,NON_KIDNEY_FRIENDLY,KOSHER,HIGH_POTASSIUM,HIGH_SUGAR,LUPINE,MEDITERRANEAN,MOLLUSK,MUSTARD,OIL_ADDED,NON_PALEO_FRIENDLY,PEANUT,NON_PESCATARIAN,PORK,RED_MEAT,SESAME,SHELLFISH,SOY,SULPHITE,TREE_NUT,NON_VEGAN,NON_VEGETARIAN,WHEAT";
 
   const prompt = `In only a JSON object response, provide the ingredients for ${query}, inside each ingredient, map a list of allergens to each ingredient. Given these allergens come from the following list ${dietaryRequirements}. Do not include your answer inside a string, just a JSON Code block. Be very accurate with the ingredients you list, ensuring to take inspiration from the dish name. Do not list the amount of ingredients, simply identify them. Structure the JSON so that it is exactly like {ingredients: [{name:"", allergens:[]}, and so on]} RETURN A JSON AND PUT ALL THIS UNDER INGREDIENTS:`;
   return callGeminiJSON(prompt);
@@ -189,7 +189,7 @@ async function createIngredient(body) {
       //If it exists (Response array is longer than 1), do not post and continue to next iteration
       if (response.data.length > 0) {
         console.log("Ingredient item already exists: ", response.data);
-        return response.data;
+        return response.data[0];
       }
     } catch (error) {
       console.error(error.message);
@@ -245,10 +245,112 @@ async function createMealIngredient(body) {
 }
 
 async function addDiet(body) {
+  const mealId = body.mealId;
+
+  let dietTracker = {
+    "ALCOHOL": "ALCOHOL_FREE",
+    "CELERY": "CELERY_FREE",
+    "CRUSTACEAN": "CRUSTACEAN_FREE",
+    "DAIRY": "DAIRY_FREE",
+    "DASH": "DASH_FREE",
+    "EGG": "EGG_FREE",
+    "FISH": "FISH_FREE",
+    "FODMAP": "FODMAP_FREE",
+    "GLUTEN": "GLUTEN_FREE",
+    "NON_IMMUNO_SUPPORTIVE": "IMMUNO_SUPPORTIVE",
+    "NON_KETO_FRIENDLY": "KETO_FRIENDLY",
+    "NON_KIDNEY_FRIENDLY": "KIDNEY_FRIENDLY",
+    "NON_KOSHER": "KOSHER",
+    "HIGH_POTASSIUM": "LOW_POTASSIUM",
+    "HIGH_SUGAR": "LOW_SUGAR",
+    "LUPINE": "LUPINE_FREE",
+    "MEDITERRANEAN": "MEDITERRANEAN_FREE",
+    "MOLLUSK": "MOLLUSK_FREE",
+    "MUSTARD": "MUSTARD_FREE",
+    "OIL_ADDED": "OIL_FREE",
+    "NON_PALEO_FRIENDLY": "PALEO_FRIENDLY",
+    "PEANUT": "PEANUT_FREE",
+    "NON_PESCATARIAN": "PESCATARIAN_FRIENDLY",
+    "PORK": "PORK_FREE",
+    "RED_MEAT": "RED_MEAT_FREE",
+    "SESAME": "SESAME_FREE",
+    "SHELLFISH": "SHELLFISH_FREE",
+    "SOY": "SOY_FREE",
+    "SULPHITE": "SULPHITE_FREE",
+    "TREE_NUT": "TREE_NUT_FREE",
+    "NON_VEGAN": "VEGAN_FRIENDLY",
+    "NON_VEGETARIAN": "NON_VEGETARIAN_FRIENDLY",
+    "WHEAT": "WHEAT_FREE"
+  };
+
+
+  //Do a get call to return all MealIngredients with the given Meal Id
+  let mealIngredients;
+  try {
+    const response = await axios.get(
+      process.env.BACKEND_URL + `/mealIngredient/getMealIngredient/${mealId}`
+    );
+    //If it exists (Response array is longer than 1), do not post and continue to next iteration
+    if (response.data.length > 0) {
+      console.log("Found meal ingredients: ", response.data);
+      mealIngredients = response.data;
+    }
+    else {
+      console.log("Ingredient does not exist")
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+
+  //For each returned mealIngredient, get the allergens from each associated ingredient, and remove them from the hashmap
+  for (let i = 0; i < mealIngredients.length; i++) {
+    // Do a get call to get the allergens from the ingredient
+    let ingredient;
+    try {
+      const response = await axios.get(
+        process.env.BACKEND_URL + `/ingredient/getIngredient/${mealIngredients[i].ingredientId}`
+      );
+      //If it exists (Response array is longer than 1), do not post and continue to next iteration
+      if (response.data.length > 0) {
+        console.log("Found ingredient: ", response.data);
+        ingredient = response.data[0];
+      }
+      else {
+        console.log("Ingredient does not exist")
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+
+    // Remove from the tracker
+    for (let j = 0; j < ingredient.allergens.length; j++) {
+      // delete from diet tracker if it exists
+      if (ingredient.allergens[j] in dietTracker) {
+        delete dietTracker[ingredient.allergens[j]];
+      }
+    }
+    console.log(dietTracker);
+  }
+
+  const dietTrackerArray = Object.values(dietTracker);
   
+  const requestBody = {diet: dietTrackerArray}
+  console.log("tracker array = ", dietTrackerArray);
+
+  // update diet array with new set
+  try {
+    const response = await axios.put(
+      process.env.BACKEND_URL + `/meal/editMeal/${mealId}`,
+      requestBody
+    );
+    console.log(response.data)
+    return response.data;
+  } catch (error) {
+    console.error(error.message);
+  }
 }
 
-module.exports = { testSuggestic, getIngredientDetails, getMeals, createMeals, createMenu, createIngredient, createMealIngredient, getMenuImage, checkMenu };
+module.exports = { testSuggestic, getIngredientDetails, getMeals, createMeals, createMenu, createIngredient, createMealIngredient, getMenuImage, checkMenu, addDiet };
 
 /*
  Flow:

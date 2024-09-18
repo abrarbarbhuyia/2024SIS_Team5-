@@ -81,7 +81,7 @@ router.put('/editMeal/:mealId', async (req, res) => {
     try {
         const { diet } = req.body;
         const query = { mealId : req.params.mealId }
-        const docs = { $set: { diet: diet } };
+        const docs = { $addToSet: { diet: {$each: diet }} };
         const updatedMeal = await databaseMaster.dbOp('update', 'MealDetails', { query, docs });
         res.status(200).json(updatedMeal)
     } catch (error) {

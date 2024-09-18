@@ -16,7 +16,7 @@ const Login = () => {
       const response = await axios.post(`http://${HOST_IP}:4000/login`, { username, password });
       await AsyncStorage.setItem('token', response.data.token);
       Alert.alert('Login Successful', `Welcome ${username}!`);
-      router.push('/'); 
+      router.push('/home'); 
     } catch (error: any) {
       Alert.alert('Login Failed', error.response.data.message || 'Invalid username or password. Try again.');
     }

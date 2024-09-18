@@ -82,6 +82,40 @@ async function testgetMenuImage() {
   }
 }
 
+async function testFlow() {
+  //Check if Restaurant exists - Create if not exists (Foursquare fsqid info) - Pending
+  //Right now, restaurant exists with id = '4e4a1510483b16676e3a760f'
+  // Check if menu exists with given restaurant id
+  const restaurantId = '4e4a1510483b16676e3a760f';
+  if (!checkMenu(restaurantId)) {
+
+    // menu does not exist we can proceed
+    const menuStringRequestBody = {restaurantId: restaurantId}
+    const menuString = await getMenuImage(menuStringRequestBody);
+
+    // create menu
+    const createMenuRequestBody = {restaurantId: restaurantId, menuString: menuString};
+    const menu = await createMenu(createMenuRequestBody);
+
+    // get meals
+    const getMealsRequestBody = {menuString: menuString};
+    const menuItems = await getMeals(getMealsRequestBody);
+
+    // create meals in db
+    const createMealsRequestBody = {menuItems: menuItems};
+    await createMeals(getMealsRequestBody);    
+
+    // get ingreedients
+    
+  }
+  // Get menu string with OCR and create menu -- FOR NOW we just get the OCR result from hard coded fsqid
+
+  // if exists -> skip all steps, if doesnt exist -> run createMenu() to make menu with 
+  // Create meals in db with Gemini
+  // Create ingredients & allergens in db with gemini 
+  
+}
+
 async function runTests() {
   try {
     // await testCreateMenu();

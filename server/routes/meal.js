@@ -77,12 +77,13 @@ router.post('/createMeal', async (req, res) => {
 });
 
 /* Update the diets associated with a mealId - TODO */
-router.put('/editIngredient/:ingredientId', async (req, res) => {
+router.put('/editMeal/:mealId', async (req, res) => {
     try {
         const { diet } = req.body;
-        const query = { ingredientId : req.params.ingredientId }
+        const query = { mealId : req.params.mealId }
         const docs = { $set: { diet: diet } };
-        await databaseMaster.dbOp('update', 'MealDetails', { query, docs });
+        const updatedMeal = await databaseMaster.dbOp('update', 'MealDetails', { query, docs });
+        res.status(200).json(updatedMeal)
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -90,10 +91,10 @@ router.put('/editIngredient/:ingredientId', async (req, res) => {
 });
 
 /* Delete a meal */
-router.delete('/deleteIngredient/:ingredientId', async (req, res) => {
+router.delete('/deleteMeal/:mealId', async (req, res) => {
     try {
         const ingredientId = req.params.ingredientId;
-        await databaseMaster.dbOp('delete', 'MealDetails', { query: { ingredientId: ingredientId } } );
+        await databaseMaster.dbOp('delete', 'MealDetails', { query: { mealId: mealId } } );
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });

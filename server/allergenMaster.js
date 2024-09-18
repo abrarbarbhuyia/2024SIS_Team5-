@@ -77,6 +77,29 @@ async function getIngredientDetails(query) {
   return callGeminiJSON(prompt);
 }
 
+// Takes in a restaurant ID and checks if the menu exists, otherwise, performs OCR to get menu string and populates it in DB with createMenu() func.
+async function checkMenu(body) {
+  //Body: {restaurantId : 1234} 
+  const JSONbody = JSON.parse(body);
+  const restaurantId = JSONbody.restaurantId;
+  
+  //Check if the menu already exists in the DB
+  try {
+    const response = await axios.get(
+      process.env.BACKEND_URL + `/menu/getMenu/${requestBody.restaurantId}`
+    );
+    //If it exists (Response array is longer than 1), do not post and continue to next iteration
+    if (response.data.length > 0) {
+      console.log("Menu already exists: ", response.data);
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.error(error.message);
+  }  
+}
+
 //Takes in menu and restaurant Ids to create a menu object in the database
 async function createMenu(body) {
   // Still not sure how this model fits into other areas 
@@ -84,7 +107,7 @@ async function createMenu(body) {
   // Need to get restaurant ID from foursquare
   const restaurantId = "1"
   //Need to also check if a menu exists by looking at restaurant ids first
-
+  
   const requestBody = {
     restaurantId: restaurantId,
     menuString: body,
@@ -92,7 +115,7 @@ async function createMenu(body) {
 
   try {
     const response = await axios.post(
-      process.env.BACKEND_URL + `/menu/createMenu/`,
+      process.env.BACKEND_URL + `/menu/createMenu/${requestBody.restaurantId}`,
       requestBody
     );
     console.log("Created Menu: ", response.data);
@@ -225,15 +248,19 @@ async function createMealIngredient(body) {
   }
 }
 
-module.exports = { testSuggestic, getIngredientDetails, getMeals, createMeals, createMenu, createIngredient, createMealIngredient, getMenuImage };
+async function addDiet(body) {
+  
+}
+
+module.exports = { testSuggestic, getIngredientDetails, getMeals, createMeals, createMenu, createIngredient, createMealIngredient, getMenuImage, checkMenu };
 
 /*
  Flow:
   FRONTEND
    1) User searches with filters
   BACKEND
-   2) Check if restaurants exist in current location (hard coded) - If not call foursquare API
-   3) Foursquare returns list of restaurants -> Save all the data to Restaurant Model
+   2) Call Foursquare API to get restaurants in current location (hard coded)
+   3) Check if restaurants exist in DB, if not, save their data to the DB.
    4) Check if restaurants have an associated menu object. 
       a) If yes -> Assume menu, meals and ingredients already exist. END
       b) If no -> Go to step 5

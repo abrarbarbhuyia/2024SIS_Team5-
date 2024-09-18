@@ -12,11 +12,18 @@ const { v4: uuidv4 } = require('uuid');
 /* Get a menu associated with a restaurantId */
 router.get('/getMenu/:restaurantId', async (req, res) => {
     try {
-        const userId = req.params.userId;
-        await databaseMaster.dbOp('find', 'MenuDetails', { query: { userId: userId } }).then(data => {
-            res.json(data);
-        });
-    } catch (error) {
+        const restaurantId = req.params.restaurantId;
+        const data = await databaseMaster.dbOp('find', 'MenuDetails', { query: { restaurantId: restaurantId } });
+        // .then(data => {
+        //     res.status(200).json(data);
+        // });
+        if(data) {
+            res.status(200).json(data);
+        } else {
+            res.status(404).json({ error: 'Menu not found' })
+        } 
+    }   
+    catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }

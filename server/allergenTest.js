@@ -1,4 +1,5 @@
 const {
+  checkMenu,
   createIngredient,
   createMealIngredient,
   createMeals,
@@ -86,26 +87,40 @@ async function testFlow() {
   //Check if Restaurant exists - Create if not exists (Foursquare fsqid info) - Pending
   //Right now, restaurant exists with id = '4e4a1510483b16676e3a760f'
   // Check if menu exists with given restaurant id
-  const restaurantId = '4e4a1510483b16676e3a760f';
-  if (!checkMenu(restaurantId)) {
+  const restaurantId = "4e4a1510483b16676e3a760f";
+  const menuExists = await checkMenu(restaurantId);
+  if (!menuExists) {
 
     // menu does not exist we can proceed
     const menuStringRequestBody = {restaurantId: restaurantId}
     const menuString = await getMenuImage(menuStringRequestBody);
 
-    // create menu
+    // // create menu
     const createMenuRequestBody = {restaurantId: restaurantId, menuString: menuString};
     const menu = await createMenu(createMenuRequestBody);
+    console.log(menu);
 
     // get meals
-    const getMealsRequestBody = {menuString: menuString};
-    const menuItems = await getMeals(getMealsRequestBody);
+    //Returns JSON {menu_items : ["saddam", "hussein"]}
+    const JSONMenuItems = JSON.parse(await getMeals(menuString));
+    const menuItems = JSONMenuItems.menu_items;
+    console.log(menuItems);
 
     // create meals in db
-    const createMealsRequestBody = {menuItems: menuItems};
-    await createMeals(getMealsRequestBody);    
+    const createMealsRequestBody = {menuItems: menuItems, menuId: menu.menuId};
+    const mealIdArray = await createMeals(createMealsRequestBody); //We will need to get meal id from here -> For meal ingredient    
+    console.log(mealIdArray);
 
-    // get ingreedients
+    // get ingredients and create ingredient at the same time
+    for (let i = 0; i < menuItems.length; i++) {
+      const ingredientDetails = await getIngredientDetails(menuItems[i]);
+      const JSONIngredients = JSON.parse(ingredientDetails);
+      for (let j = 0; j < JSONIngredients.ingredients.length; j++) {
+        const createIngredientRequestBody = {name: JSONIngredients.ingredients[j].name, allergens: JSONIngredients.ingredients[j].allergens}
+        const ingredient = await createIngredient(createIngredientRequestBody);
+        console.log(ingredient);
+      }
+    }
     
   }
   // Get menu string with OCR and create menu -- FOR NOW we just get the OCR result from hard coded fsqid
@@ -124,13 +139,11 @@ async function runTests() {
     // await testGetIngredientDetails();
     // await testCreateIngredient();
     // await testCreateMealIngredient();
-    await testgetMenuImage();
+    // await testgetMxenuImage();
+    await testFlow();
   } catch (error) {
     console.error("An error occured during testing", error);
   }
 }
 
-// Execute tasks
-runTests().catch(console.error);
-
-module.exports = { runTests };
+module.exports = { runTests};

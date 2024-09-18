@@ -48,12 +48,14 @@ async function testSuggestic(query) {
 }
 
 // Takes in a menu string (from OCR) and converts it into a JSON list of menu items extracted from the string
-async function getMenuImage(fsqId) {
+async function getMenuImage(body) {
   // temp hard coded id
-  const fsqIdTemp = '4e4a1510483b16676e3a760f';
+  // const JSONbody = JSON.parse(body);
+  const restaurantId = body.restaurantId;
+  
   try {
     const response = await axios.get(
-      process.env.BACKEND_URL + `/menu/getMenuString/${fsqIdTemp}`
+      process.env.BACKEND_URL + `/menu/getMenuString/${restaurantId}`
     );
     console.log("Menu String: ", response.data);
     return response.data;
@@ -73,26 +75,23 @@ async function getIngredientDetails(query) {
   const dietaryRequirements =
     "ALCOHOL_COCKTAIL,ALCOHOL,CELERY,CRUSTACEAN,DAIRY,DASH,EGG,FISH,FODMAP,GLUTEN,IMMUNO_SUPPORTIVE,KETO_FRIENDLY,KIDNEY_FRIENDLY,KOSHER,LOW_POTASSIUM,LOW_SUGAR,LUPINE,MEDITERRANEAN,MOLLUSK,MUSTARD,NO_OIL_ADDED,PALEO,PEANUT,PESCATARIAN,PORK,RED_MEAT,SESAME,SHELLFISH,SOY,SUGAR_CONSCIOUS,SULPHITE,TREE_NUT,VEGAN,VEGETARIAN,WHEAT";
 
-  const prompt = `In only a JSON object response, provide the ingredients for ${query}, inside each ingredient, map a list of allergens to each ingredient. Given these allergens come from the following list ${dietaryRequirements}. Do not include your answer inside a string, just a JSON Code block. Be very accurate with the ingredients you list, ensuring to take inspiration from the dish name. Do not list the amount of ingredients, simply identify them.`;
+  const prompt = `In only a JSON object response, provide the ingredients for ${query}, inside each ingredient, map a list of allergens to each ingredient. Given these allergens come from the following list ${dietaryRequirements}. Do not include your answer inside a string, just a JSON Code block. Be very accurate with the ingredients you list, ensuring to take inspiration from the dish name. Do not list the amount of ingredients, simply identify them. Structure the JSON so that it is exactly like {ingredients: [{name:"", allergens:[]}, and so on]} RETURN A JSON AND PUT ALL THIS UNDER INGREDIENTS:`;
   return callGeminiJSON(prompt);
 }
 
 // Takes in a restaurant ID and checks if the menu exists, otherwise, performs OCR to get menu string and populates it in DB with createMenu() func.
-async function checkMenu(body) {
-  //Body: {restaurantId : 1234} 
-  const JSONbody = JSON.parse(body);
-  const restaurantId = JSONbody.restaurantId;
-  
+async function checkMenu(restaurantId) {
   //Check if the menu already exists in the DB
   try {
     const response = await axios.get(
-      process.env.BACKEND_URL + `/menu/getMenu/${requestBody.restaurantId}`
+      process.env.BACKEND_URL + `/menu/getMenu/${restaurantId}`
     );
     //If it exists (Response array is longer than 1), do not post and continue to next iteration
     if (response.data.length > 0) {
       console.log("Menu already exists: ", response.data);
       return true;
     } else {
+      console.log("Menu does not exist!");
       return false;
     }
   } catch (error) {
@@ -105,20 +104,21 @@ async function createMenu(body) {
   // Still not sure how this model fits into other areas 
   
   // Need to get restaurant ID from foursquare
-  const restaurantId = "1"
+  // const restaurantId = "1"
   //Need to also check if a menu exists by looking at restaurant ids first
   
   const requestBody = {
-    restaurantId: restaurantId,
-    menuString: body,
+    restaurantId: body.restaurantId,
+    menuString: body.menuString,
   }
 
   try {
     const response = await axios.post(
-      process.env.BACKEND_URL + `/menu/createMenu/${requestBody.restaurantId}`,
+      process.env.BACKEND_URL + `/menu/createMenu/`,
       requestBody
     );
     console.log("Created Menu: ", response.data);
+    return response.data
   } catch (error) {
     console.error(error.message);
   }
@@ -126,16 +126,16 @@ async function createMenu(body) {
 
 // Takes in the meals JSON object and creates the meals in the database
 async function createMeals(body) {
-  const JSONbody = JSON.parse(body);
-  const menuItems = JSONbody.menu_items;
-  console.log(menuItems);
+  const menuItems = body.menuItems;
+  const menuId = body.menuId;
+  let mealIdArray = [];
+  console.log(body);
 
   //Extract each menu item in a loop, check if it exists. If not, post it. 
   for (let i = 0; i < menuItems.length; i++) {
     const requestBody = {
       name: menuItems[i],
-      // diet: ["test"],
-      // menuId: 2,
+      menuId: menuId,
     };
 
     //Before posting, check if the menuItem already exists in the DB
@@ -147,6 +147,7 @@ async function createMeals(body) {
       //If it exists (Response array is longer than 1), do not post and continue to next iteration
       if (response.data.length > 0) {
         console.log("Menu item already exists: ", response.data);
+        mealIdArray.push(response.data.mealId);
         continue;  
       }
     } catch (error) {
@@ -160,40 +161,35 @@ async function createMeals(body) {
         requestBody
       );
       console.log("Created Menu Item: ", response.data);
+      mealIdArray.push(response.data.mealId);
     } catch (error) {
       console.error(error.message);
     }
   }
-  // menuItems.forEach(async (item) => {
-  // });
-  // mealId: req.body.mealId, - we need to generate this
-  // name: req.body.name, - we have this
-  // diet: req.body.diet, - we can get this but it's inside of getIngredientDetails (maybe populate with an update?)
-  // menuId: req.body.menuId - we need to generate this or get thiss
+  return mealIdArray;
 }
+
+
 // Takes in ingredient name and allergens and creates the ingredient in the database
 async function createIngredient(body) {
-  const JSONbody = JSON.parse(body);
-  const ingredients = JSONbody.ingredients;
-  console.log(ingredients);
+  const name = body.name;
+  const allergens = body.allergens;
+  // console.log();
 
-  for (let i = 0; i < ingredients.length; i++) {
     const requestBody = {
-      // ingredientId: "1",
-      name: ingredients[i].name,
-      allergens: ingredients[i].allergens
+      name: name,
+      allergens: allergens
     };
 
     //Before posting, check if the ingredient already exists in the DB
     try {
       const response = await axios.get(
-        process.env.BACKEND_URL + `/ingredient/getIngredientByName/${requestBody.name}`,
-        requestBody
+        process.env.BACKEND_URL + `/ingredient/getIngredientByName/${requestBody.name}`
       );
       //If it exists (Response array is longer than 1), do not post and continue to next iteration
       if (response.data.length > 0) {
         console.log("Ingredient item already exists: ", response.data);
-        continue;  
+        return response.data;
       }
     } catch (error) {
       console.error(error.message);
@@ -206,10 +202,10 @@ async function createIngredient(body) {
         requestBody
       );
       console.log("Created Ingredient Item: ", response.data);
+      return response.data;
     } catch (error) {
       console.error(error.message);
     }
-  }
 }
 
 // After front-end is developed, this function will be called
@@ -225,7 +221,7 @@ async function createMealIngredient(body) {
   //Before posting, check if the meal ingredient already exists in the DB
   try {
     const response = await axios.get(
-      process.env.BACKEND_URL + `/mealIngredient/getMealIngredient/${requestBody.mealid}`,
+      process.env.BACKEND_URL + `/mealIngredient/getMealIngredient/${requestBody.mealId}`,
       requestBody
     );
     //If it exists (Response array is longer than 1), do not post and continue to next iteration

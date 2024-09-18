@@ -10,7 +10,8 @@ const mealRoutes = require('./routes/meal');
 const menuRoutes = require('./routes/menu');
 const ingredientRoutes = require('./routes/ingredient');
 const mealIngredientRoutes = require('./routes/mealIngredient');
-// const { runTests } = require('./allergenTest');
+const { runTests } = require('./allergenTest');
+
 
 const corsOptions = {
   origin: '*',
@@ -41,6 +42,6 @@ app.get('/', (req, res) => {
 
 app.listen(port, async () => {
   await testConnection();
-  // await runTests();
+  await runTests();
   console.log(`Example app listening on port ${port}`);
 });

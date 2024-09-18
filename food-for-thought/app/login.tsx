@@ -4,7 +4,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } fro
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { HOST_IP } from '@env';
+// import { HOST_IP } from '@env';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -12,6 +12,7 @@ const Login = () => {
 
   const handleLogin = useCallback(async () => {
     try {
+      const HOST_IP = '' // add your IP address here
       const response = await axios.post(`http://${HOST_IP}:4000/login`, { username, password });
       await AsyncStorage.setItem('token', response.data.token);
       Alert.alert('Login Successful', `Welcome ${username}!`);

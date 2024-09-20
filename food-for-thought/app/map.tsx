@@ -11,18 +11,19 @@ import { useState } from "react";
 import { DietaryFilterModal } from '@/components/DietaryFilterModal';
 import Header from '@/components/Header';
 import { capitaliseFirstLetter } from '@/utils';
+import MapView, { Marker } from 'react-native-maps';
 
-const Map = () => {
+const RestaurantMap = () => {
   const [filterType, setFilterType] = useState<string | undefined>();
   const [activeFilters, setActiveFilters] = useState<{ type: string, value: string }[]>([]);
+  const [markerLocation, setMarkerLocation] = useState<{name: string, lat: number, long: number}[]>([
+    {name: 'Pane e Vino', lat: -33.88087996454809, long: 151.2097105847393}]);
+
   const filterTypes = ['diets', 'allergens', 'ingredients', 'cuisine'];
-  // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-  // variables
   const snapPoints = useMemo(() => ['25%', '50%'], []);
 
-  // callbacks
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
@@ -30,13 +31,17 @@ const Map = () => {
     console.log('handleSheetChanges', index);
   }, []);
 
-  // renders
   return (
     <BottomSheetModalProvider>
       <View style={styles.container}>
         <Header />
         <Card containerStyle={styles.baseCard}>
           <View style={{ flexDirection: 'column', rowGap: 2}}>
+            {/* <Button
+              onPress={handlePresentModalPress}
+              title="Present Modal"
+              color="black"
+            /> */}
             <SearchBar />
             <View style={styles.flexContainer}>
               <Icon
@@ -66,7 +71,7 @@ const Map = () => {
                     </Text>} />) : <Text style={{color: 'grey', fontSize: 12, paddingTop: 5}}>No filters set</Text>} 
                   </ScrollView>
             </View>
-            <View style={{...styles.flexContainer, paddingHorizontal: 4}}>
+            <View style={{...styles.flexContainer, paddingBottom: 6 }}>
               {filterTypes.map(f =>
                 <Badge 
                   containerStyle={{ flex: 1 }}
@@ -77,7 +82,6 @@ const Map = () => {
                       borderColor: filterColours['selected'].border 
                     }), 
                   }}
-                  // textStyle={styles.typesText}
                   value={<View style={styles.filterBadgeContainer}>
                     {activeFilters.map(f => f.type).includes(f) && <Icon
                       name='check'
@@ -92,6 +96,43 @@ const Map = () => {
                   onPress={() => setFilterType(f)} />)}
                   
             </View>
+            <MapView
+              style={styles.map}
+              initialRegion={{ // initial region is hardcoded to UTS Tower
+                latitude: -33.88336558611229,
+                longitude: 151.2009263036271,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}
+            >
+              <Marker 
+                coordinate={{ latitude:  -33.88336558611229, longitude: 151.2009263036271 }}
+                title={"My location"} >
+                <View style={styles.filledCircle} />
+              </Marker>
+              {markerLocation.length > 0 && markerLocation.map((m, i) => 
+              <Marker
+               key={`marker-${i}`}
+                coordinate={{ latitude: m.lat, longitude: m.long }}
+                title={m.name}>
+                <View style={styles.markerContainer}>
+                  <Icon
+                    name="map-marker"
+                    type="material-community"
+                    color="#CB4C4E"
+                    size={50}
+                  />
+                  <View style={styles.innerCircle}>
+                    <Icon
+                      name="food"
+                      type="material-community"
+                      color="white"
+                      size={18}
+                    />
+                  </View>
+                </View>
+              </Marker>)}
+            </MapView>
             <BottomSheetModal
               ref={bottomSheetModalRef}
               index={1}
@@ -103,14 +144,6 @@ const Map = () => {
               </BottomSheetView>
             </BottomSheetModal>
           </View>
-        </Card>
-        <Card containerStyle={styles.baseCard}>
-          <Text>Add Map viewer here</Text>
-          <Button
-            onPress={handlePresentModalPress}
-            title="Present Modal"
-            color="black"
-          />
         </Card>
       </View>
       {filterType && <DietaryFilterModal 
@@ -129,9 +162,14 @@ const filterColours: {[key: string]: {fill: string, border: string}} = {
   'cuisine': { fill: '#E7FFE7', border: '#B1F6B1' },
   'selected': { fill: '#E8DEF8', border: '#BDB0CA' }
 }
-const {width} = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
+  map: {
+    minWidth: 300,
+    width: width,
+    height: '86%',
+  },
   container: {
     flex: 1,
     alignItems: 'center',
@@ -142,17 +180,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   baseCard: {
-    maxHeight: 200,
-    width: width - 32,
-    height: 170,
+    maxHeight: height-160,
+    maxWidth:width+2,
     backgroundColor: "#FBF8FF",
-    padding: 12,
     borderRadius: 24,
     marginTop: 5,
     elevation: 4,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 2,
-    shadowRadius: 4,
+    paddingHorizontal: 0,
     justifyContent: "space-between",
     marginBottom: 5,
   },
@@ -169,6 +203,7 @@ const styles = StyleSheet.create({
     height: 20,
     minHeight: 30,
     width: '100%',
+    paddingHorizontal: 10
 
   },
   typesBackground: {
@@ -178,8 +213,6 @@ const styles = StyleSheet.create({
     paddingRight: 4,
     borderStyle: 'solid',
     borderColor: '#79747E',
-    // width: '100%',
-    // flex: 1,
   },
   typesText: {
     color: '#281554',
@@ -189,7 +222,6 @@ const styles = StyleSheet.create({
   },
   filterCheck: {
     color:'#534072',
-    // fontSize: 12,
     marginRight: 5,
   },
   filterBackground: {
@@ -224,6 +256,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 4,
   },
+  markerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 1,
+    shadowRadius: 1,
+  },
+  innerIcon: {
+    position: 'absolute',
+  },
+  innerCircle: {
+    position: 'absolute', 
+    backgroundColor: '#CB4C4E',
+    borderRadius: 20, 
+    width: 20,
+    height: 25, 
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: [{ translateY: -5 }]
+  },
+  filledCircle: {
+    position: 'absolute',
+    width: 22,
+    height: 22,
+    borderRadius: 12.5, 
+    borderStyle:'solid',
+    borderWidth: 3,
+    borderColor: 'white',
+    backgroundColor: '#0B84FF',
+    elevation: 4,
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 2,
+    shadowRadius: 4,
+  },
 });
 
-export default Map;
+export default RestaurantMap;

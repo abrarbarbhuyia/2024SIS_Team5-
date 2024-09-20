@@ -71,7 +71,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#E6D7FA',
-    fontFamily: 'Roboto',
   },
   rectangle: {
     width: '90%',
@@ -79,6 +78,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FBF8FF',
     borderRadius: 20,
     alignItems: 'center',
+    paddingBottom: 10,
   },
   logo: {
     width: 124,
@@ -102,11 +102,6 @@ const styles = StyleSheet.create({
     color: '#49454F',
     marginBottom: 30,
   },
-  inputContainer: {
-    width: '100%',
-    marginBottom: 20,
-    position: 'relative',
-  },
   label: {
     position: 'absolute',
     left: 10,
@@ -116,6 +111,11 @@ const styles = StyleSheet.create({
     color: '#7E7093',
     fontWeight: 600,
   },
+  inputContainer: {
+    width: '100%',
+    marginBottom: 30,
+    position: 'relative',
+  },
   input: {
     width: '100%',
     height: 40,
@@ -123,16 +123,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 4,
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 10,
+    paddingHorizontal: 40,
     fontSize: 16,
     color: '#808080',
   },
-  button: {
+  icon: {
     position: 'absolute',
+    left: 10,
+    top: '50%',
+    transform: [{ translateY: -10 }],
+    zIndex: 1,
+  },
+  button: {
     width: '50%',
     height: '10%',
-    left: '40%',
-    top: '105%',
     backgroundColor: '#5A428F',
     borderColor: '#484DBE',
     borderWidth: 1,
@@ -144,11 +148,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  icon: {
-    bottom: 30,
-    right: -10,
-    zIndex: 9000,
   },
   registerText: {
     textDecorationLine: 'underline',

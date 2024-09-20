@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FBF8FF',
     borderRadius: 20,
     alignItems: 'center',
+    paddingBottom: 15,
   },
   logo: {
     width: 124,
@@ -115,17 +116,8 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: '100%',
-    marginBottom: 20,
+    marginBottom: 30,
     position: 'relative',
-  },
-  label: {
-    position: 'absolute',
-    left: 10,
-    backgroundColor: 'transparent',
-    top: -18,
-    fontSize: 12,
-    color: '#7E7093',
-    fontWeight: 600,
   },
   input: {
     width: '100%',
@@ -134,9 +126,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 4,
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 10,
+    paddingHorizontal: 40,
     fontSize: 16,
     color: '#808080',
+  },
+  icon: {
+    position: 'absolute',
+    left: 10,
+    top: '50%',
+    transform: [{ translateY: -10 }],
+    zIndex: 1,
   },
   button: {
     width: '50%',
@@ -148,15 +147,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  label: {
+    position: 'absolute',
+    left: 10,
+    backgroundColor: 'transparent',
+    top: -18,
+    fontSize: 12,
+    color: '#7E7093',
+    fontWeight: 600,
+  },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  icon: {
-    bottom: 30,
-    right: -10,
-    zIndex: 9000,
   },
   registerText: {
     textDecorationLine: 'underline',

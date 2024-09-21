@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { styles } from '../styles/app-styles'; 
 
 export default function Index() {
 
@@ -26,78 +27,3 @@ export default function Index() {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#E6D7FA',
-    fontFamily: 'Roboto',
-  },
-  rectangle: {
-    width: '90%',
-    padding: '10%',
-    backgroundColor: '#FBF8FF',
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logo: {
-    width: 124,
-    height: 59,
-    borderRadius: 5,
-    marginBottom: 20,
-  },
-  subtitle: {
-    fontWeight: '600',
-    fontSize: 24,
-    lineHeight: 32,
-    color: '#1D1B20',
-    marginBottom: 20,
-  },
-  supportingText: {
-    width: '100%',
-    fontWeight: '400',
-    fontSize: 14,
-    lineHeight: 20,
-    textAlign: 'center',
-    color: '#49454F',
-  },
-  loginButton: {
-    marginTop: 15,
-    marginBottom: 10,
-    width: '50%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#5A428F',
-    borderColor: '#484DBE',
-    borderWidth: 1,
-    borderRadius: 20,
-    padding: 7,
-  },
-  signUpButton: {
-    marginBottom: 15,
-    width: '50%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FBF8FF',
-    borderColor: '#5A428F',
-    borderWidth: 2,
-    borderRadius: 20,
-    padding: 7,
-  },
-  loginButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  signUpButtonText: {
-    color: '#5A428F',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  guestText: {
-    color: '#720BC4',
-  },
-});

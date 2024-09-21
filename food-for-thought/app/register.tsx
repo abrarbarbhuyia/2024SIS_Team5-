@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
-// import { HOST_IP } from '@env';
+import { styles } from '../styles/app-styles'; 
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -75,96 +75,5 @@ const Register = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  // Same styles as before
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#E6D7FA',
-  },
-  rectangle: {
-    width: '90%',
-    padding: '10%',
-    backgroundColor: '#FBF8FF',
-    borderRadius: 20,
-    alignItems: 'center',
-    paddingBottom: 15,
-  },
-  logo: {
-    width: 124,
-    height: 59,
-    borderRadius: 5,
-    marginBottom: 20,
-  },
-  subtitle: {
-    fontWeight: '600',
-    fontSize: 24,
-    lineHeight: 32,
-    color: '#1D1B20',
-    marginBottom: 20,
-  },
-  supportingText: {
-    width: '100%',
-    fontWeight: '400',
-    fontSize: 14,
-    lineHeight: 20,
-    textAlign: 'center',
-    color: '#49454F',
-    marginBottom: 30,
-  },
-  inputContainer: {
-    width: '100%',
-    marginBottom: 30,
-    position: 'relative',
-  },
-  input: {
-    width: '100%',
-    height: 40,
-    borderColor: '#CCCCCC',
-    borderWidth: 1,
-    borderRadius: 4,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 40,
-    fontSize: 16,
-    color: '#808080',
-  },
-  icon: {
-    position: 'absolute',
-    left: 10,
-    top: '50%',
-    transform: [{ translateY: -10 }],
-    zIndex: 1,
-  },
-  button: {
-    width: '50%',
-    height: '10%',
-    backgroundColor: '#5A428F',
-    borderColor: '#484DBE',
-    borderWidth: 1,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  label: {
-    position: 'absolute',
-    left: 10,
-    backgroundColor: 'transparent',
-    top: -18,
-    fontSize: 12,
-    color: '#7E7093',
-    fontWeight: 600,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  registerText: {
-    textDecorationLine: 'underline',
-    color: '#5A428F',
-  },
-});
 
 export default Register;

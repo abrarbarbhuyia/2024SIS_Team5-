@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, Button, Dimensions, ScrollView } from 'react-native';
+import { View, Text, Button, Dimensions, ScrollView } from 'react-native';
 import {
   BottomSheetModal,
   BottomSheetView,
@@ -11,6 +11,7 @@ import { useState } from "react";
 import { DietaryFilterModal } from '@/components/DietaryFilterModal';
 import Header from '@/components/Header';
 import { capitaliseFirstLetter } from '@/utils';
+import { styles } from '../styles/app-styles';
 
 const Map = () => {
   const [filterType, setFilterType] = useState<string | undefined>();
@@ -42,7 +43,7 @@ const Map = () => {
               <Icon
                 name='sliders'
                 type='font-awesome'
-                iconStyle={styles.icon}
+                iconStyle={styles.mapIcon}
                 size={20} />
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.badgeScrollView}>
                   {activeFilters.length > 0 ? activeFilters.map(f => <Badge 
@@ -130,100 +131,5 @@ const filterColours: {[key: string]: {fill: string, border: string}} = {
   'selected': { fill: '#E8DEF8', border: '#BDB0CA' }
 }
 const {width} = Dimensions.get('window');
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#E6D7FA',
-  },
-  contentContainer: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  baseCard: {
-    maxHeight: 200,
-    width: width - 32,
-    height: 170,
-    backgroundColor: "#FBF8FF",
-    padding: 12,
-    borderRadius: 24,
-    marginTop: 5,
-    elevation: 4,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 2,
-    shadowRadius: 4,
-    justifyContent: "space-between",
-    marginBottom: 5,
-  },
-  filterBadgeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-  },
-  flexContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    gap: 4,
-    height: 20,
-    minHeight: 30,
-    width: '100%',
-
-  },
-  typesBackground: {
-    backgroundColor: '#FBF8FF',
-    height: 28,
-    paddingLeft: 4,
-    paddingRight: 4,
-    borderStyle: 'solid',
-    borderColor: '#79747E',
-    // width: '100%',
-    // flex: 1,
-  },
-  typesText: {
-    color: '#281554',
-    fontWeight: '400',
-    fontSize: 11,
-    letterSpacing: -0.4,
-  },
-  filterCheck: {
-    color:'#534072',
-    // fontSize: 12,
-    marginRight: 5,
-  },
-  filterBackground: {
-    backgroundColor: '#FBF8FF',
-    height: 22,
-    paddingHorizontal: 4,
-    borderStyle: 'solid',
-    borderColor: '#79747E',
-  },
-  filterText: {
-    color: '#281554',
-    fontWeight: '300',
-    fontSize: 11,
-    textAlign: 'center',
-  },
-  badgesCross: {
-    color: '#BCBCBC',
-    paddingLeft: 4,
-    height: 12,
-    width: 20,
-  },
-  card: {
-    backgroundColor: '#FBF8FF',
-    padding: 20,
-    borderRadius: 20,
-  },
-  icon: {
-    color:'#534072',
-    paddingHorizontal: 8,
-  },
-  badgeScrollView: {
-    flexDirection: 'row',
-    gap: 4,
-  },
-});
 
 export default Map;

@@ -1,12 +1,13 @@
-import { View, Dimensions, Image, StyleSheet, FlatList } from "react-native";
-import { Link, router } from "expo-router";
-import { Button, Card, Text, Icon } from '@rneui/themed';
+import { View, Image, FlatList } from "react-native";
+import { router } from "expo-router";
+import { Card, Text, Icon } from '@rneui/themed';
 import SearchBar from "@/components/SearchBar";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Header from "@/components/Header";     
-import pic from '../assets/images/react-logo.png';        
+import { styles } from '../styles/app-styles'; 
+import pic from '../assets/images/react-logo.png';     
 
-        //mock data images for carousel
+//mock data images for carousel
 const carouselData = [
   { id: '1', image: pic, label: 'Food item', secondLabel: 'Food' },
   { id: '2', image: pic, label: 'Food item', secondLabel: 'Food' },
@@ -22,7 +23,7 @@ const Home = () => {
   //carousel view + styling
   const renderItem = ({ item }) => (
     <View style={styles.imageContainer}>
-      <Image source={item.image} style={styles.image} />
+      <Image source={item.image} style={styles.homeImage} />
       <Text style={styles.recentLabel}>{item.label}</Text>
       <Text style={styles.recentComment}>{item.secondLabel}</Text>
     </View>
@@ -74,82 +75,5 @@ const Home = () => {
     </View>
   );
 };
-
-const {width} = Dimensions.get('window');
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    backgroundColor: "#E6D7FA",
-  },
-  finderCard: {
-    width: width - 32,
-    height: 200,
-    backgroundColor: "#FBF8FF",
-    padding: 12,
-    borderRadius: 24,
-    marginTop: 5,
-    elevation: 4,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 2,
-    shadowRadius: 4,
-    justifyContent: "space-between",
-    marginBottom: 5,
-  },
-  recentCard: {
-    width: width - 32,
-    height: 220,
-    backgroundColor: "#FBF8FF",
-    padding: 12,
-    borderRadius: 24,
-    marginTop: 5,
-    elevation: 4,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 2,
-    shadowRadius: 4,
-    justifyContent: "space-between",
-    marginBottom: 5,
-  },
-  recommendationsCard: {
-    width: width - 32,
-    height: 250,
-    backgroundColor: "#FBF8FF",
-    padding: 12,
-    borderRadius: 24,
-    marginTop: 5,
-    elevation: 4,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 2,
-    shadowRadius: 4,
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  carousel: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  imageContainer: {
-    marginRight: 10,
-    backgroundColor: 'white',
-    borderRadius: 8,
-    overflow: 'hidden',
-    width: 120,
-    height: 150,
-  },
-  image: {
-    width: '100%',
-  },
-  recentLabel: {
-    marginLeft: 5,
-    marginTop: 5,
-  },
-  recentComment: {
-    marginLeft: 5,
-    fontSize: 12,
-    opacity: 0.5,
-  }
-});
 
 export default Home;

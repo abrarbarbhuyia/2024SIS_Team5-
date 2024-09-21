@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
-import { HOST_IP } from '@env';
+// import { HOST_IP } from '@env';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -17,6 +17,7 @@ const Register = () => {
     }
 
     try {
+      const HOST_IP = '' // add your IP address here
       const response = await axios.post(`http://${HOST_IP}:4000/register`, { username, password });
       Alert.alert('Registration Successful', `Welcome ${username}!`);
       router.push('/login');

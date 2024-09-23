@@ -30,12 +30,23 @@ async function testDelete() {
         console.log('Delete operation failed');
     }
 }
+async function testUpdate() {
+    try {
+        const query = { name: "TEST" };
+        const docs = { $set: { x: 3 } };
+        await dbOp('update', 'Test', { query, docs });
+        console.log('Update operation successful');
+    } catch(error) {
+        console.log('Update operation failed');
+    }
+}
 
 async function runTests() {
     try {
         await testInsert();
         await testFind();
         await testDelete();
+        await testUpdate();
     } catch (error) {
         console.error('An error occured during testing', error);
     }

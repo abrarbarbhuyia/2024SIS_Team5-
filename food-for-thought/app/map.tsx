@@ -1,19 +1,20 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet, Button, Dimensions, ScrollView } from 'react-native';
 import {
   BottomSheetModal,
   BottomSheetView,
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
 import SearchBar from "@/components/SearchBar";
-import { Badge, Icon } from "@rneui/themed";
+import { Badge, Card, Icon } from "@rneui/themed";
 import { useState } from "react";
 import { DietaryFilterModal } from '@/components/DietaryFilterModal';
+import Header from '@/components/Header';
+import { capitaliseFirstLetter } from '@/utils';
 
 const Map = () => {
   const [filterType, setFilterType] = useState<string | undefined>();
-  const [activeFilters, setActiveFilters] = useState<{ type: string, value: string }[]>(
-    [{ type: 'diet', value: 'halal' }, { type: 'allergen', value: 'No Nuts' }, { type: 'ingredient', value: 'salmon' }, { type: 'cuisine', value: 'spanish' }]);
+  const [activeFilters, setActiveFilters] = useState<{ type: string, value: string }[]>([]);
   const filterTypes = ['diets', 'allergens', 'ingredients', 'cuisine'];
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -33,98 +34,142 @@ const Map = () => {
   return (
     <BottomSheetModalProvider>
       <View style={styles.container}>
-        <View style={{ backgroundColor: '#FBF8FF', borderRadius: 20, flex: 1, maxHeight: 200 }}>
-          <SearchBar />
-          <View style={{ flex: 1, maxHeight: 60}}>
+        <Header />
+        <Card containerStyle={styles.baseCard}>
+          <View style={{ flexDirection: 'column', rowGap: 2}}>
+            <SearchBar />
             <View style={styles.flexContainer}>
               <Icon
                 name='sliders'
                 type='font-awesome'
                 iconStyle={styles.icon}
                 size={20} />
-                {activeFilters.map(f =>
-                  <Badge 
+                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.badgeScrollView}>
+                  {activeFilters.length > 0 ? activeFilters.map(f => <Badge 
                     badgeStyle={{ 
                       ...styles.filterBackground, 
-                      backgroundColor: filterColours[f.type].fill, 
-                      borderColor: filterColours[f.type].border }}
+                      backgroundColor: filterColours[f.type]?.fill ?? 'white', 
+                      borderColor: filterColours[f.type]?.border ?? 'white'}}
                     textStyle={styles.filterText}
                     key={`${f.type}-${f.value}`}
                     value={
                       <Text style={styles.filterText}>
-                        {capitaliseFirstLetter(f.value)}
+                        {`${f.type === 'allergens' ? 'No' : ''} ${capitaliseFirstLetter(f.value)}`}
                         <Icon
                           name='x'
                           type='feather'
                           iconStyle={styles.badgesCross}
                           size={15}
-                          onPress={() => console.log('hello')} />
-                      </Text>} />)}
+                          onPress={() => activeFilters.length > 0 
+                            ? setActiveFilters(activeFilters.filter(filter => !(filter === f))) 
+                            : null} />
+                    </Text>} />) : <Text style={{color: 'grey', fontSize: 12, paddingTop: 5}}>No filters set</Text>} 
+                  </ScrollView>
             </View>
-            <View style={{...styles.flexContainer, paddingHorizontal: 8}}>
+            <View style={{...styles.flexContainer, paddingHorizontal: 4}}>
               {filterTypes.map(f =>
-                  <Badge 
-                    badgeStyle={{...styles.typesBackground, 
-                      ...(filterType === f && { backgroundColor: filterColours['selected'].fill, borderColor: filterColours['selected'].border }), 
-                    }}
-                    textStyle={styles.typesText}
-                    value={capitaliseFirstLetter(f)}
-                    key={f}
-                    onPress={() => setFilterType(f)} />)}
+                <Badge 
+                  containerStyle={{ flex: 1 }}
+                  badgeStyle={{...styles.typesBackground, 
+                    width: '100%',
+                    ...((filterType === f || activeFilters.map(f => f.type).includes(f)) && { 
+                      backgroundColor: filterColours['selected'].fill, 
+                      borderColor: filterColours['selected'].border 
+                    }), 
+                  }}
+                  // textStyle={styles.typesText}
+                  value={<View style={styles.filterBadgeContainer}>
+                    {activeFilters.map(f => f.type).includes(f) && <Icon
+                      name='check'
+                      type='feather'
+                      iconStyle={styles.filterCheck}
+                      size={13} />}
+                    <Text style={styles.typesText}>
+                      {capitaliseFirstLetter(f)}
+                    </Text>
+                  </View>}
+                  key={f}
+                  onPress={() => setFilterType(f)} />)}
+                  
             </View>
+            <BottomSheetModal
+              ref={bottomSheetModalRef}
+              index={1}
+              snapPoints={snapPoints}
+              onChange={handleSheetChanges}
+            >
+              <BottomSheetView style={styles.contentContainer}>
+                <Text>Awesome 🎉</Text>
+              </BottomSheetView>
+            </BottomSheetModal>
           </View>
+        </Card>
+        <Card containerStyle={styles.baseCard}>
+          <Text>Add Map viewer here</Text>
           <Button
             onPress={handlePresentModalPress}
             title="Present Modal"
             color="black"
           />
-          <BottomSheetModal
-            ref={bottomSheetModalRef}
-            index={1}
-            snapPoints={snapPoints}
-            onChange={handleSheetChanges}
-          >
-            <BottomSheetView style={styles.contentContainer}>
-              <Text>Awesome 🎉</Text>
-            </BottomSheetView>
-          </BottomSheetModal>
-        </View>
-        <View style={{ backgroundColor: '#FBF8FF', borderRadius: 20, flex: 1, maxHeight: '40%', marginTop: 10 }}>
-          <Text>Add Map viewer here</Text>
-        </View>
+        </Card>
       </View>
-      {filterType && <DietaryFilterModal filterType={filterType} setShowModal={setFilterType} />}
+      {filterType && <DietaryFilterModal 
+        filterType={filterType} 
+        currentFilters={activeFilters}
+        setShowModal={setFilterType} 
+        setActiveFilters={setActiveFilters} />}
     </BottomSheetModalProvider>
   );
 };
 
-function capitaliseFirstLetter(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 const filterColours: {[key: string]: {fill: string, border: string}} = {
-  'diet': { fill: '#FFE7DC', border: '#FEBFAC' },
-  'allergen': { fill: '#F3D9FF', border: '#D59CEF' },
-  'ingredient': { fill: '#E4EDFF', border: '#A8C1F3' },
+  'diets': { fill: '#FFE7DC', border: '#FEBFAC' },
+  'allergens': { fill: '#F3D9FF', border: '#D59CEF' },
+  'ingredients': { fill: '#E4EDFF', border: '#A8C1F3' },
   'cuisine': { fill: '#E7FFE7', border: '#B1F6B1' },
   'selected': { fill: '#E8DEF8', border: '#BDB0CA' }
 }
+const {width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 24,
-    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#E6D7FA',
   },
   contentContainer: {
     flex: 1,
     alignItems: 'center',
   },
+  baseCard: {
+    maxHeight: 200,
+    width: width - 32,
+    height: 170,
+    backgroundColor: "#FBF8FF",
+    padding: 12,
+    borderRadius: 24,
+    marginTop: 5,
+    elevation: 4,
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 2,
+    shadowRadius: 4,
+    justifyContent: "space-between",
+    marginBottom: 5,
+  },
+  filterBadgeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
   flexContainer: {
     flex: 1,
     flexDirection: 'row',
     gap: 4,
+    height: 20,
+    minHeight: 30,
+    width: '100%',
+
   },
   typesBackground: {
     backgroundColor: '#FBF8FF',
@@ -132,14 +177,20 @@ const styles = StyleSheet.create({
     paddingLeft: 4,
     paddingRight: 4,
     borderStyle: 'solid',
-    borderColor: '#79747E',  
-    width: 85
+    borderColor: '#79747E',
+    // width: '100%',
+    // flex: 1,
   },
   typesText: {
     color: '#281554',
-    fontFamily: 'Roboto',
-    fontWeight: '500',
-    fontSize: 12,
+    fontWeight: '400',
+    fontSize: 11,
+    letterSpacing: -0.4,
+  },
+  filterCheck: {
+    color:'#534072',
+    // fontSize: 12,
+    marginRight: 5,
   },
   filterBackground: {
     backgroundColor: '#FBF8FF',
@@ -150,25 +201,28 @@ const styles = StyleSheet.create({
   },
   filterText: {
     color: '#281554',
-    fontFamily: 'Roboto',
-    fontWeight: '400',
+    fontWeight: '300',
     fontSize: 11,
     textAlign: 'center',
   },
   badgesCross: {
-    color: '#DADADA',
+    color: '#BCBCBC',
     paddingLeft: 4,
     height: 12,
-    width: 20
+    width: 20,
   },
   card: {
     backgroundColor: '#FBF8FF',
     padding: 20,
-    borderRadius: 20
+    borderRadius: 20,
   },
   icon: {
     color:'#534072',
     paddingHorizontal: 8,
+  },
+  badgeScrollView: {
+    flexDirection: 'row',
+    gap: 4,
   },
 });
 

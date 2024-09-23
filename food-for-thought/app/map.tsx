@@ -12,16 +12,43 @@ import { DietaryFilterModal } from '@/components/DietaryFilterModal';
 import Header from '@/components/Header';
 import { capitaliseFirstLetter } from '@/utils';
 import MapView, { Marker } from 'react-native-maps';
+import { RestaurantModal } from '@/components/RestaurantModal';
+
+export type Restaurant = {
+  name: string,
+  address: string,
+  openingTimes?: string,
+  cuisine?: string,
+  // star rating out of 5
+  rating?: number,
+  // cost rating out of 'affordable' | 'average' | 'expensive'
+  costRating?: string,
+  // distance in kilometers
+  distance?: number,
+  // number of matching menu items to current dietary filters
+  menuMatches?: number,
+}
+
+const exampleRestaurant = {
+  name: 'Mother Chus Kitchen',
+  address: '367 Pitt Street, Sydney NSW 2000',
+  openingTimes: 'Today, 9am to 5pm',
+  rating: 4.3,
+  cuisine: 'asian',
+  costRating: 'average',
+  distance: 1.2,
+  menuMatches: 25,
+}
 
 const RestaurantMap = () => {
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [filterType, setFilterType] = useState<string | undefined>();
   const [activeFilters, setActiveFilters] = useState<{ type: string, value: string }[]>([]);
-  const [markerLocation, setMarkerLocation] = useState<{name: string, lat: number, long: number}[]>([
+  const [markers, setMarkers] = useState<{name: string, lat: number, long: number}[]>([
     {name: 'Pane e Vino', lat: -33.88087996454809, long: 151.2097105847393}]);
+  const [activeRestaurant, setActiveRestaurant] = useState<Restaurant | undefined>();
 
   const filterTypes = ['diets', 'allergens', 'ingredients', 'cuisine'];
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-
   const snapPoints = useMemo(() => ['25%', '50%'], []);
 
   const handlePresentModalPress = useCallback(() => {
@@ -110,11 +137,11 @@ const RestaurantMap = () => {
                 title={"My location"} >
                 <View style={styles.filledCircle} />
               </Marker>
-              {markerLocation.length > 0 && markerLocation.map((m, i) => 
+              {markers.length > 0 && markers.map((m, i) => 
               <Marker
-               key={`marker-${i}`}
+                key={`marker-${i}`}
                 coordinate={{ latitude: m.lat, longitude: m.long }}
-                title={m.name}>
+                onPress={() => setActiveRestaurant(exampleRestaurant)}>
                 <View style={styles.markerContainer}>
                   <Icon
                     name="map-marker"
@@ -151,6 +178,8 @@ const RestaurantMap = () => {
         currentFilters={activeFilters}
         setShowModal={setFilterType} 
         setActiveFilters={setActiveFilters} />}
+      {activeRestaurant && <RestaurantModal
+        setShowModal={setActiveRestaurant} restaurant={activeRestaurant} />}
     </BottomSheetModalProvider>
   );
 };

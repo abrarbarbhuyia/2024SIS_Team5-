@@ -15,7 +15,7 @@ const SearchBarComponent: React.FunctionComponent<SearchBarComponentProps> = ({ 
   useEffect(() => {
     const currentPage = route.name;
     switch (currentPage) {
-      case 'index':
+      case 'home':
         setPlaceholder('Search by dietary requirement...');
         break;
       default:

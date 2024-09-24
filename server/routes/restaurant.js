@@ -46,7 +46,7 @@ router.get('/getRestaurant', async (req, res) => {
             if (result.length == 0)
 
             {
-                //fetch the place details of the restaurant including location, name, telephone, hours and webstie
+                //fetch the place details of the restaurant including location, name, telephone, hours and website
                 const placeDetailsUrl = `https://api.foursquare.com/v3/places/${fsq_id}?fields=tel%2Cname%2Chours%2Clocation%2Cwebsite`;
                 const response1 = await axios.get(placeDetailsUrl, {
                     headers: {
@@ -55,13 +55,13 @@ router.get('/getRestaurant', async (req, res) => {
                 });
                 const placeDetails = response1.data
 
-                //create a restaurant entry using model schema and add new entry to the RestaurantDetails colelction
+                //create a restaurant entry using model schema and add new entry to the RestaurantDetails collection
                 const restaurant = new Restaurant({
                     restaurantId: fsq_id,
                     name: placeDetails.name,
                     address: placeDetails.location.formatted_address,
                     openingHours: placeDetails.hours.display,
-                    phoneNumber: parseInt(placeDetails.tel),
+                    phoneNumber: placeDetails.tel,
                     website: placeDetails.website,
                 }) 
                 await databaseMaster.dbOp('insert', 'RestaurantDetails', { docs: [restaurant] });  

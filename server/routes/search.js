@@ -9,6 +9,13 @@ router.get('/', async (req, res) => {
         const dietsFilter = req.query.diets || [];
         const searchQuery = req.query.searchQuery || '';
 
+        const isFilterApplied = ingredientFilter || allergensFilter.length > 0 || dietsFilter.length > 0 || searchQuery;
+
+        if (!isFilterApplied) {
+            const allRestaurants = await databaseMaster.dbOp('find', 'RestaurantDetails', {});
+            return res.json(allRestaurants);
+        }
+
         let ingredientQuery = {
             name: { $regex: ingredientFilter, $options: 'i' }  // construct core query for ingredients - "name" will always return
         };
@@ -40,15 +47,26 @@ router.get('/', async (req, res) => {
         console.log(`mealIds that match applied filters ${mealIds}`);
 
         const menuIds = mealResults.map(meal => meal.menuId);
+        
+        let restaurantQuery = {};
 
-        let restaurantQuery = {
-            menuId: { $in: menuIds }
-        };
-
-        if (searchQuery !== '' && searchQuery !== null) {
+        if (menuIds.length > 0) {
+            restaurantQuery.menuId = { $in: menuIds };
+        }
+        
+        if (searchQuery !== '') {
             restaurantQuery.name = { $regex: searchQuery, $options: 'i' };
         }
-      
+        
+        if (menuIds.length > 0 && searchQuery !== '') {
+            restaurantQuery = {
+                $and: [
+                    { menuId: { $in: menuIds } },
+                    { name: { $regex: searchQuery, $options: 'i' } }
+                ]
+            };
+        }
+        
         let restaurantResults = await databaseMaster.dbOp('find', 'RestaurantDetails', { query: restaurantQuery });
 
         const restaurantIds = restaurantResults.map(restaurant => restaurant.restaurantId);

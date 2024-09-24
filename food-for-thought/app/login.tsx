@@ -4,6 +4,7 @@ import { View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-nat
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Card } from '@rneui/themed';
 import { styles } from '../styles/app-styles'; 
 
 const Login = () => {
@@ -24,12 +25,12 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.rectangle}>
+      <Card containerStyle={styles.rectangle}>
         <Image source={require('../assets/images/food-for-thought-logo.png')} style={styles.logo} />
 
         <Text style={styles.subtitle}>Login</Text>
-        <Text style={styles.supportingText}>New to Food For Thought?{' '}
-          <Text style={styles.registerText} onPress={() => router.push('/register')}>Sign up for free.</Text>
+        <Text style={styles.supportingText}>New to Food For Thought?{'\n'}
+          <Text style={styles.registerText} onPress={() => router.push('/register')}>Sign up for free!</Text>
         </Text>
 
         <View style={styles.inputContainer}>
@@ -60,7 +61,7 @@ const Login = () => {
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableOpacity>
-      </View>
+      </Card>
     </View>
   );
 };

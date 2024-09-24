@@ -3,6 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
+import { Card } from '@rneui/themed';
 import { styles } from '../styles/app-styles'; 
 
 const Register = () => {
@@ -28,11 +29,11 @@ const Register = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.rectangle}>
+      <Card containerStyle={styles.rectangle}>
         <Image source={require('../assets/images/food-for-thought-logo.png')} style={styles.logo} />
 
         <Text style={styles.subtitle}>Create an Account</Text>
-        <Text style={styles.supportingText}>Already have an account?{' '}
+        <Text style={styles.supportingText}>Already have an account?{'\n'}
           <Text style={styles.registerText} onPress={() => router.push('/login')}>Log in here.</Text>
         </Text>
 
@@ -71,7 +72,7 @@ const Register = () => {
         <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>SIGN UP</Text>
         </TouchableOpacity>
-      </View>
+      </Card>
     </View>
   );
 };

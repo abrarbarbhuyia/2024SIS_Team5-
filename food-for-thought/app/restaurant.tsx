@@ -62,11 +62,10 @@ const styles = StyleSheet.create({
     detailsContainer: {
         alignItems: 'center',
         backgroundColor: '#F5EEFF',
-        paddingTop: 15,
+        paddingTop: 10,
         width: width,
         height: height,
-        paddingBottom: 115,
-        marginTop: 15,
+        flex: 1,
     },
     tabContainer: {
         flex: 1,

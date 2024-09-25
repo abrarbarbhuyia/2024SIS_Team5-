@@ -4,16 +4,6 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
 export default function Index() {
-  //carousel view + styling
-  const renderItem = ({ item }) => (
-    <View style={styles.imageContainer}>
-      <TouchableOpacity onPress={() => router.push('/restaurant')}>
-        <Image source={item.image} style={styles.image} />
-        <Text style={styles.recentLabel}>{item.label}</Text>
-        <Text style={styles.recentComment}>{item.secondLabel}</Text>
-      </TouchableOpacity>
-    </View>
-  )
 
   return (
     <View style={styles.container}>

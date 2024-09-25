@@ -15,7 +15,7 @@ useEffect(() => {
 
     // determine placeholder text based on current page
     switch (currentPage) {
-      case 'index':
+      case 'home':
         setPlaceholder('Search by dietary requirement...');
         break;
       default:

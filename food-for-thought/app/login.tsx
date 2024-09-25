@@ -4,6 +4,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } fro
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Card } from '@rneui/themed';
 // import { HOST_IP } from '@env';
 
 const Login = () => {
@@ -16,7 +17,7 @@ const Login = () => {
       const response = await axios.post(`http://${HOST_IP}:4000/login`, { username, password });
       await AsyncStorage.setItem('token', response.data.token);
       Alert.alert('Login Successful', `Welcome ${username}!`);
-      router.push('/'); 
+      router.push('/home'); 
     } catch (error: any) {
       Alert.alert('Login Failed', error.response.data.message || 'Invalid username or password. Try again.');
     }
@@ -24,12 +25,12 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.rectangle}>
+      <Card containerStyle={styles.rectangle}>
         <Image source={require('../assets/images/food-for-thought-logo.png')} style={styles.logo} />
 
         <Text style={styles.subtitle}>Login</Text>
-        <Text style={styles.supportingText}>New to Food For Thought?{' '}
-          <Text style={styles.registerText} onPress={() => router.push('/register')}>Sign up for free.</Text>
+        <Text style={styles.supportingText}>New to Food For Thought?{'\n'}
+          <Text style={styles.registerText} onPress={() => router.push('/register')}>Sign up for free!</Text>
         </Text>
 
         <View style={styles.inputContainer}>
@@ -60,7 +61,7 @@ const Login = () => {
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableOpacity>
-      </View>
+      </Card>
     </View>
   );
 };
@@ -75,16 +76,23 @@ const styles = StyleSheet.create({
   },
   rectangle: {
     width: '90%',
-    padding: '10%',
+    paddingVertical: 20,
     backgroundColor: '#FBF8FF',
     borderRadius: 20,
     alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 2,
+    shadowRadius: 4,
   },
   logo: {
     width: 124,
     height: 59,
     borderRadius: 5,
     marginBottom: 20,
+    marginTop: 15,
+    alignSelf: 'center'
   },
   subtitle: {
     fontWeight: '600',
@@ -92,18 +100,20 @@ const styles = StyleSheet.create({
     lineHeight: 32,
     color: '#1D1B20',
     marginBottom: 20,
+    textAlign: 'center',
   },
   supportingText: {
-    width: '100%',
+    paddingBottom: 8,
     fontWeight: '400',
     fontSize: 14,
     lineHeight: 20,
     textAlign: 'center',
     color: '#49454F',
     marginBottom: 30,
+    alignSelf: 'center',
   },
   inputContainer: {
-    width: '100%',
+    minWidth: '80%',
     marginBottom: 20,
     position: 'relative',
   },
@@ -128,17 +138,16 @@ const styles = StyleSheet.create({
     color: '#808080',
   },
   button: {
-    position: 'absolute',
-    width: '50%',
-    height: '10%',
-    left: '40%',
-    top: '105%',
+    minWidth: '50%',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#5A428F',
     borderColor: '#484DBE',
     borderWidth: 1,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginBottom: 10,
+    padding: 7,
+    alignSelf: 'center'
   },
   buttonText: {
     color: '#FFFFFF',

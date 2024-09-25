@@ -13,7 +13,7 @@ const Login = () => {
 
   const handleLogin = useCallback(async () => {
     try {
-      const HOST_IP = '' // add your IP address here
+      const HOST_IP = '172.19.147.72' // add your IP address here
       const response = await axios.post(`http://${HOST_IP}:4000/login`, { username, password });
       await AsyncStorage.setItem('token', response.data.token);
       Alert.alert('Login Successful', `Welcome ${username}!`);
@@ -58,7 +58,7 @@ const Login = () => {
           <Icon name="lock" size={20} color="#7E7093" style={styles.icon} />
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <TouchableOpacity style={styles.button} >
           <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableOpacity>
       </Card>
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     top: -18,
     fontSize: 12,
     color: '#7E7093',
-    fontWeight: 600,
+    fontWeight: '600',
   },
   input: {
     width: '100%',

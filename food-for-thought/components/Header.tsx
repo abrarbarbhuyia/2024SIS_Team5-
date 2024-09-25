@@ -10,7 +10,7 @@ export default function Header({homepage=false}) {
     //dont need to pass in prop in any other page as false default is expected functionality
     const handleHomeRoute = () => {
         if (!homepage) {
-            router.dismissAll();
+            router.push('/home');
         }
     }
 

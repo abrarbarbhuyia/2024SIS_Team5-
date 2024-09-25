@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     top: -18,
     fontSize: 12,
     color: '#7E7093',
-    fontWeight: 600,
+    fontWeight: '600',
   },
   input: {
     height: 40,

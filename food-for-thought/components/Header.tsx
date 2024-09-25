@@ -2,6 +2,7 @@ import { Card, Text, Icon } from '@rneui/themed';
 import { View, StyleSheet, Dimensions, Image } from "react-native";
 import React from 'react';
 import { router } from 'expo-router';
+import logo from '../assets/images/logo.png';        
 
 export default function Header({homepage=false}) {
 
@@ -23,7 +24,7 @@ export default function Header({homepage=false}) {
                     </View>
                     {/* <Icon name='user' type='evilicon' /> */}
                     {/* also some text alongside the icon */}
-                    <Card.Image source={logo} style={styles.image} onPress={handleHomePress}/>
+                    <Card.Image source={logo} style={styles.image} onPress={handleHomeRoute}/>
                     {/* now two more icons on other side of logo, side by side */}
                     <View style={{ flexDirection: 'row', marginLeft: 35, marginTop: 10}}>
                         <Icon style={{ color: '#000000', marginRight: 20 }} name='bell' type='fontisto' size={25} onPress={() => console.log("Notifications click")}/>

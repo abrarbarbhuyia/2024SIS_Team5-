@@ -14,8 +14,6 @@ export function DietaryFilterModal({ filterType, currentFilters, setActiveFilter
   const [newFilter, setNewFilter] = React.useState<string>();
   const allergens = ['nuts', 'eggs', 'soy', 'crustaceans', 'fish', 'milk', 'peanuts', 'sesame', 'wheat', 'lupin'];
   const diets = ['vegetarian', 'vegan', 'halal', 'gluten-free', 'keto', 'fodmap', 'lactose-free', 'low-sugar', 'pescatarian'];
-  const cuisine = ['thai', 'indian', 'italian', 'chinese', 'japanese', 'mexican', 'korean', 'french', 'greek', 'turkish', 'vietnamese'];
-
 
   function addFilter(value: string) {
     if (value === null) return;
@@ -127,40 +125,6 @@ export function DietaryFilterModal({ filterType, currentFilters, setActiveFilter
               />
             </ListItem>))}
         </ScrollView>
-        : filterType === 'cuisine' ?
-          <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
-            {cuisine.concat(currentFilters.filter(f => (f.type === 'cuisine') && (!diets.includes(f.value))).map(f => f.value) ?? []).map(c => (
-              <ListItem bottomDivider containerStyle={styles.listItem} key={`${c}-cuisine`}>
-                <Avatar
-                  size={32}
-                  rounded
-                  title={c[0].toUpperCase()}
-                  containerStyle={{ backgroundColor: "purple" }} />
-                <ListItem.Content>
-                  <ListItem.Title>{capitaliseFirstLetter(c)}</ListItem.Title>
-                </ListItem.Content>
-                <CheckBox
-                  key={`${c}-cuisine-checkbox`}
-                  checked={currentFilters
-                    ? currentFilters.find(cur => (cur.type === filterType) && (cur.value === formatTextValue(c))) ? true : false
-                    : false}
-                  onPress={() => onCheckFilter(c)}
-                  containerStyle={styles.checkBoxContainer}
-                  checkedColor="#5A428F"
-                  uncheckedColor="#BCBCBC"
-                  checkedIcon={
-                    <Icon
-                      name="check-box"
-                      type="material"
-                      color="#5A428F"
-                      size={25}
-                      iconStyle={styles.checkboxIcon}
-                    />
-                  }
-                  size={25}
-                />
-              </ListItem>))}
-          </ScrollView>
           : <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
             {(currentFilters?.filter(f => f.type === 'ingredients') ?? []).map(f =>
               <ListItem bottomDivider containerStyle={styles.listItem} key={`${f.value}-ingredients`}>

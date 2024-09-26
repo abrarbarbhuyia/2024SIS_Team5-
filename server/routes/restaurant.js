@@ -51,13 +51,6 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
             // if there is no existing entry
             if (result.length == 0)
             {
-                //fetch the place details of the restaurant including location, name, telephone, hours and website
-                const placeDetailsUrl = `https://api.foursquare.com/v3/places/${fsq_id}?fields=name%2Clocation%2Cgeocodes%2Chours%2Ctel%2Cwebsite%2Ccategories%2Cprice%2Crating%2Cstats`;
-                const response1 = await axios.get(placeDetailsUrl, {
-                    headers: {
-                        Authorization: `${process.env.FOURSQUARE_API_KEY}`
-                    }
-                });
 
                 //call the testFlow to create the menu and its associated meals and allergens
                 const has_menu_flag = await testFlow(fsq_id);
@@ -65,6 +58,49 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
                 //if the restaurant has a valid menu, add the restaurant to the restaurant collection
                 if (has_menu_flag)
                 {   
+                    //fetch the place details of the restaurant including location, name, telephone, hours and website
+                    const placeDetailsUrl = `https://api.foursquare.com/v3/places/${fsq_id}?fields=name%2Clocation%2Cgeocodes%2Chours%2Ctel%2Cwebsite%2Ccategories%2Cprice%2Crating%2Cstats`;
+                    const response1 = await axios.get(placeDetailsUrl, {
+                        headers: {
+                            Authorization: `${process.env.FOURSQUARE_API_KEY}`
+                        }
+                    });
+
+                    //fetch 5 most popular indoor and/or outdoor photos of the restaurant
+                    const restaurantPhotosUrl = `https://api.foursquare.com/v3/places/${fsq_id}/photos?limit=5&classifications=indoor%2Coutdoor`;
+                    const response2 = await axios.get(restaurantPhotosUrl, {
+                        headers: {
+                            Authorization: `${process.env.FOURSQUARE_API_KEY}`
+                        }
+                    });
+
+                    //iterate through each photo in the array
+                    var place_photo_array = response2.data
+                    var restaurant_photo_array = [];
+                    for (let i = 0; i < place_photo_array.length; i++) 
+                    {
+                              //concatenate the menu_url_string to "prefix" + "widthxheight" + "height"
+                              const menu_url = place_photo_array[i].prefix + place_photo_array[i].width + "x" + place_photo_array[i].height + place_photo_array[i].suffix;
+                              restaurant_photo_array.push(menu_url)
+                    }
+
+                    //fetch 5 most popular food photos of the restaurant
+                    const foodPhotosUrl = `https://api.foursquare.com/v3/places/${fsq_id}/photos?limit=5&classifications=food`;
+                    const response3 = await axios.get(foodPhotosUrl, {
+                        headers: {
+                            Authorization: `${process.env.FOURSQUARE_API_KEY}`
+                        }
+                    });
+
+                    place_photo_array = response3.data
+                    var food_photo_array = [];
+                    for (let i = 0; i < place_photo_array.length; i++) 
+                    {
+                              //concatenate the menu_url_string to "prefix" + "widthxheight" + "height"
+                              const menu_url = place_photo_array[i].prefix + place_photo_array[i].width + "x" + place_photo_array[i].height + place_photo_array[i].suffix;
+                              food_photo_array.push(menu_url)
+                    }
+
                     //retrieve the restaurant's menu from the MenuDetails collection
                     const menu_find_result = await databaseMaster.dbOp('find', 'MenuDetails', { query: { restaurantId: fsq_id } });
                     const placeDetails = response1.data;
@@ -94,15 +130,31 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
                         price: placeDetails.price,
                         rating: placeDetails.rating,
                         total_ratings: placeDetails.stats.total_ratings,
-                        menuId: menu_find_result[0].menuId
+                        restaurantPhotos: restaurant_photo_array,
+                        foodPhotos: food_photo_array,
+                        menuId: menu_find_result[0].menuId,
+                        hasMenu: true
                     }) 
                     await databaseMaster.dbOp('insert', 'RestaurantDetails', { docs: [restaurant] });
                     restaurant_ids.push(fsq_id);
                 }
+                else 
+                {
+                    //for restaurants without a valid menu, create any entry in the restaurant details collections but set the hasMenuFlag to false
+                    const restaurant = new Restaurant({
+                        restaurantId: fsq_id,
+                        hasMenu: false
+                    })
+                    await databaseMaster.dbOp('insert', 'RestaurantDetails', { docs: [restaurant] });
+                }
             }
             else
-            {
-                restaurant_ids.push(fsq_id);
+            { 
+                //if the restaurant has a valid menu, add it to the list of search query restaurants
+                  if(result[0].hasMenu)
+                {
+                    restaurant_ids.push(fsq_id);
+                } 
             }
         }  
         //a wierd bug where the restaurant_ids array were returning duplicates, quick fix for now

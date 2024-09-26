@@ -4,8 +4,8 @@ const axios = require('axios');
 const router = express.Router();
 const Restaurant = require('../models/restaurantModel');
 const databaseMaster = require('../databaseMaster');
+const {testFlow} = require('../allergenTest');
 
-/* Get a restaurant from a restaurantId */
 router.get('/getRestaurant/:restaurantId', async (req, res) => {
     try {
         const restaurantId = req.params.restaurantId;
@@ -20,6 +20,7 @@ router.get('/getRestaurant/:restaurantId', async (req, res) => {
 
 router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) => {
     //latitude, longitude of user and radius of search (in metres) in the request params
+    const restaurant_ids = [];
     const latitude = req.params.latitude;
     const longitude = req.params.longitude;
     const radius = req.params.radius;
@@ -57,38 +58,55 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
                         Authorization: `${process.env.FOURSQUARE_API_KEY}`
                     }
                 });
-                const placeDetails = response1.data
-                const categories_array = placeDetails.categories
 
-                //iterate through the categories array to retrieve the cuisines
-                const cuisine = [];
-                cuisine_options = ["Chinese", "Australian", "Thai", "Asian", "Italian", "Greek", "Mexican", "Japanese", "Vietnamese", "Korean", "American", "French", "Turkish", "Indian"]
-                for (i = 0; i < categories_array.length; i++)
-                {
-                    if(cuisine_options.includes(categories_array[i].short_name))
+                //call the testFlow to create the menu and its associated meals and allergens
+                const has_menu_flag = await testFlow(fsq_id);
+
+                //if the restaurant has a valid menu, add the restaurant to the restaurant collection
+                if (has_menu_flag)
+                {   
+                    //retrieve the restaurant's menu from the MenuDetails collection
+                    const menu_find_result = await databaseMaster.dbOp('find', 'MenuDetails', { query: { restaurantId: fsq_id } });
+                    const placeDetails = response1.data;
+
+                    //iterate through the categories array to retrieve the cuisines
+                    const categories_array = placeDetails.categories;
+                    const cuisine = [];
+                    cuisine_options = ["Chinese", "Australian", "Thai", "Asian", "Italian", "Greek", "Mexican", "Japanese", "Vietnamese", "Korean", "American", "French", "Turkish", "Indian"]
+                    for (i = 0; i < categories_array.length; i++)
                     {
-                        cuisine.push(categories_array[i].short_name);
-                    }  
+                        if(cuisine_options.includes(categories_array[i].short_name))
+                        {
+                            cuisine.push(categories_array[i].short_name);
+                        }  
+                    }
+                    //create a restaurant entry using model schema and add new entry to the RestaurantDetails collection
+                    const restaurant = new Restaurant({
+                        restaurantId: fsq_id,
+                        name: placeDetails.name,
+                        address: placeDetails.location.formatted_address,
+                        latitude: placeDetails.geocodes.main.latitude,
+                        longitude: placeDetails.geocodes.main.longitude,
+                        openingHours: placeDetails.hours.regular,
+                        phoneNumber: placeDetails.tel,
+                        website: placeDetails.website,
+                        cuisine: cuisine,
+                        price: placeDetails.price,
+                        rating: placeDetails.rating,
+                        total_ratings: placeDetails.stats.total_ratings,
+                        menuId: menu_find_result[0].menuId
+                    }) 
+                    await databaseMaster.dbOp('insert', 'RestaurantDetails', { docs: [restaurant] });
+                    restaurant_ids.push(fsq_id);
                 }
-                //create a restaurant entry using model schema and add new entry to the RestaurantDetails collection
-                const restaurant = new Restaurant({
-                    restaurantId: fsq_id,
-                    name: placeDetails.name,
-                    address: placeDetails.location.formatted_address,
-                    latitude: placeDetails.geocodes.main.latitude,
-                    longitude: placeDetails.geocodes.main.longitude,
-                    openingHours: placeDetails.hours.regular,
-                    phoneNumber: placeDetails.tel,
-                    website: placeDetails.website,
-                    cuisine: cuisine,
-                    price: placeDetails.price,
-                    rating: placeDetails.rating,
-                    total_ratings: placeDetails.stats.total_ratings
-                }) 
-                await databaseMaster.dbOp('insert', 'RestaurantDetails', { docs: [restaurant] });  
+            }
+            else
+            {
+                restaurant_ids.push(fsq_id);
             }
         }  
-        res.json(restaurants_array);
+        //a wierd bug where the restaurant_ids array were returning duplicates, quick fix for now
+        res.json(Array.from(new Set(restaurant_ids)));
  
     } catch(error) {
         console.error(error);

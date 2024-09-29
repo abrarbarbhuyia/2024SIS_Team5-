@@ -10,6 +10,7 @@ const mealRoutes = require('./routes/meal');
 const menuRoutes = require('./routes/menu');
 const ingredientRoutes = require('./routes/ingredient');
 const mealIngredientRoutes = require('./routes/mealIngredient');
+const restaurantRoutes = require('./routes/restaurant.js');
 const { runTests } = require('./allergenTest');
 
 
@@ -26,6 +27,8 @@ app.use('/meal', mealRoutes);
 app.use('/menu', menuRoutes);
 app.use('/ingredient', ingredientRoutes);
 app.use('/mealIngredient', mealIngredientRoutes);
+app.use('/restaurant', restaurantRoutes);
+
 
 app.get('/api/menu', async (req, res) => {
   try {
@@ -42,6 +45,6 @@ app.get('/', (req, res) => {
 
 app.listen(port, async () => {
   await testConnection();
-  // await runTests();
+  //await runTests();
   console.log(`Example app listening on port ${port}`);
 });

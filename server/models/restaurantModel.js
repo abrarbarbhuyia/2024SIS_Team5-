@@ -9,7 +9,9 @@ restaurantSchema = new schema({
     openingHours: {type: String, required: true},
     phoneNumber: {type: Number, required: true},
     website: {type: String, required: true},
-    menuId: {type: String, required: true}
+    menuId: {type: String, required: true},
+    cuisine: {type: String, required: true},
+    restaurantPhotos: {type: [String], required: false},
 })
 
 module.exports = model("Restaurant", restaurantSchema)

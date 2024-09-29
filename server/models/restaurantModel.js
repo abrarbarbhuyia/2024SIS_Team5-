@@ -9,6 +9,8 @@ restaurantSchema = new schema({
     openingHours: {type: String, required: true},
     phoneNumber: {type: Number, required: true},
     website: {type: String, required: true},
+    cuisine: {type: Array[String], required: true},
+    menuItemMatches: {type: Number},
     menuId: {type: String, required: true}
 })
 

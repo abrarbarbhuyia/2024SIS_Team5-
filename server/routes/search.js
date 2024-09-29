@@ -7,9 +7,11 @@ router.get('/', async (req, res) => {
         const ingredientFilter = req.query.ingredientFilter;
         const allergensFilter = req.query.allergens || [];
         const dietsFilter = req.query.diets || [];
+        const cuisineFilter = req.query.cuisine || [];
+        const mealFilter = req.query.meals;
         const searchQuery = req.query.searchQuery || '';
 
-        const isFilterApplied = ingredientFilter || allergensFilter.length > 0 || dietsFilter.length > 0 || searchQuery;
+        const isFilterApplied = ingredientFilter || allergensFilter.length > 0 || dietsFilter.length > 0 || cuisineFilter.length > 0 || mealFilter || searchQuery;
 
         if (!isFilterApplied) {
             const allRestaurants = await databaseMaster.dbOp('find', 'RestaurantDetails', {});
@@ -32,7 +34,8 @@ router.get('/', async (req, res) => {
         console.log(`ingredientIds that match applied filters ${ingredientIds}`);
         
         let mealQuery = {
-            mealId: { $in: await getMealIdsForIngredients(ingredientIds) }
+            mealId: { $in: await getMealIdsForIngredients(ingredientIds) },
+            name: { $regex: mealFilter, $options: 'i' }
         };
 
         if (dietsFilter.length > 0) { // only add the diets filter if it has values
@@ -52,6 +55,10 @@ router.get('/', async (req, res) => {
 
         if (menuIds.length > 0) {
             restaurantQuery.menuId = { $in: menuIds };
+        }
+
+        if (cuisineFilter.length > 0) {
+            restaurantQuery.cuisine = { $in: [cuisineFilter] };
         }
         
         if (searchQuery !== '') {

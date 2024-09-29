@@ -8,17 +8,18 @@ import pic from '../assets/images/react-logo.png'; // Placeholder image
 import RecommendedRestaurant from "@/components/RecommendedRestaurant";
 import MapView, { Marker } from "react-native-maps";
 import React, { useState, useEffect } from "react";
-import axios from "axios"; // Make sure you import axios if you're using it
+import axios from "axios";
 
-// For now, static API call - will handle user variation later
-const API_URL = "http://192.168.1.208:4000";
+// insert your URL + port number server running on below
+const API_URL = "";
 
 // Component
 const Home = () => {
-  const [fetchedRestaurants, setFetchedRestaurants] = useState<any[]>([]); // Specify the type here
+  const [fetchedRestaurants, setFetchedRestaurants] = useState<any[]>([]);
 
   // Fetch specific restaurants by ID
   const fetchRestaurants = async () => {
+    //using static IDs from Mongo for now
     const restaurantIds = ['4e4a1510483b16676e3a760f', '5296bc3011d29d380e6f36d2', '4b679079f964a52078552be3', '592fcdf29ef8ef6604fa5b64', '4b09eb00f964a520bf1f23e3'];
     const promises = restaurantIds.map(id => {
       const url = `${API_URL}/restaurant/getIngredient/${id}`;

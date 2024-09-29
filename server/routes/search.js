@@ -45,9 +45,14 @@ router.get('/', async (req, res) => {
         let mealResults = await databaseMaster.dbOp('find', 'MealDetails', { // search for meals that match diet AND whose mealId contains the ingredients before
             query: mealQuery
         });
+        
+        let menuMealCount = mealResults.reduce((map, meal) => { // REDUUUUUUUUUCE !!
+            const menuId = meal.menuId;
+            map.set(menuId, (map.get(menuId) || 0) + 1);
+            return map;
+        }, new Map());
 
-        const mealIds = mealResults.map(meal => meal.mealId);
-        console.log(`mealIds that match applied filters ${mealIds}`);
+        console.log(menuMealCount);
 
         const menuIds = mealResults.map(meal => meal.menuId);
         
@@ -75,11 +80,14 @@ router.get('/', async (req, res) => {
         }
         
         let restaurantResults = await databaseMaster.dbOp('find', 'RestaurantDetails', { query: restaurantQuery });
+        const updatedRestaurantResults = restaurantResults.map(r => ({
+            ...r, menuItemMatches: menuMealCount.get(r.menuId)
+        }));
 
-        const restaurantIds = restaurantResults.map(restaurant => restaurant.restaurantId);
-        console.log(`restaurantIds that match applied filters ${restaurantIds}`);
+        res.json(updatedRestaurantResults);
 
-        res.json(restaurantResults);
+        // TO DO: filter by radius by calling external function searchRestaurant/:latitude/:longitude/:radius
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: error.message || 'Internal Server Error' });

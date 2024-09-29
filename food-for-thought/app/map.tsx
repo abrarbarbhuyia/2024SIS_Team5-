@@ -220,9 +220,11 @@ const RestaurantMap = () => {
 };
 
 const filterColours: {[key: string]: {fill: string, border: string}} = {
-  'diets': { fill: '#FFE7DC', border: '#FEBFAC' },
-  'allergens': { fill: '#F3D9FF', border: '#D59CEF' },
+  'diets': { fill: '#F3D9FF', border: '#D59CEF' },
+  'allergens': { fill: '#FFDCDC', border: '#FEACAC' },
   'ingredients': { fill: '#E4EDFF', border: '#A8C1F3' },
+  'cuisine': { fill: '#FFF2D9', border: '#FFC56F' },
+  'meals': { fill: '#DDF8DD', border: '#B5EFB5' },
   'selected': { fill: '#E8DEF8', border: '#BDB0CA' }
 }
 

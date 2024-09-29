@@ -9,6 +9,18 @@ Install the latest version of [NodeJS](https://nodejs.org/en/download) and NPM. 
 
 Install [Expo Go](https://docs.expo.dev/get-started/set-up-your-environment/) for your development environment.
 
+## Environment Variables
+Add relevant environment variables in `app.json` under `"extra"`.
+```json
+{
+    "expo": {
+        "extra": {
+            "HOST_IP": "127.0.0.1"
+        }
+    }
+}
+```
+
 ## Terminal
 ```bash
 cd food-for-thought

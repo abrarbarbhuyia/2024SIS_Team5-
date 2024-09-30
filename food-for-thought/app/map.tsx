@@ -12,29 +12,29 @@ import { RestaurantModal } from '@/components/RestaurantModal';
 import Constants from 'expo-constants';
 
 export type Restaurant = {
+  _id: string,
+  restaurantId: string,
   name: string,
   address: string,
-  openingTimes?: string,
-  cuisine?: string,
-  // star rating out of 5
+  latitude: string,
+  longitude: string,
+  openingHours?: [{ 
+    close: string, day: number, open: string
+  }],
+  phoneNumber?: string,
+  website?: string,
+  cuisine?: string[],
+  // price rating out of 1: cheap, 2: average, 3: expensive, 4: very expensive 
+  price?: number,
+  // rating out of 10
   rating?: number,
-  // cost rating out of 'affordable' | 'average' | 'expensive'
-  costRating?: string,
-  // distance in kilometers
-  distance?: number,
-  // number of matching menu items to current dietary filters
-  menuMatches?: number,
-}
-
-const exampleRestaurant = {
-  name: 'Mother Chus Kitchen',
-  address: '367 Pitt Street, Sydney NSW 2000',
-  openingTimes: 'Today, 9am to 5pm',
-  rating: 4.3,
-  cuisine: 'asian',
-  costRating: 'average',
-  distance: 1.2,
-  menuMatches: 25,
+  total_ratings?: 232,
+  menuId?: string,
+  restaurantPhotos?: string[],
+  foodPhotos?: string[],
+  hasMenu?: boolean
+  // number of matching menu items to the current dietary filters
+  menuItemMatches?: number
 }
 
 const RestaurantMap = () => {
@@ -44,6 +44,11 @@ const RestaurantMap = () => {
   const [activeRestaurant, setActiveRestaurant] = useState<Restaurant | undefined>();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [restaurants, setRestaurants] = useState<any[]>([]);
+  // initial region is hardcoded to UTS Tower
+  const [userLocation, setUserLocation] = useState<{ latitude: number, longitude: number }>({ 
+    latitude: -33.88336558611229,
+    longitude: 151.2009263036271,
+  })
 
   const filterTypes = ['diets', 'allergens', 'ingredients', 'cuisine', 'meals'];
   const snapPoints = useMemo(() => ['25%', '50%'], []);
@@ -62,7 +67,7 @@ const RestaurantMap = () => {
         },
       });
       setRestaurants(response.data);
-      console.log("SEARCH RESTAURANTS", response.data);
+      console.log("SEARCH RESTAURANTS", JSON.stringify(response.data[6]));
       bottomSheetModalRef.current?.present();
     } catch (error: any) {
       console.error(error.response.data?.message || 'Error searching restaurants. Try again.');
@@ -153,15 +158,14 @@ const RestaurantMap = () => {
             </View>
             <MapView
               style={styles.map}
-              initialRegion={{ // initial region is hardcoded to UTS Tower
-                latitude: -33.88336558611229,
-                longitude: 151.2009263036271,
+              initialRegion={{
+                ...userLocation,
                 latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
+                longitudeDelta: 0.0421
               }}
             >
               <Marker
-                coordinate={{ latitude: -33.88336558611229, longitude: 151.2009263036271 }}
+                coordinate={userLocation}
                 title={"My location"} >
                 <View style={styles.filledCircle} />
               </Marker>
@@ -169,7 +173,7 @@ const RestaurantMap = () => {
                 <Marker
                   key={`marker-${i}`}
                   coordinate={{ latitude: r.latitude, longitude: r.longitude }}
-                  onPress={() => setActiveRestaurant(exampleRestaurant)}>
+                  onPress={() => setActiveRestaurant(r)}>
                   <View style={styles.markerContainer}>
                     <Icon
                       name="map-marker"

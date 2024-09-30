@@ -53,11 +53,11 @@ export function RestaurantModal({ restaurant, setShowModal, ...rest }: DietaryFi
       </View>
       <View style={styles.flexFormGroup}>
         <Text style={styles.formDescriptionTextBold}>
-          {capitaliseFirstLetter(restaurant.cuisine ?? '')} • {restaurant.costRating} cost • {restaurant.distance}km away</Text>
+          {capitaliseFirstLetter(restaurant.cuisine?.toString() ?? '')} • {restaurant.price} cost • km away</Text>
       </View>
       <View style={styles.flexFormGroup}>
         <Text style={styles.formDescriptionTextBold}>
-          {restaurant.menuMatches} menu items matches your dietary filters!
+          {restaurant.menuItemMatches} menu items matches your dietary filters!
         </Text>
       </View>
       <View style={styles.flexFormGroup}>
@@ -74,7 +74,7 @@ export function RestaurantModal({ restaurant, setShowModal, ...rest }: DietaryFi
           type='feather'
           iconStyle={styles.icon}
           size={16} />
-        <Text style={styles.formDescriptionText}>{restaurant.openingTimes}</Text>
+        <Text style={styles.formDescriptionText}>{restaurant.name}</Text>
       </View>
       <View style={{ ...styles.flexFormGroup, paddingBottom: 10 }}>
         <Text style={styles.formDescriptionTextBold}>Matching menu items: </Text>

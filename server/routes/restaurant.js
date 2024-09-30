@@ -110,20 +110,19 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
                     const cuisineType_array = [];
                     const restaurantType_array = [];
                     const cuisineTypes = ["Chinese", "Australian", "Thai", "Asian", "Italian", "Greek", "Mexican", "Japanese", "Vietnamese", "Korean", "American", "French", "Turkish", "Indian", "Malay", "Korean BBQ", "Mediterranean"];
-                    const restaurantTypes = ["Bakery", "Bar", "Pub", "Café", "Coffee Shop", "Halal", "Vegan and Vegetarian", "Desserts", "Donuts", "Steakhouse", "Diner", "Fish and Chips Shop", "Ice Cream", "Tea Room", "Gelato", "Pizza", "Hotel Bar", "Wine Bar", "Beer Bar"];
                     for (i = 0; i < categories_array.length; i++)
                     {
                         if(cuisineTypes.includes(categories_array[i].short_name))
                         {
                             //retrieve the cuisine name and associated icon png at size 64 pixels
-                            const cuisine_icon_url = categories_array[i].icon.prefix + "bg_64" + categories_array[i].icon.suffix
+                            const cuisine_icon_url = categories_array[i].icon.prefix + "64.png"
                             cuisineType_array.push({"cuisineType": categories_array[i].short_name, "icon" : cuisine_icon_url});
                         }  
 
-                        else if(restaurantTypes.includes(categories_array[i].short_name))
+                        else
                         {
                             //retrieve the restaurant Type and associated icon png at size 64 pixels
-                            const restaurantType_icon_url = categories_array[i].icon.prefix + "bg_64" + categories_array[i].icon.suffix
+                            const restaurantType_icon_url = categories_array[i].icon.prefix + "64.png"
                             restaurantType_array.push({"restaurantType": categories_array[i].short_name, "icon" : restaurantType_icon_url});
                         }  
                     }

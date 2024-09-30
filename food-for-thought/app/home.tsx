@@ -5,36 +5,38 @@ import SearchBar from "@/components/SearchBar";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Header from "@/components/Header";     
 import pic from '../assets/images/react-logo.png';
+import RecommendedRestaurant from "@/components/RecommendedRestaurant";
 import MapView, { Marker } from "react-native-maps";
 import { styles } from '../styles/app-styles'; 
 
 //mock data images for carousel
 const carouselData = [
-  { id: '1', image: pic, label: 'Food item', secondLabel: 'Food' },
-  { id: '2', image: pic, label: 'Food item', secondLabel: 'Food' },
-  { id: '3', image: pic, label: 'Food item', secondLabel: 'Food' },
-  { id: '4', image: pic, label: 'Food item', secondLabel: 'Food' },
-  { id: '5', image: pic, label: 'Food item', secondLabel: 'Food' },
-  { id: '6', image: pic, label: 'Food item', secondLabel: 'Food' },
-  { id: '7', image: pic, label: 'Food item', secondLabel: 'Food' },
+  { id: '1', image: pic, label: 'Restaurant Title', secondLabel: 'Cuisine' },
+  { id: '2', image: pic, label: 'Restaurant Title', secondLabel: 'Cuisine' },
+  { id: '3', image: pic, label: 'Restaurant Title', secondLabel: 'Cuisine' },
+  { id: '4', image: pic, label: 'Restaurant Title', secondLabel: 'Cuisine' },
+  { id: '5', image: pic, label: 'Restaurant Title', secondLabel: 'Cuisine' },
+  { id: '6', image: pic, label: 'Restaurant Title', secondLabel: 'Cuisine' },
+  { id: '7', image: pic, label: 'Restaurant Title', secondLabel: 'Cuisine' },
 ];
-
 
 const Home = () => {
   //carousel view + styling
-  const renderItem = ({item}: any) => (
+  const renderItem = ({ item }: any) => (
     <View style={styles.imageContainer}>
-      <Image source={item.image} style={styles.homeImage} />
-      <Text style={styles.recentLabel}>{item.label}</Text>
-      <Text style={styles.recentComment}>{item.secondLabel}</Text>
+      <TouchableOpacity onPress={() => router.push('/restaurant')}>
+        <Image source={item.image} style={styles.homeImage} />
+        <Text style={styles.recentLabel}>{item.label}</Text>
+        <Text style={styles.recentComment}>{item.secondLabel}</Text>
+      </TouchableOpacity>
     </View>
   )
 
   return (
     <View style={styles.container}>
-      <Header />
+      <Header homepage={true}></Header>
       {/* Card for the Restaurant finder */}
-        <TouchableOpacity onPress={() => router.push('/map')}>
+      <TouchableOpacity onPress={() => router.push('/map')}>
           <Card containerStyle={styles.finderCard}>
             <View style={{  }}>
               <SearchBar/>             
@@ -59,7 +61,7 @@ const Home = () => {
       {/* Card for recently visited Restaurants */}
       <Card containerStyle={styles.recentCard}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text h4>Last Visited</Text>
+          <Text h4 style={{color: '#2E1C47'}}>Last Visited</Text>
           <Icon name="arrowright" type="antdesign" size={25} onPress={() => console.log("Recent arrow clicked")} />
         </View>
         {/* rendering the pics in carousel */}
@@ -75,14 +77,14 @@ const Home = () => {
       {/* Card for restaurant recommndations */}
       <Card containerStyle={styles.recommendationsCard}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text h4>Recommendations</Text>
+          <Text h4 style={{color: '#2E1C47'}}>Recommendations</Text>
           <Icon name="arrowright" type="antdesign" size={25} onPress={() => console.log("Recommendations arrow clicked")} />
         </View>
-        {/* <Link href={"/login"}>Login</Link>
-        <Link href={"/map"}>Click here to see the Map Display</Link> */}
+        <RecommendedRestaurant />
+        <RecommendedRestaurant />
       </Card>
     </View>
   );
-};
+}
 
 export default Home;

@@ -60,7 +60,7 @@ const Login = () => {
           <Icon name="lock" size={20} color="#7E7093" style={styles.icon} />
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <TouchableOpacity style={styles.button} >
           <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableOpacity>
       </Card>

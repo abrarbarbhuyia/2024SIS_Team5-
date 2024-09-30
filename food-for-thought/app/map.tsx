@@ -41,8 +41,6 @@ const RestaurantMap = () => {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [filterType, setFilterType] = useState<string | undefined>();
   const [activeFilters, setActiveFilters] = useState<{ type: string, value: string }[]>([]);
-  const [markers, setMarkers] = useState<{name: string, lat: number, long: number}[]>([
-    {name: 'Pane e Vino', lat: -33.88087996454809, long: 151.2097105847393}]);
   const [activeRestaurant, setActiveRestaurant] = useState<Restaurant | undefined>();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [restaurants, setRestaurants] = useState<any[]>([]);
@@ -64,6 +62,7 @@ const RestaurantMap = () => {
         },
       });
       setRestaurants(response.data);
+      console.log("SEARCH RESTAURANTS", response.data);
       bottomSheetModalRef.current?.present();
     } catch (error: any) {
       console.error(error.response.data?.message || 'Error searching restaurants. Try again.');
@@ -73,7 +72,7 @@ const RestaurantMap = () => {
   useEffect(() => {
     fetchRestaurants();
   }, [searchTerm, activeFilters]);
-  
+
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
   }, []);
@@ -95,7 +94,7 @@ const RestaurantMap = () => {
       <View style={styles.container}>
         <Header />
         <Card containerStyle={styles.baseCard}>
-          <View style={{ flexDirection: 'column', rowGap: 2}}>
+          <View style={{ flexDirection: 'column', rowGap: 2 }}>
             <SearchBar onSearch={handleSearch} />
             <View style={styles.flexContainer}>
               <Icon
@@ -103,38 +102,40 @@ const RestaurantMap = () => {
                 type='font-awesome'
                 iconStyle={styles.icon}
                 size={20} />
-                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.badgeScrollView}>
-                  {activeFilters.length > 0 ? activeFilters.map(f => <Badge 
-                    badgeStyle={{ 
-                      ...styles.filterBackground, 
-                      backgroundColor: filterColours[f.type]?.fill ?? 'white', 
-                      borderColor: filterColours[f.type]?.border ?? 'white'}}
-                    textStyle={styles.filterText}
-                    key={`${f.type}-${f.value}`}
-                    value={
-                      <Text style={styles.filterText}>
-                        {`${f.type === 'allergens' ? 'No' : ''} ${capitaliseFirstLetter(f.value)}`}
-                        <Icon
-                          name='x'
-                          type='feather'
-                          iconStyle={styles.badgesCross}
-                          size={15}
-                          onPress={() => activeFilters.length > 0 
-                            ? setActiveFilters(activeFilters.filter(filter => !(filter === f))) 
-                            : null} />
-                    </Text>} />) : <Text style={{color: 'grey', fontSize: 12, paddingTop: 5}}>No filters set</Text>} 
-                  </ScrollView>
+              <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.badgeScrollView}>
+                {activeFilters.length > 0 ? activeFilters.map(f => <Badge
+                  badgeStyle={{
+                    ...styles.filterBackground,
+                    backgroundColor: filterColours[f.type]?.fill ?? 'white',
+                    borderColor: filterColours[f.type]?.border ?? 'white'
+                  }}
+                  textStyle={styles.filterText}
+                  key={`${f.type}-${f.value}`}
+                  value={
+                    <Text style={styles.filterText}>
+                      {`${f.type === 'allergens' ? 'No' : ''} ${capitaliseFirstLetter(f.value)}`}
+                      <Icon
+                        name='x'
+                        type='feather'
+                        iconStyle={styles.badgesCross}
+                        size={15}
+                        onPress={() => activeFilters.length > 0
+                          ? setActiveFilters(activeFilters.filter(filter => !(filter === f)))
+                          : null} />
+                    </Text>} />) : <Text style={{ color: 'grey', fontSize: 12, paddingTop: 5 }}>No filters set</Text>}
+              </ScrollView>
             </View>
-            <View style={{...styles.flexContainer, paddingBottom: 6 }}>
+            <View style={{ ...styles.flexContainer, paddingBottom: 6 }}>
               {filterTypes.map(f =>
-                <Badge 
+                <Badge
                   containerStyle={{ flex: 1 }}
-                  badgeStyle={{...styles.typesBackground, 
+                  badgeStyle={{
+                    ...styles.typesBackground,
                     width: '100%',
-                    ...((filterType === f || activeFilters.map(f => f.type).includes(f)) && { 
-                      backgroundColor: filterColours['selected'].fill, 
-                      borderColor: filterColours['selected'].border 
-                    }), 
+                    ...((filterType === f || activeFilters.map(f => f.type).includes(f)) && {
+                      backgroundColor: filterColours['selected'].fill,
+                      borderColor: filterColours['selected'].border
+                    }),
                   }}
                   value={<View style={styles.filterBadgeContainer}>
                     {activeFilters.map(f => f.type).includes(f) && <Icon
@@ -148,7 +149,7 @@ const RestaurantMap = () => {
                   </View>}
                   key={f}
                   onPress={() => setFilterType(f)} />)}
-                  
+
             </View>
             <MapView
               style={styles.map}
@@ -159,59 +160,58 @@ const RestaurantMap = () => {
                 longitudeDelta: 0.0421,
               }}
             >
-              <Marker 
-                coordinate={{ latitude:  -33.88336558611229, longitude: 151.2009263036271 }}
+              <Marker
+                coordinate={{ latitude: -33.88336558611229, longitude: 151.2009263036271 }}
                 title={"My location"} >
                 <View style={styles.filledCircle} />
               </Marker>
-              {markers.length > 0 && markers.map((m, i) => 
-              <Marker
-                key={`marker-${i}`}
-                coordinate={{ latitude: m.lat, longitude: m.long }}
-                onPress={() => setActiveRestaurant(exampleRestaurant)}>
-                <View style={styles.markerContainer}>
-                  <Icon
-                    name="map-marker"
-                    type="material-community"
-                    color="#CB4C4E"
-                    size={50}
-                  />
-                  <View style={styles.innerCircle}>
+              {restaurants.length > 0 && restaurants.map((r, i) =>
+                <Marker
+                  key={`marker-${i}`}
+                  coordinate={{ latitude: r.latitude, longitude: r.longitude }}
+                  onPress={() => setActiveRestaurant(exampleRestaurant)}>
+                  <View style={styles.markerContainer}>
                     <Icon
-                      name="food"
+                      name="map-marker"
                       type="material-community"
-                      color="white"
-                      size={18}
+                      color="#CB4C4E"
+                      size={50}
                     />
+                    <View style={styles.innerCircle}>
+                      <Icon
+                        name="food"
+                        type="material-community"
+                        color="white"
+                        size={18}
+                      />
+                    </View>
                   </View>
-                </View>
-              </Marker>)}
+                </Marker>)}
             </MapView>
             <BottomSheetModal
               ref={bottomSheetModalRef}
               index={1}
               snapPoints={snapPoints}
-              onChange={handleSheetChanges}
-            >
-          <BottomSheetView style={styles.contentContainer}>
-            {restaurants.length > 0 ? (
-              <FlatList
-                data={restaurants}
-                renderItem={renderRestaurant}
-                keyExtractor={item => item.restaurantId}
-              />
-            ) : (
-              <Text style={styles.noResultsText}>No restaurants found.</Text>
-            )}
-          </BottomSheetView>
+              onChange={handleSheetChanges}>
+              <BottomSheetView style={styles.contentContainer}>
+                {restaurants.length > 0 ? (
+                  <FlatList
+                    data={restaurants}
+                    renderItem={renderRestaurant}
+                    keyExtractor={item => item.restaurantId}
+                  />
+                ) : (
+                  <Text style={styles.noResultsText}>No restaurants found.</Text>
+                )}
+              </BottomSheetView>
             </BottomSheetModal>
           </View>
         </Card>
       </View>
-      {filterType && <DietaryFilterModal 
-        filterType={filterType} 
+      {filterType && <DietaryFilterModal
+        filterType={filterType}
         currentFilters={activeFilters}
-        setShowModal={setFilterType} 
+        setShowModal={setFilterType}
         setActiveFilters={setActiveFilters} />}
       {activeRestaurant && <RestaurantModal
         setShowModal={setActiveRestaurant} restaurant={activeRestaurant} />}
@@ -219,7 +219,7 @@ const RestaurantMap = () => {
   );
 };
 
-const filterColours: {[key: string]: {fill: string, border: string}} = {
+const filterColours: { [key: string]: { fill: string, border: string } } = {
   'diets': { fill: '#F3D9FF', border: '#D59CEF' },
   'allergens': { fill: '#FFDCDC', border: '#FEACAC' },
   'ingredients': { fill: '#E4EDFF', border: '#A8C1F3' },
@@ -228,7 +228,7 @@ const filterColours: {[key: string]: {fill: string, border: string}} = {
   'selected': { fill: '#E8DEF8', border: '#BDB0CA' }
 }
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   map: {
@@ -246,8 +246,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   baseCard: {
-    maxHeight: height-160,
-    maxWidth:width+2,
+    maxHeight: height - 160,
+    maxWidth: width + 2,
     backgroundColor: "#FBF8FF",
     borderRadius: 24,
     marginTop: 5,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4,
   },
   filterCheck: {
-    color:'#534072',
+    color: '#534072',
     marginRight: 5,
   },
   filterBackground: {
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   icon: {
-    color:'#534072',
+    color: '#534072',
     paddingHorizontal: 8,
   },
   badgeScrollView: {
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   markerContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 1,
     shadowRadius: 1,
   },
@@ -333,11 +333,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   innerCircle: {
-    position: 'absolute', 
+    position: 'absolute',
     backgroundColor: '#CB4C4E',
-    borderRadius: 20, 
+    borderRadius: 20,
     width: 20,
-    height: 25, 
+    height: 25,
     alignItems: 'center',
     justifyContent: 'center',
     transform: [{ translateY: -5 }]
@@ -346,13 +346,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 22,
     height: 22,
-    borderRadius: 12.5, 
-    borderStyle:'solid',
+    borderRadius: 12.5,
+    borderStyle: 'solid',
     borderWidth: 3,
     borderColor: 'white',
     backgroundColor: '#0B84FF',
     elevation: 4,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 2,
     shadowRadius: 4,
   },

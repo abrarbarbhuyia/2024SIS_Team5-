@@ -380,9 +380,16 @@ export const styles = StyleSheet.create({
     color: '#65558F',
     marginBottom: 10,
   },
+  fabCount: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colours.labelColor,
+    textAlign: 'center', 
+  },
   fabText: {
     fontSize: 10,
     fontWeight: '600',
     color: '#2E1C49',
+    textAlign: 'center', 
   },
 });

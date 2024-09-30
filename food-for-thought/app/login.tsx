@@ -16,7 +16,7 @@ const Login = () => {
 
   const handleLogin = useCallback(async () => {
     try {
-      const response = await axios.post(`http://10.0.0.187:4000/login`, { username, password });
+      const response = await axios.post(`http://${HOST_IP}:4000/login`, { username, password });
       await AsyncStorage.setItem('token', response.data.token);
       Alert.alert('Login Successful', `Welcome ${username}!`);
       router.push('/home'); 

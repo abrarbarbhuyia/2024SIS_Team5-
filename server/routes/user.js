@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const databaseMaster = require('../databaseMaster');
 
-router.get('/getUser/:userId', async (req, res) => {
+router.get('/getUser/:userName', async (req, res) => {
     try {
-        const userId = req.params.userId;
-        await databaseMaster.dbOp('find', 'User', { query: { userId: userId } }).then(data => {
+        const userName = req.params.userName;
+        await databaseMaster.dbOp('find', 'User', { query: { username: userName } }).then(data => {
             res.json(data);
         });
     } catch (error) {
@@ -13,3 +13,5 @@ router.get('/getUser/:userId', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+module.exports = router;

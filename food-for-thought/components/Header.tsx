@@ -1,14 +1,17 @@
 import { Card, Text, Icon } from '@rneui/themed';
 import { View, StyleSheet, Dimensions, Image } from "react-native";
 import React from 'react';
-import logo from '../assets/images/logo.png';
 import { router } from 'expo-router';
+import logo from '../assets/images/logo.png';        
 
-export default function Header() {
+export default function Header({homepage=false}) {
 
-    const handleHomePress = () => {
-        //navigate to home page, prob need to clear stack of pages?
-        console.log("Home click");
+    //dont want to clear stack if already at homepage (top of stack)
+    //dont need to pass in prop in any other page as false default is expected functionality
+    const handleHomeRoute = () => {
+        if (!homepage) {
+            router.push('/home');
+        }
     }
 
     return (
@@ -21,7 +24,7 @@ export default function Header() {
                     </View>
                     {/* <Icon name='user' type='evilicon' /> */}
                     {/* also some text alongside the icon */}
-                    <Card.Image source={logo} style={styles.image} onPress={handleHomePress}/>
+                    <Card.Image source={logo} style={styles.image} onPress={handleHomeRoute}/>
                     {/* now two more icons on other side of logo, side by side */}
                     <View style={{ flexDirection: 'row', marginLeft: 35, marginTop: 10}}>
                         <Icon style={{ color: '#000000', marginRight: 20 }} name='bell' type='fontisto' size={25} onPress={() => console.log("Notifications click")}/>
@@ -43,7 +46,7 @@ const styles = StyleSheet.create({
     },
     headerCard: {
         width: width - 32,
-        height: 100,
+        height: 85,
         backgroundColor: "#FBF8FF",
         padding: 12,
         borderRadius: 24,
@@ -53,6 +56,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 2,
         shadowRadius: 4,
         justifyContent: "space-between",
+        flexWrap: 'nowrap',
     },
     image: {
         width: 135,

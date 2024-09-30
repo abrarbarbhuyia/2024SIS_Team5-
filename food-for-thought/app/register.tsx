@@ -3,12 +3,15 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
-// import { HOST_IP } from '@env';
+import { Card } from '@rneui/themed';
+import Constants from 'expo-constants';
 
 const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
   const handleRegister = useCallback(async () => {
     if (password !== confirmPassword) {
@@ -17,7 +20,6 @@ const Register = () => {
     }
 
     try {
-      const HOST_IP = '' // add your IP address here
       const response = await axios.post(`http://${HOST_IP}:4000/register`, { username, password });
       Alert.alert('Registration Successful', `Welcome ${username}!`);
       router.push('/login');
@@ -28,11 +30,11 @@ const Register = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.rectangle}>
+      <Card containerStyle={styles.rectangle}>
         <Image source={require('../assets/images/food-for-thought-logo.png')} style={styles.logo} />
 
         <Text style={styles.subtitle}>Create an Account</Text>
-        <Text style={styles.supportingText}>Already have an account?{' '}
+        <Text style={styles.supportingText}>Already have an account?{'\n'}
           <Text style={styles.registerText} onPress={() => router.push('/login')}>Log in here.</Text>
         </Text>
 
@@ -71,7 +73,7 @@ const Register = () => {
         <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>SIGN UP</Text>
         </TouchableOpacity>
-      </View>
+      </Card>
     </View>
   );
 };
@@ -86,16 +88,23 @@ const styles = StyleSheet.create({
   },
   rectangle: {
     width: '90%',
-    padding: '10%',
+    paddingVertical: 20,
     backgroundColor: '#FBF8FF',
     borderRadius: 20,
     alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 2,
+    shadowRadius: 4,
   },
   logo: {
     width: 124,
     height: 59,
     borderRadius: 5,
     marginBottom: 20,
+    marginTop: 15,
+    alignSelf: 'center'
   },
   subtitle: {
     fontWeight: '600',
@@ -103,8 +112,10 @@ const styles = StyleSheet.create({
     lineHeight: 32,
     color: '#1D1B20',
     marginBottom: 20,
+    textAlign: 'center',
   },
   supportingText: {
+    paddingBottom: 8,
     width: '100%',
     fontWeight: '400',
     fontSize: 14,
@@ -112,9 +123,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#49454F',
     marginBottom: 30,
+    alignSelf: 'center',
   },
   inputContainer: {
-    width: '100%',
+    minWidth: '80%',
     marginBottom: 20,
     position: 'relative',
   },
@@ -128,25 +140,26 @@ const styles = StyleSheet.create({
     fontWeight: 600,
   },
   input: {
-    width: '100%',
     height: 40,
     borderColor: '#CCCCCC',
     borderWidth: 1,
-    borderRadius: 4,
+    borderRadius: 8,
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 10,
     fontSize: 16,
     color: '#808080',
   },
   button: {
-    width: '50%',
-    height: '10%',
+    minWidth: '50%',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#5A428F',
     borderColor: '#484DBE',
     borderWidth: 1,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 7,
+    alignSelf: 'center',
+    marginBottom: 10,
   },
   buttonText: {
     color: '#FFFFFF',
@@ -161,6 +174,7 @@ const styles = StyleSheet.create({
   registerText: {
     textDecorationLine: 'underline',
     color: '#5A428F',
+    textAlign: 'center',
   },
 });
 

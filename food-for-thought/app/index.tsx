@@ -1,153 +1,117 @@
-import { View, Dimensions, Image, StyleSheet, FlatList } from "react-native";
-import { Link, router } from "expo-router";
-import { Button, Card, Text, Icon } from '@rneui/themed';
-import SearchBar from "@/components/SearchBar";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import Header from "@/components/Header";     
-import pic from '../assets/images/react-logo.png';        
-
-        //mock data images for carousel
-const carouselData = [
-  { id: '1', image: pic, label: 'Food item', secondLabel: 'Food' },
-  { id: '2', image: pic, label: 'Food item', secondLabel: 'Food' },
-  { id: '3', image: pic, label: 'Food item', secondLabel: 'Food' },
-  { id: '4', image: pic, label: 'Food item', secondLabel: 'Food' },
-  { id: '5', image: pic, label: 'Food item', secondLabel: 'Food' },
-  { id: '6', image: pic, label: 'Food item', secondLabel: 'Food' },
-  { id: '7', image: pic, label: 'Food item', secondLabel: 'Food' },
-];
-
+import { Card } from '@rneui/themed';
+import { router } from 'expo-router';
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
 export default function Index() {
-  //carousel view + styling
-  const renderItem = ({ item }) => (
-    <View style={styles.imageContainer}>
-      <Image source={item.image} style={styles.image} />
-      <Text style={styles.recentLabel}>{item.label}</Text>
-      <Text style={styles.recentComment}>{item.secondLabel}</Text>
-    </View>
-  )
 
   return (
     <View style={styles.container}>
-      <Header />
-      {/* Card for the Restaurant finder */}
-        <TouchableOpacity onPress={() => router.push('/map')}>
-          <Card containerStyle={styles.finderCard}>
-            <View style={{  }}>
-              <SearchBar/>             
-            </View>
-            <Card.Image
-                style={{ padding: 0, height: 100 }}
-                source={{
-                  uri:
-                    'https://developers.google.com/static/maps/images/landing/hero_maps_static_api.png',
-                }}
-              />
-          </Card>
+      <Card containerStyle={styles.rectangle}>
+        <Image source={require('../assets/images/food-for-thought-logo.png')} style={styles.logo} />
+
+        <Text style={styles.subtitle}>Welcome!</Text>
+        <Text style={styles.supportingText}>Welcome to Food for Thought,{'\n'}find restaurants for your dietary needs.</Text>
+
+        <TouchableOpacity style={styles.loginButton} onPress={() => router.push('/login')}>
+          <Text style={styles.loginButtonText}>LOGIN</Text>
         </TouchableOpacity>
-      {/* Card for recently visited Restaurants */}
-      <Card containerStyle={styles.recentCard}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text h4>Last Visited</Text>
-          <Icon name="arrowright" type="antdesign" size={25} onPress={() => console.log("Recent arrow clicked")} />
-        </View>
-        {/* rendering the pics in carousel */}
-        <FlatList
-          data={carouselData}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.carousel}
-        />
-      </Card>
-      {/* Card for restaurant recommndations */}
-      <Card containerStyle={styles.recommendationsCard}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text h4>Recommendations</Text>
-          <Icon name="arrowright" type="antdesign" size={25} onPress={() => console.log("Recommendations arrow clicked")} />
-        </View>
-        {/* <Link href={"/login"}>Login</Link>
-        <Link href={"/map"}>Click here to see the Map Display</Link> */}
+
+        <TouchableOpacity style={styles.signUpButton} onPress={() => router.push('/register')}>
+          <Text style={styles.signUpButtonText}>SIGN UP</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.guestText} onPress={() => router.push('/home')}>Continue as a guest</Text>
+        <Text style={styles.supportingText}>Your preferences won't be saved!</Text>
       </Card>
     </View>
   );
-}
-
-const {width} = Dimensions.get('window');
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    backgroundColor: "#E6D7FA",
-  },
-  finderCard: {
-    width: width - 32,
-    height: 200,
-    backgroundColor: "#FBF8FF",
-    padding: 12,
-    borderRadius: 24,
-    marginTop: 5,
-    elevation: 4,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 2,
-    shadowRadius: 4,
-    justifyContent: "space-between",
-    marginBottom: 5,
-  },
-  recentCard: {
-    width: width - 32,
-    height: 220,
-    backgroundColor: "#FBF8FF",
-    padding: 12,
-    borderRadius: 24,
-    marginTop: 5,
-    elevation: 4,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 2,
-    shadowRadius: 4,
-    justifyContent: "space-between",
-    marginBottom: 5,
-  },
-  recommendationsCard: {
-    width: width - 32,
-    height: 250,
-    backgroundColor: "#FBF8FF",
-    padding: 12,
-    borderRadius: 24,
-    marginTop: 5,
-    elevation: 4,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 2,
-    shadowRadius: 4,
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  carousel: {
-    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
+    backgroundColor: '#E6D7FA',
+    fontFamily: 'Roboto',
   },
-  imageContainer: {
-    marginRight: 10,
-    backgroundColor: 'white',
-    borderRadius: 8,
-    overflow: 'hidden',
-    width: 120,
-    height: 150,
+  rectangle: {
+    width: '90%',
+    paddingVertical: 20,
+    backgroundColor: '#FBF8FF',
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 2,
+    shadowRadius: 4,
   },
-  image: {
-    width: '100%',
+  logo: {
+    width: 124,
+    height: 59,
+    borderRadius: 5,
+    marginBottom: 20,
+    marginTop: 15,
+    alignSelf: 'center',
   },
-  recentLabel: {
-    marginLeft: 5,
-    marginTop: 5,
+  subtitle: {
+    fontWeight: '600',
+    fontSize: 24,
+    lineHeight: 32,
+    color: '#1D1B20',
+    marginBottom: 20,
+    textAlign: 'center'
   },
-  recentComment: {
-    marginLeft: 5,
-    fontSize: 12,
-    opacity: 0.5,
-  }
+  supportingText: {
+    maxWidth: '80%',
+    paddingBottom: 8,
+    fontWeight: '400',
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
+    color: '#49454F',
+    alignSelf: 'center',
+  },
+  loginButton: {
+    marginTop: 15,
+    marginBottom: 10,
+    minWidth: '50%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#5A428F',
+    borderColor: '#484DBE',
+    borderWidth: 1,
+    borderRadius: 20,
+    padding: 7,
+    alignSelf: 'center'
+  },
+  signUpButton: {
+    marginBottom: 15,
+    minWidth: '50%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FBF8FF',
+    borderColor: '#5A428F',
+    borderWidth: 2,
+    borderRadius: 20,
+    padding: 7,
+    alignSelf: 'center',
+  },
+  loginButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  signUpButtonText: {
+    color: '#5A428F',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  guestText: {
+    paddingTop: 6,
+    color: '#720BC4',
+    textAlign: 'center',
+  },
 });

@@ -6,9 +6,10 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import Header from "@/components/Header";     
 import pic from '../assets/images/react-logo.png';
 import RecommendedRestaurant from "@/components/RecommendedRestaurant";
-import MapView, { Marker } from "react-native-maps"
+import MapView, { Marker } from "react-native-maps";
+import { styles } from '../styles/app-styles'; 
 
-        //mock data images for carousel
+//mock data images for carousel
 const carouselData = [
   { id: '1', image: pic, label: 'Restaurant Title', secondLabel: 'Cuisine' },
   { id: '2', image: pic, label: 'Restaurant Title', secondLabel: 'Cuisine' },
@@ -24,7 +25,7 @@ const Home = () => {
   const renderItem = ({ item }: any) => (
     <View style={styles.imageContainer}>
       <TouchableOpacity onPress={() => router.push('/restaurant')}>
-        <Image source={item.image} style={styles.image} />
+        <Image source={item.image} style={styles.homeImage} />
         <Text style={styles.recentLabel}>{item.label}</Text>
         <Text style={styles.recentComment}>{item.secondLabel}</Text>
       </TouchableOpacity>
@@ -85,104 +86,5 @@ const Home = () => {
     </View>
   );
 }
-
-const {width} = Dimensions.get('window');
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    backgroundColor: "#E6D7FA",
-  },
-  finderCard: {
-    width: width - 32,
-    height: 200,
-    backgroundColor: "#FBF8FF",
-    padding: 12,
-    borderRadius: 24,
-    marginTop: 5,
-    elevation: 4,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 2,
-    shadowRadius: 4,
-    justifyContent: "space-between",
-    marginBottom: 5,
-  },
-  recentCard: {
-    width: width - 32,
-    height: 210,
-    backgroundColor: "#FBF8FF",
-    padding: 12,
-    borderRadius: 24,
-    marginTop: 5,
-    elevation: 4,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 2,
-    shadowRadius: 4,
-    justifyContent: "space-between",
-    marginBottom: 5,
-  },
-  recommendationsCard: {
-    width: width - 32,
-    height: 275,
-    backgroundColor: "#FBF8FF",
-    padding: 10,
-    borderRadius: 24,
-    marginTop: 5,
-    elevation: 4,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 2,
-    shadowRadius: 4,
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  carousel: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  imageContainer: {
-    marginRight: 10,
-    backgroundColor: 'white',
-    borderRadius: 8,
-    overflow: 'hidden',
-    width: 120,
-    height: 145,
-  },
-  image: {
-    width: '100%',
-  },
-  recentLabel: {
-    marginLeft: 5,
-    marginTop: 5,
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-  recentComment: {
-    marginLeft: 5,
-    fontSize: 10,
-    opacity: 0.5,
-  },
-  filledCircle: {
-    position: 'absolute',
-    width: 22,
-    height: 22,
-    borderRadius: 12.5, 
-    borderStyle:'solid',
-    borderWidth: 3,
-    borderColor: 'white',
-    backgroundColor: '#0B84FF',
-    elevation: 4,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 2,
-    shadowRadius: 4,
-  },
-  map: {
-    minWidth: 300,
-    width: '100%',
-    height: '57%',
-    borderRadius: 15
-  },
-});
 
 export default Home;

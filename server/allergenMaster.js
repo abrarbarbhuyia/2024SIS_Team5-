@@ -298,7 +298,7 @@ async function addDiet(body) {
   }
 }
 
-module.exports = { testSuggestic, getIngredientDetails, getMeals, createMeals, createMenu, createIngredient, createMealIngredient, getMenuImage, checkMenu, addDiet };
+module.exports = { getIngredientDetails, getMeals, createMeals, createMenu, createIngredient, createMealIngredient, getMenuImage, checkMenu, addDiet };
 
 /*
  Flow:

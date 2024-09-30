@@ -10,20 +10,20 @@ import MapView, { Marker } from "react-native-maps";
 import { styles } from '../styles/app-styles'; 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
-// insert your URL + port number server running on below
-const API_URL = "";
+import Constants from 'expo-constants';
 
 // Component
 const Home = () => {
   const [fetchedRestaurants, setFetchedRestaurants] = useState<any[]>([]);
+
+  const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
   // Fetch specific restaurants by ID
   const fetchRestaurants = async () => {
     //using static IDs from Mongo for now
     const restaurantIds = ['4e4a1510483b16676e3a760f', '5296bc3011d29d380e6f36d2', '4b679079f964a52078552be3', '592fcdf29ef8ef6604fa5b64', '4b09eb00f964a520bf1f23e3'];
     const promises = restaurantIds.map(id => {
-      const url = `${API_URL}/restaurant/getIngredient/${id}`;
+      const url = `http://${HOST_IP}:4000/restaurant/getRestaurant/${id}`;
       console.log("Fetching:", url);
       return axios.get(url)
         .then(response => response.data) // Return only the data part
@@ -47,7 +47,7 @@ const Home = () => {
   const renderItem = ({ item }: { item: any }) => (
     <View style={styles.imageContainer}>
       <TouchableOpacity onPress={() => router.push('/restaurant')}>
-      <Image source={ item.restaurantPhotos && item.restaurantPhotos.length > 0 ? { uri: item.restaurantPhotos[0]} : pic} style={styles.image} />        
+      <Image source={ item.restaurantPhotos && item.restaurantPhotos.length > 0 ? { uri: item.restaurantPhotos[0]} : pic} style={styles.homeImage} />        
         <Text numberOfLines={1} style={styles.recentLabel}>{item.name || 'Restaurant Title'}</Text>
         <Text numberOfLines={1} style={styles.recentComment}>{item.cuisine && item.cuisine.length > 0 ? item.cuisine.join(', ') : 'Other'}</Text>
       </TouchableOpacity>

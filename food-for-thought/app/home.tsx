@@ -16,7 +16,8 @@ import Constants from 'expo-constants';
 const Home = () => {
   const [fetchedRestaurants, setFetchedRestaurants] = useState<any[]>([]);
 
-  const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
+  //const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
+  const HOST_IP = '192.168.1.208';
 
   // Fetch specific restaurants by ID
   const fetchRestaurants = async () => {
@@ -47,9 +48,9 @@ const Home = () => {
   const renderItem = ({ item }: { item: any }) => (
     <View style={styles.imageContainer}>
       <TouchableOpacity onPress={() => router.push('/restaurant')}>
-      <Image source={ item.restaurantPhotos && item.restaurantPhotos.length > 0 ? { uri: item.restaurantPhotos[0]} : pic} style={styles.homeImage} />        
+      <Image source={ item.foodPhotos && item.foodPhotos.length > 0 ? { uri: item.foodPhotos[0]} : pic} style={styles.homeImage} />        
         <Text numberOfLines={1} style={styles.recentLabel}>{item.name || 'Restaurant Title'}</Text>
-        <Text numberOfLines={1} style={styles.recentComment}>{item.cuisine && item.cuisine.length > 0 ? item.cuisine.join(', ') : 'Other'}</Text>
+        <Text numberOfLines={1} style={styles.recentComment}>{item.cuisineType && item.cuisineType.length > 0 ? item.cuisineType.map(cuisine => cuisine.cuisineType).join(', ') : 'Other'}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -102,8 +103,9 @@ const Home = () => {
           <Text h4 style={{ color: '#2E1C47' }}>Recommendations</Text>
           <Icon name="arrowright" type="antdesign" size={25} onPress={() => console.log("Recommendations arrow clicked")} />
         </View>
-        <RecommendedRestaurant />
-        <RecommendedRestaurant />
+        {/* passing in static restaurants, but can handle any passed in */}
+        <RecommendedRestaurant restaurant={fetchedRestaurants[2]}/>
+        <RecommendedRestaurant restaurant={fetchedRestaurants[0]}/>
       </Card>
     </View>
   );

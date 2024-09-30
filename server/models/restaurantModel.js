@@ -11,7 +11,7 @@ restaurantSchema = new schema({
     openingHours: {type: Array, required: false,  default: undefined}, //each array object represents lunchtime or dinnertime opening hours for a day
     phoneNumber: {type: String, required: true},
     website: {type: String, required: true},
-    cuisine: {type: Array,  required: false,  default: undefined},
+    cuisineType: {type: Array,  required: false,  default: undefined},
     price: {type: Number, required: true},
     rating: {type: Number, required: true}, //ratings score
     total_ratings: {type: Number, required: true}, //total number of ratings    

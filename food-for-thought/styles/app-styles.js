@@ -215,6 +215,7 @@ export const styles = StyleSheet.create({
   },
   homeImage: {
     width: '100%',
+    height: 100,
   },
   recentLabel: {
     marginLeft: 5,

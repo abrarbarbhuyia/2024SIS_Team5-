@@ -3,7 +3,6 @@ const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
 
 const uri = process.env.DATABASE_URI;
-console.log(uri);
 const client = new MongoClient(uri);
 
 const fs = require("fs");
@@ -31,6 +30,11 @@ async function deleteDoc(collType, query) {
   return await coll.deleteMany(query);
 }
 
+async function updateDoc(collType, query, docs) {
+  const db = client.db("SIS0");
+  const coll = db.collection(collType);
+  return await coll.updateMany(query, docs);
+}
 
 async function testConnection() {
   try{
@@ -63,6 +67,10 @@ module.exports = {
           result = await deleteDoc(collType, query);
           console.log('Delete Doc Result', result);
           break;
+        case 'update':
+          result = await updateDoc(collType, query, docs);
+          console.log('Update Doc Result:', result);
+          break;
         default:
           console.log("Invalid operation type.");
       }
@@ -70,7 +78,7 @@ module.exports = {
     } catch (error) {
       console.error('An error occurred:', error);
     } finally {
-      setTimeout(async ()  => await client.close(), 6000)
+      setTimeout(async ()  => await client.close(), 150000)
     }
   }, 
   testConnection

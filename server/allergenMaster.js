@@ -3,54 +3,8 @@ const axios = require("axios");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
 
-async function testSuggestic(query) {
-  require("isomorphic-fetch");
-
-  try {
-    const response = await fetch("https://production.suggestic.com/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Token ${process.env.SUGGESTIC_API_KEY}`,
-      },
-      body: JSON.stringify({
-        query: `
-            {
-              searchRecipeByNameOrIngredient(query: "${query}") {
-                onPlan {
-                  id
-                  name
-                  author
-                  adherence
-                  ingredients {
-                    name
-                  }
-                }
-                otherResults {
-                  id
-                  name
-                  author
-                  adherence
-                  ingredients {
-                    name
-                  }
-                }
-              }
-            }`,
-      }),
-    });
-
-    const data = await response.json();
-    console.log(JSON.stringify(data, null, 2)); // Pretty-print JSON response
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-}
-
 // Takes in a menu string (from OCR) and converts it into a JSON list of menu items extracted from the string
 async function getMenuImage(body) {
-  // temp hard coded id
-  // const JSONbody = JSON.parse(body);
   const restaurantId = body.restaurantId;
   
   try {
@@ -100,13 +54,7 @@ async function checkMenu(restaurantId) {
 }
 
 //Takes in menu and restaurant Ids to create a menu object in the database
-async function createMenu(body) {
-  // Still not sure how this model fits into other areas 
-  
-  // Need to get restaurant ID from foursquare
-  // const restaurantId = "1"
-  //Need to also check if a menu exists by looking at restaurant ids first
-  
+async function createMenu(body) { 
   const requestBody = {
     restaurantId: body.restaurantId,
     menuString: body.menuString,

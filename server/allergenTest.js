@@ -85,10 +85,8 @@ async function testgetMenuImage() {
 }
 
 async function testFlow(restaurantId) {
-  //Check if Restaurant exists - Create if not exists (Foursquare fsqid info) - Pending
+  //Check if Restaurant exists - Create if not exists and go through flow of retrieving menus, meals, ingredients and allergens
   //returns true if the restaurant has a valid menu, returns false if not
-  //Right now, restaurant exists with id = '4e4a1510483b16676e3a760f'
-  // Check if menu exists with given restaurant id
   //const restaurantId = "4e4a1510483b16676e3a760f";
   const menuExists = await checkMenu(restaurantId);
   if (!menuExists) {
@@ -110,14 +108,13 @@ async function testFlow(restaurantId) {
       console.log(menu);
 
       // get meals
-      //Returns JSON {menu_items : ["saddam", "hussein"]}
       const JSONMenuItems = JSON.parse(await getMeals(menuString));
       const menuItems = JSONMenuItems.menu_items;
       console.log(menuItems);
 
       // create meals in db
       const createMealsRequestBody = {menuItems: menuItems, menuId: menu.menuId};
-      const mealIdArray = await createMeals(createMealsRequestBody); //We will need to get meal id from here -> For meal ingredient    
+      const mealIdArray = await createMeals(createMealsRequestBody); 
       console.log(mealIdArray);
 
       // get ingredients and create ingredient at the same time

@@ -3,8 +3,10 @@ const router = express.Router();
 const Meal = require('../models/mealModel');
 const databaseMaster = require('../databaseMaster');
 
+const { v4: uuidv4 } = require('uuid');
+
 /* Get all meals from a menuId */
-router.get('/getMeal/:menuId', async (req, res) => {
+router.get('/getMealByMenuId/:menuId', async (req, res) => {
     try {
         const menuId = req.params.menuId;
         await databaseMaster.dbOp('find', 'MealDetails', { query: { menuId: menuId } }).then(data => {
@@ -17,10 +19,23 @@ router.get('/getMeal/:menuId', async (req, res) => {
 });
 
 /* Get a meal from a mealId */
-router.get('/getMeal/:mealId', async (req, res) => {
+router.get('/getMealById/:mealId', async (req, res) => {
     try {
         const mealId = req.params.mealId;
         await databaseMaster.dbOp('find', 'MealDetails', { query: { mealId: mealId } }).then(data => {
+            res.json(data);
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+/* Get a meal from a meal name */
+router.get('/getMealByName/:name', async (req, res) => {
+    try {
+        const name = req.params.name;
+        await databaseMaster.dbOp('find', 'MealDetails', { query: { name: name } }).then(data => {
             res.json(data);
         });
     } catch (error) {
@@ -45,13 +60,16 @@ router.get('/getDiets/:mealId', async (req, res) => {
 /* Create a meal */
 router.post('/createMeal', async (req, res) => {
     try {
+        const mealId = uuidv4();
+
         const meal = new Meal({
-            mealId: req.body.mealId,
+            mealId: mealId,
             name: req.body.name,
             diet: req.body.diet,
             menuId: req.body.menuId
         });
-        await databaseMaster.dbOp('insert', 'MealDetails', { docs: [meal] });
+        const result = await databaseMaster.dbOp('insert', 'MealDetails', { docs: [meal] });
+        res.status(201).json(meal)
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -59,12 +77,13 @@ router.post('/createMeal', async (req, res) => {
 });
 
 /* Update the diets associated with a mealId - TODO */
-router.put('/editIngredient/:ingredientId', async (req, res) => {
+router.put('/editMeal/:mealId', async (req, res) => {
     try {
         const { diet } = req.body;
-        const query = { ingredientId : req.params.ingredientId }
-        const docs = { $set: { diet: diet } };
-        await databaseMaster.dbOp('update', 'MealDetails', { query, docs });
+        const query = { mealId : req.params.mealId }
+        const docs = { $addToSet: { diet: {$each: diet }} };
+        const updatedMeal = await databaseMaster.dbOp('update', 'MealDetails', { query, docs });
+        res.status(200).json(updatedMeal)
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -72,10 +91,10 @@ router.put('/editIngredient/:ingredientId', async (req, res) => {
 });
 
 /* Delete a meal */
-router.delete('/deleteIngredient/:ingredientId', async (req, res) => {
+router.delete('/deleteMeal/:mealId', async (req, res) => {
     try {
         const ingredientId = req.params.ingredientId;
-        await databaseMaster.dbOp('delete', 'MealDetails', { query: { ingredientId: ingredientId } } );
+        await databaseMaster.dbOp('delete', 'MealDetails', { query: { mealId: mealId } } );
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });

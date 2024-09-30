@@ -21,6 +21,10 @@ export default function Index() {
           <Text style={styles.signUpButtonText}>SIGN UP</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity style={styles.signUpButton} onPress={() => router.push('/user')}>
+          <Text style={styles.signUpButtonText}>USER</Text>
+        </TouchableOpacity>
+
         <Text style={styles.guestText} onPress={() => router.push('/home')}>Continue as a guest</Text>
         <Text style={styles.supportingText}>Your preferences won't be saved!</Text>
       </Card>

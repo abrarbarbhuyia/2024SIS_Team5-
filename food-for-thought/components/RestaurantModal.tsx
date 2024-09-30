@@ -44,7 +44,7 @@ export function RestaurantModal({ restaurant, setShowModal, ...rest }: DietaryFi
       <View style={styles.flexFormGroup}>
         <Badge badgeStyle={styles.filterBackground}value={'PERFECT'} textStyle={styles.filterText} />
         <Text style={styles.formDescriptionText}>
-          {Math.round(restaurant.rating ?? 0)} out of 5</Text>
+          {Math.round(restaurant.rating ?? 0)} out of 10</Text>
           <Icon
             name='star'
             type='font-awesome'

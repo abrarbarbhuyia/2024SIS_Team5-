@@ -176,17 +176,17 @@ const RestaurantMap = () => {
                   onPress={() => setActiveRestaurant(r)}>
                   <View style={styles.markerContainer}>
                     <Icon
-                      name="map-marker"
-                      type="material-community"
-                      color="#CB4C4E"
-                      size={50}
+                      name="fmd-good"
+                      type="material"
+                      color="#EA4335"
+                      size={40}
                     />
                     <View style={styles.innerCircle}>
                       <Icon
-                        name="food"
+                        name="silverware-fork-knife"
                         type="material-community"
                         color="white"
-                        size={18}
+                        size={16}
                       />
                     </View>
                   </View>
@@ -329,27 +329,26 @@ const styles = StyleSheet.create({
   markerContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 0.5,
   },
   innerIcon: {
     position: 'absolute',
   },
   innerCircle: {
     position: 'absolute',
-    backgroundColor: '#CB4C4E',
+    backgroundColor: '#EA4335',
     borderRadius: 20,
-    width: 20,
-    height: 25,
+    paddingTop: 5,
     alignItems: 'center',
     justifyContent: 'center',
     transform: [{ translateY: -5 }]
   },
   filledCircle: {
     position: 'absolute',
-    width: 22,
-    height: 22,
+    width: 20,
+    height: 20,
     borderRadius: 12.5,
     borderStyle: 'solid',
     borderWidth: 3,

@@ -107,13 +107,24 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
 
                     //iterate through the categories array to retrieve the cuisines
                     const categories_array = placeDetails.categories;
-                    const cuisine = [];
-                    cuisine_options = ["Chinese", "Australian", "Thai", "Asian", "Italian", "Greek", "Mexican", "Japanese", "Vietnamese", "Korean", "American", "French", "Turkish", "Indian"]
+                    const cuisineType_array = [];
+                    const restaurantType_array = [];
+                    const cuisineTypes = ["Chinese", "Australian", "Thai", "Asian", "Italian", "Greek", "Mexican", "Japanese", "Vietnamese", "Korean", "American", "French", "Turkish", "Indian", "Malay", "Korean BBQ", "Mediterranean"];
+                    const restaurantTypes = ["Bakery", "Bar", "Pub", "Café", "Coffee Shop", "Halal", "Vegan and Vegetarian", "Desserts", "Donuts", "Steakhouse", "Diner", "Fish and Chips Shop", "Ice Cream", "Tea Room", "Gelato", "Pizza", "Hotel Bar", "Wine Bar", "Beer Bar"];
                     for (i = 0; i < categories_array.length; i++)
                     {
-                        if(cuisine_options.includes(categories_array[i].short_name))
+                        if(cuisineTypes.includes(categories_array[i].short_name))
                         {
-                            cuisine.push(categories_array[i].short_name);
+                            //retrieve the cuisine name and associated icon png at size 88 pixels
+                            const cuisine_icon_url = categories_array[i].icon.prefix + "bg_64" + categories_array[i].icon.suffix
+                            cuisineType_array.push({"cuisineType": categories_array[i].short_name, "icon" : cuisine_icon_url});
+                        }  
+
+                        else if(restaurantTypes.includes(categories_array[i].short_name))
+                        {
+                            //retrieve the restaurant Type and associated icon png at size 88 pixels
+                            const restaurantType_icon_url = categories_array[i].icon.prefix + "bg_64" + categories_array[i].icon.suffix
+                            restaurantType_array.push({"restaurantType": categories_array[i].short_name, "icon" : restaurantType_icon_url});
                         }  
                     }
                     //create a restaurant entry using model schema and add new entry to the RestaurantDetails collection
@@ -126,7 +137,8 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
                         openingHours: placeDetails.hours.regular,
                         phoneNumber: placeDetails.tel,
                         website: placeDetails.website,
-                        cuisine: cuisine,
+                        cuisineType: cuisineType_array,
+                        restaurantType: restaurantType_array,
                         price: placeDetails.price,
                         rating: placeDetails.rating,
                         total_ratings: placeDetails.stats.total_ratings,
@@ -135,6 +147,7 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
                         menuId: menu_find_result[0].menuId,
                         hasMenu: true
                     }) 
+                   
                     await databaseMaster.dbOp('insert', 'RestaurantDetails', { docs: [restaurant] });
                     restaurant_ids.push(fsq_id);
                 }
@@ -215,4 +228,26 @@ router.delete('/deleteRestaurant/:restaurantId', async (req, res) => {
     }
 });
 
+router.get('/search/:latitude/:longitude/:radius', async (req, res) => {
+    //latitude, longitude of user and radius of search (in metres) in the request params
+    const restaurant_ids = [];
+    const latitude = req.params.latitude;
+    const longitude = req.params.longitude;
+    const radius = req.params.radius;
+    //const latitude = -33.87941228154
+    //const longitude = 151.20215135093403
+
+    //perform a search query to return up to 10 restaurants (ids) that a within a specified metre radius from the set location specified by the latitude and longitude coordinates
+    //will filter restaurants that are open at the time of search
+    const url = `https://api.foursquare.com/v3/places/search?ll=${latitude}%2C${longitude}&radius=${radius}&categories=13000&fields=fsq_id,categories&open_now=true&limit=50`;
+    // fetch the restaurants nearby the specified latitude and longitude location (set to UTS Building 5)
+    const response = await axios.get(url, {
+        headers: {
+            Authorization: `${process.env.FOURSQUARE_API_KEY}`
+        }
+    });
+    
+    // iterate through each restaurant in the resulting array
+    res.json(response.data.results);
+});
 module.exports = router;

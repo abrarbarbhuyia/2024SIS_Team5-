@@ -11,7 +11,7 @@ const mealRoutes = require('./routes/meal');
 const menuRoutes = require('./routes/menu');
 const ingredientRoutes = require('./routes/ingredient');
 const mealIngredientRoutes = require('./routes/mealIngredient');
-const restaurantRoutes = require('./routes/restaurant.js');
+const restaurantRoutes = require('./routes/restaurant');
 const { runTests } = require('./allergenTest');
 
 

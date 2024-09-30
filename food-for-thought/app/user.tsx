@@ -1,105 +1,91 @@
-import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { Card } from '@rneui/themed';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { Card, Icon } from '@rneui/themed';
 import { router } from 'expo-router';
 import Header from "@/components/Header";     
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const handleLogout = async () => {
-  if (await AsyncStorage.getItem('token')) {
-    AsyncStorage.removeItem('token');
-  }
-  router.push('/'); 
-};
+import { jwtDecode } from 'jwt-decode';
+import { styles } from '../styles/app-styles';
 
 const UserProfile = () => {
+  const [username, setUsername] = useState('');
+  const [isGuest, setIsGuest] = useState(true);
+
+  const loadUser = useCallback(async () => {
+    const token = await AsyncStorage.getItem('token');
+    if (token) {
+      try {
+        const decodedToken: any = jwtDecode(token);
+        setUsername(decodedToken.username);
+        setIsGuest(false);
+      } catch (error) {
+        console.error("Invalid token");
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('token');
+    setUsername('');
+    setIsGuest(true);
+    router.push('/');
+  };
+
   return (
     <View style={styles.container}>
       <Header />
 
-      <Card containerStyle={styles.profileCard}>
-        <Text style={styles.userName}>John Doe</Text>
-        <Text style={styles.userDetails}>johndoe@example.com</Text>
-        <Text style={styles.userDetails}>Member since 2023</Text>
-      </Card>
+      <Card containerStyle={styles.rectangle}>
+        <Icon style={{ color: '#000000' }} name='account-circle' type='material' size={100} />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogout}>
-        <Text style={styles.buttonText}>LOGOUT</Text>
-      </TouchableOpacity>
+        {isGuest ? (
+          <Text style={styles.supportingText}>
+            Currently browsing as a guest. Please log in to add user preferences, favourites, and personal notes.
+          </Text>
+        ) : (
+          <Text style={styles.subtitle}>{username}</Text>
+        )}
+
+        <TouchableOpacity style={styles.button} onPress={() => router.push('/home')}>
+          <Icon style={{ color: '#000000' }} name='settings' type='material' size={40} />
+          <Text style={styles.buttonText}>SETTINGS</Text>
+        </TouchableOpacity>
+
+        {!isGuest && (
+          <View style={styles.fabContainer}>
+            <TouchableOpacity onPress={() => router.push('/home')}>
+              <Card containerStyle={styles.fab}>
+                <Icon style={styles.fabIcon} name='note' type='material' size={40} />
+                <Text style={styles.fabText}>Notes</Text>
+              </Card>
+           </TouchableOpacity>
+
+           <TouchableOpacity onPress={() => router.push('/home')}>
+              <Card containerStyle={styles.fab}>
+                <Icon style={styles.fabIcon} name='favorite' type='material' size={40} />
+                <Text style={styles.fabText}>Favorites</Text>
+              </Card>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => router.push('/home')}>
+              <Card containerStyle={styles.fab}>
+                <Icon style={styles.fabIcon} name='checklist' type='material' size={40} />
+                <Text style={styles.fabText}>Preferences</Text>
+              </Card>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.signUpButton} onPress={handleLogout}>
+              <Text style={styles.signUpButtonText}>LOGOUT</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </Card>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5EEFF',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-  },
-  leadingIcon: {
-    width: 48,
-    height: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 100,
-  },
-  trailingIcon: {
-    width: 48,
-    height: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 100,
-  },
-  headline: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#1D1B20',
-  },
-  profileCard: {
-    width: '90%',
-    alignItems: 'center',
-    marginTop: 144,
-    paddingVertical: 20,
-    backgroundColor: '#FBF8FF',
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  profileImage: {
-    width: 124,
-    height: 124,
-    borderRadius: 62,
-    marginBottom: 20,
-  },
-  userName: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#2E1C49',
-  },
-  userDetails: {
-    fontSize: 14,
-    color: '#49454F',
-    marginTop: 4,
-  },
-  button: {
-    marginTop: 20,
-    width: '50%',
-    backgroundColor: '#5A428F',
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-    elevation: 3,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
 
 export default UserProfile;

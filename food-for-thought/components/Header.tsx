@@ -16,8 +16,7 @@ export default function Header() {
             <Card containerStyle={styles.headerCard}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 35, marginTop: 7 }}>
-                        <Icon style={{ color: '#000000' }} name='user' type='evilicon' size={35} onPress={() => router.push('/login')}/>
-                        <Text style={{ marginLeft: 8 }}>Nep</Text>
+                        <Icon style={{ color: '#000000' }} name='account-circle' type='material' size={35} onPress={() => router.push('/user')}/>
                     </View>
                     {/* <Icon name='user' type='evilicon' /> */}
                     {/* also some text alongside the icon */}

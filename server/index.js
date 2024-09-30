@@ -6,6 +6,7 @@ const port = 4000;
 const searchRoutes = require('./routes/search');
 const loginRoutes = require('./routes/login');
 const registerRoutes = require('./routes/register');
+const userRoutes = require('./routes/user');
 
 const corsOptions = {
   origin: '*',
@@ -17,6 +18,7 @@ app.use(cors(corsOptions));
 app.use('/search', searchRoutes);
 app.use('/login', loginRoutes);
 app.use('/register', registerRoutes);
+app.use('/user', userRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello World!')

@@ -16,8 +16,7 @@ import Constants from 'expo-constants';
 const Home = () => {
   const [fetchedRestaurants, setFetchedRestaurants] = useState<any[]>([]);
 
-  //const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
-  const HOST_IP = '192.168.1.208';
+  const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
   // Fetch specific restaurants by ID
   const fetchRestaurants = async () => {

@@ -14,8 +14,7 @@ export default function RecommendedRestaurant({restaurant}) {
     const item = restaurant || {};
     const restaurantId = item.restaurantId;
 
-    //const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
-    const HOST_IP = '192.168.1.208';
+    const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
     useEffect(() => {
         if (restaurantId) {

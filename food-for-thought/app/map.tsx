@@ -1,17 +1,13 @@
-import React, { useCallback, useMemo, useRef } from 'react';
-import { View, Text, ScrollView } from 'react-native';
-import {
-  BottomSheetModal,
-  BottomSheetView,
-  BottomSheetModalProvider,
-} from '@gorhom/bottom-sheet';
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Dimensions, ScrollView, FlatList, TouchableOpacity } from 'react-native';
+import { BottomSheetModal, BottomSheetView, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import SearchBar from "@/components/SearchBar";
 import { Badge, Card, Icon } from "@rneui/themed";
-import { useState } from "react";
+import axios from 'axios';
+import MapView, { Marker } from 'react-native-maps';
 import { DietaryFilterModal } from '@/components/DietaryFilterModal';
 import Header from '@/components/Header';
 import { capitaliseFirstLetter } from '@/utils';
-import MapView, { Marker } from 'react-native-maps';
 import { RestaurantModal } from '@/components/RestaurantModal';
 import { styles } from '../styles/app-styles'; 
 
@@ -48,16 +44,49 @@ const RestaurantMap = () => {
   const [markers, setMarkers] = useState<{name: string, lat: number, long: number}[]>([
     {name: 'Pane e Vino', lat: -33.88087996454809, long: 151.2097105847393}]);
   const [activeRestaurant, setActiveRestaurant] = useState<Restaurant | undefined>();
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [restaurants, setRestaurants] = useState<any[]>([]);
 
-  const filterTypes = ['diets', 'allergens', 'ingredients', 'cuisine'];
+  const filterTypes = ['diets', 'allergens', 'ingredients'];
   const snapPoints = useMemo(() => ['25%', '50%'], []);
 
-  const handlePresentModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
-  }, []);
+  const fetchRestaurants = async () => {
+    try {
+      const HOST_IP = ''
+      const response = await axios.get(`http://${HOST_IP}:4000/search`, {
+        params: {
+          ingredientFilter: (activeFilters?.filter(f => f.type === 'ingredients') || []).map(f => f.value)[0] || "",
+          allergens: (activeFilters?.filter(f => f.type === 'allergens') || []).map(f => f.value) || [],
+          diets: (activeFilters?.filter(f => f.type === 'diets') || []).map(f => f.value) || [],
+          searchQuery: searchTerm
+        },
+      });
+      setRestaurants(response.data);
+      bottomSheetModalRef.current?.present();
+    } catch (error: any) {
+      console.error(error.response.data?.message || 'Error searching restaurants. Try again.');
+    }
+  };
+
+  useEffect(() => {
+    fetchRestaurants();
+  }, [searchTerm, activeFilters]);
+  
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
   }, []);
+
+  const handleSearch = (search: string) => {
+    setSearchTerm(search);
+  };
+
+  const renderRestaurant = ({ item }: { item: any }) => (
+    <TouchableOpacity onPress={() => console.log(`Clicked restaurant: ${item.name}`)}>
+      <View style={styles.restaurantItem}>
+        <Text style={styles.restaurantName}>{item.name}</Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
     <BottomSheetModalProvider>
@@ -65,12 +94,7 @@ const RestaurantMap = () => {
         <Header />
         <Card containerStyle={styles.baseCard}>
           <View style={{ flexDirection: 'column', rowGap: 2}}>
-            {/* <Button
-              onPress={handlePresentModalPress}
-              title="Present Modal"
-              color="black"
-            /> */}
-            <SearchBar />
+            <SearchBar onSearch={handleSearch} />
             <View style={styles.flexContainer}>
               <Icon
                 name='sliders'
@@ -167,9 +191,17 @@ const RestaurantMap = () => {
               snapPoints={snapPoints}
               onChange={handleSheetChanges}
             >
-              <BottomSheetView style={styles.contentContainer}>
-                <Text>Awesome 🎉</Text>
-              </BottomSheetView>
+          <BottomSheetView style={styles.contentContainer}>
+            {restaurants.length > 0 ? (
+              <FlatList
+                data={restaurants}
+                renderItem={renderRestaurant}
+                keyExtractor={item => item.restaurantId}
+              />
+            ) : (
+              <Text style={styles.noResultsText}>No restaurants found.</Text>
+            )}
+          </BottomSheetView>
             </BottomSheetModal>
           </View>
         </Card>
@@ -189,7 +221,6 @@ const filterColours: {[key: string]: {fill: string, border: string}} = {
   'diets': { fill: '#FFE7DC', border: '#FEBFAC' },
   'allergens': { fill: '#F3D9FF', border: '#D59CEF' },
   'ingredients': { fill: '#E4EDFF', border: '#A8C1F3' },
-  'cuisine': { fill: '#E7FFE7', border: '#B1F6B1' },
   'selected': { fill: '#E8DEF8', border: '#BDB0CA' }
 }
 

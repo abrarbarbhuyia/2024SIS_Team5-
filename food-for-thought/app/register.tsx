@@ -5,11 +5,14 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import { Card } from '@rneui/themed';
 import { styles } from '../styles/app-styles'; 
+import Constants from 'expo-constants';
 
 const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
   const handleRegister = useCallback(async () => {
     if (password !== confirmPassword) {
@@ -18,7 +21,6 @@ const Register = () => {
     }
 
     try {
-      const HOST_IP = '' // add your IP address here
       const response = await axios.post(`http://${HOST_IP}:4000/register`, { username, password });
       Alert.alert('Registration Successful', `Welcome ${username}!`);
       router.push('/login');

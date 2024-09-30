@@ -6,14 +6,16 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Card } from '@rneui/themed';
 import { styles } from '../styles/app-styles'; 
+import Constants from 'expo-constants';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+  const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
+
   const handleLogin = useCallback(async () => {
     try {
-      const HOST_IP = '' // add your IP address here
       const response = await axios.post(`http://${HOST_IP}:4000/login`, { username, password });
       await AsyncStorage.setItem('token', response.data.token);
       Alert.alert('Login Successful', `Welcome ${username}!`);

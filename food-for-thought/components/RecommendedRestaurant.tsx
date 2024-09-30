@@ -5,6 +5,7 @@ import pic from '../assets/images/react-logo.png';
 import { useEffect, useState } from "react";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from 'expo-constants';
 
 export default function RecommendedRestaurant({restaurant}) {
 

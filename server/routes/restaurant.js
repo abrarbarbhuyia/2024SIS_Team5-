@@ -105,15 +105,25 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
                     const menu_find_result = await databaseMaster.dbOp('find', 'MenuDetails', { query: { restaurantId: fsq_id } });
                     const placeDetails = response1.data;
 
-                    //iterate through the categories array to retrieve the cuisines
+                    //iterate through the categories array to retrieve the cuisines and restaurantTypes
                     const categories_array = placeDetails.categories;
-                    const cuisine = [];
-                    cuisine_options = ["Chinese", "Australian", "Thai", "Asian", "Italian", "Greek", "Mexican", "Japanese", "Vietnamese", "Korean", "American", "French", "Turkish", "Indian"]
+                    const cuisineType_array = [];
+                    const restaurantType_array = [];
+                    const cuisineTypes = ["Chinese", "Australian", "Thai", "Asian", "Italian", "Greek", "Mexican", "Japanese", "Vietnamese", "Korean", "American", "French", "Turkish", "Indian", "Malay", "Korean BBQ", "Mediterranean"];
                     for (i = 0; i < categories_array.length; i++)
                     {
-                        if(cuisine_options.includes(categories_array[i].short_name))
+                        if(cuisineTypes.includes(categories_array[i].short_name))
                         {
-                            cuisine.push(categories_array[i].short_name);
+                            //retrieve the cuisine name and associated icon png at size 64 pixels
+                            const cuisine_icon_url = categories_array[i].icon.prefix + "64.png"
+                            cuisineType_array.push({"cuisineType": categories_array[i].short_name, "icon" : cuisine_icon_url});
+                        }  
+
+                        else
+                        {
+                            //retrieve the restaurant Type and associated icon png at size 64 pixels
+                            const restaurantType_icon_url = categories_array[i].icon.prefix + "64.png"
+                            restaurantType_array.push({"restaurantType": categories_array[i].short_name, "icon" : restaurantType_icon_url});
                         }  
                     }
                     //create a restaurant entry using model schema and add new entry to the RestaurantDetails collection
@@ -126,7 +136,8 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
                         openingHours: placeDetails.hours.regular,
                         phoneNumber: placeDetails.tel,
                         website: placeDetails.website,
-                        cuisine: cuisine,
+                        cuisineType: cuisineType_array,
+                        restaurantType: restaurantType_array,
                         price: placeDetails.price,
                         rating: placeDetails.rating,
                         total_ratings: placeDetails.stats.total_ratings,
@@ -135,6 +146,7 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
                         menuId: menu_find_result[0].menuId,
                         hasMenu: true
                     }) 
+                   
                     await databaseMaster.dbOp('insert', 'RestaurantDetails', { docs: [restaurant] });
                     restaurant_ids.push(fsq_id);
                 }

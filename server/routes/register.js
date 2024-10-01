@@ -23,7 +23,7 @@ router.post('/', [
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = { username, password: hashedPassword };
+        const newUser = { username, password: hashedPassword, notes: [], favourites: [], preferences: []};
         await dbOp('insert', 'User', { docs: [newUser] });
 
         res.status(201).json({ message: `User ${username} registered successfully.` });

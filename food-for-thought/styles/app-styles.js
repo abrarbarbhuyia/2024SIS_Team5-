@@ -188,7 +188,7 @@ export const styles = StyleSheet.create({
   },
   recommendationsCard: {
     width: width - 32,
-    height: 250,
+    height: 265,
     backgroundColor: colours.secondary,
     padding: 12,
     borderRadius: 24,
@@ -198,7 +198,7 @@ export const styles = StyleSheet.create({
     shadowOpacity: 2,
     shadowRadius: 4,
     justifyContent: "space-between",
-    marginBottom: 10,
+    marginBottom: 5,
   },
   carousel: {
     flexDirection: 'row',

@@ -10,6 +10,7 @@ export default function RootLayout() {
             <Stack.Screen name="login" options={{headerShown:false,fullScreenGestureEnabled:true,gestureDirection:'horizontal'}}/>
             <Stack.Screen name="register" options={{headerShown:false,fullScreenGestureEnabled:true,gestureDirection:'horizontal'}}/>
             <Stack.Screen name="home" options={{headerShown:false,fullScreenGestureEnabled:true,gestureDirection:'horizontal'}}/>
+            <Stack.Screen name="restaurant" options={{headerShown:false,fullScreenGestureEnabled:true,gestureDirection:'horizontal'}}/>
           </Stack>
       </GestureHandlerRootView>
   );

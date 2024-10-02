@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Places Photo</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=<INSERT YOUR KEY!!>>&libraries=places"></script>
+</head>
+
+<body></body>
+    <div>
+        <input type="text" id="place-input" placeholder="Enter a place" />
+        <button onclick="searchPlace()">Search</button>
+    </div>
+
+    <div id="photo-controls" style="display:none;">
+        <button onclick="prevPhoto()">Previous</button>
+        <button onclick="nextPhoto()">Next</button>
+    </div>
+
+
+    <div id="place-photo"></div>
+
+    <script>
+        function searchPlace() {
+            const placeName = document.getElementById('place-input').value;
+            const service = new google.maps.places.PlacesService(document.createElement('div'));
+
+            const request = {
+                query: placeName, // search by name
+                fields: ['place_id', 'photos'], // request place_id and photos fields
+            };
+
+            service.findPlaceFromQuery(request, (results, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+                    const place = results[0];
+                    const placeId = place.place_id;
+                    getPlaceDetails(placeId);
+                } 
+                else {
+                    alert('Place not found!'); // popup 
+                }
+            });
+        }
+
+        function getPlaceDetails(placeId) {
+            const service = new google.maps.places.PlacesService(document.createElement('div'));
+            const request = {
+                placeId: placeId,
+                fields: ['place_id', 'photos'], 
+            };
+
+            service.getDetails(request, (place, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    if (place.photos && place.photos.length > 0) {
+                        // Store all photos in the global array
+                        photos = place.photos;
+
+                        // Display the first photo
+                        currentPhotoIndex = 0;
+                        displayPhoto();
+
+                        // Show the photo controls (previous/next buttons)
+                        document.getElementById('photo-controls').style.display = 'block';
+                    } else {
+                        alert('No photos found for this place.');
+                        document.getElementById('photo-controls').style.display = 'none';
+                    }
+                } else {
+                    console.error('Place details request failed:', status);
+                }
+            });
+        }
+        function displayPhoto() {
+            if (photos.length > 0) {
+                const photoUrl = photos[currentPhotoIndex].getUrl({ maxWidth: 400, maxHeight: 400 });
+                document.getElementById('place-photo').innerHTML = `<img src="${photoUrl}" alt="Place Photo">`;
+            }
+
+            // add the isMenu function here to see if image is a menu
+        }
+
+        function nextPhoto() {
+            if (currentPhotoIndex < photos.length - 1) {
+                currentPhotoIndex++;
+                displayPhoto();
+            }
+        }
+
+        function prevPhoto() {
+            if (currentPhotoIndex > 0) {
+                currentPhotoIndex--;
+                displayPhoto();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -2,17 +2,15 @@ import { View, StyleSheet, Dimensions, Linking } from "react-native";
 import { Card, Text } from '@rneui/themed';
 import React from "react";
 import { Icon } from "react-native-elements";
-import { Link } from "expo-router";
+import { styles } from "@/styles/app-styles";
 
-export default function RestaurantDescription() {
-    const websiteURL = 'https://www.restaurantwebsite.com.au/';
+export default function RestaurantDescription({restaurant}) {
+    const websiteURL = restaurant.website;
 
     return (
         <View style={styles.pageContainer}>
             <View style={styles.textDetail}>
-                <Text style={{fontWeight: 'bold', fontSize: 12}}>*Cuisine* Restuarant</Text>
-                <Icon name='dot-single' type='entypo' size={15}></Icon>
-                <Text style={styles.body}>$20 - 40pp</Text>
+                <Text style={{fontWeight: 'bold', fontSize: 12, flex: 1}}>{restaurant.cuisineType?.map(cuisine => cuisine.cuisineType).join('/')} Restaurant</Text>
                 <Icon name='dot-single' type='entypo' size={15}></Icon>
                 <Text style={styles.body}>1.2 miles away</Text>
             </View>
@@ -31,16 +29,16 @@ export default function RestaurantDescription() {
                 <Icon name='star' type='entypo' size={18} color='#FCBE09'></Icon>
                 <Icon name='star' type='entypo' size={18} color='#FCBE09'></Icon>
                 </View>
-                <Text style={styles.body}>(563)</Text>
+                <Text style={styles.body}>({restaurant.total_ratings})</Text>
             </View>
             <View style={styles.contactCard}>
                 <View style={styles.contactInformation}>
                     <Icon name='location' type='octicon' size={25} style={{paddingRight: 10}}/>
-                    <Text style={styles.body}>367 Pitt Street, Sydney NSW 2000</Text>
+                    <Text style={styles.body}>{restaurant.address}</Text>
                 </View>
                 <View style={styles.contactInformation}>
                     <Icon name='phone' type='feather' size={25} style={{paddingRight: 10}}/>
-                    <Text style={styles.body}>(02) 9283 2828</Text>
+                    <Text style={styles.body}>{restaurant.phoneNumber}</Text>
                 </View>
                 <View style={styles.contactInformation}>
                     <Icon name='globe' type='feather' size={25} style={{paddingRight: 10}}/>
@@ -60,31 +58,3 @@ export default function RestaurantDescription() {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    pageContainer: {
-        padding: 15,
-        justifyContent: 'space-between',
-        
-    },
-    textDetail: {
-        paddingBottom: 25,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    ratingsView: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    contactCard: {
-        paddingTop: 20,
-    },
-    contactInformation: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingBottom: 10,
-    },
-    body: {
-        fontSize: 12,
-    }
-})

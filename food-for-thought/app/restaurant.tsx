@@ -6,20 +6,23 @@ import { ButtonGroup } from "react-native-elements";
 import RestaurantGallery from "@/components/RestaurantGallery";
 import RestaurantDescription from "@/components/RestaurantDescription";
 import RestaurantMenu from "@/components/RestaurantMenu";
+import { useLocalSearchParams } from "expo-router";
 
 export default function Restaurant() {
-    //stuff
     const [selectedIndex, setSelectedIndex] = React.useState(0);
+    //need to get the restaurant data from path route - object was stringified
+    const {restaurant} = useLocalSearchParams();
+    const restaurantData = JSON.parse(restaurant);
 
-    // Components to load based on selected index
+    // Components to load based on selected index, passes restaurant data
     const renderContent = () => {
         switch (selectedIndex) {
             case 0:
-                return <RestaurantMenu/>;
+                return <RestaurantMenu restaurant={restaurantData}/>;
             case 1:
-                return <RestaurantDescription/>;
+                return <RestaurantDescription restaurant={restaurantData}/>;
             case 2:
-                return <RestaurantGallery/>;
+                return <RestaurantGallery restaurant={restaurantData}/>;
             default:
                 return null;
         }

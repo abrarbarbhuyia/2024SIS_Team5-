@@ -5,7 +5,7 @@ import { Icon } from "react-native-elements";
 import { ScrollView } from "react-native-gesture-handler";
 import Meal from "./Meal";
 
-export default function RestaurantMenu() {
+export default function RestaurantMenu({restaurant}) {
     const menuURL = 'https://irp.cdn-website.com/1efc617b/files/uploaded/takeawaymenu_2021_Aug.pdf';
     
     const [isMatchingMeal, setIsMatchingMeal] = React.useState(false);

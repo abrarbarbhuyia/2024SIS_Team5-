@@ -358,5 +358,60 @@ export const styles = StyleSheet.create({
   },
   restaurantName: { 
     fontSize: 18 
-  }
+  },
+  pageContainer: {
+    padding: 15,
+    justifyContent: 'space-between', 
+  },
+  textDetail: {
+      paddingBottom: 25,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+  },
+  ratingsView: {
+      flexDirection: 'row',
+      alignItems: 'center',
+  },
+  contactCard: {
+      paddingTop: 20,
+  },
+  contactInformation: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingBottom: 10,
+      paddingRight: 10,
+  },
+  body: {
+      fontSize: 12,
+  },
+  galleryImageContainer: {
+      marginRight: 10,
+      backgroundColor: 'white',
+      borderRadius: 8,
+      overflow: 'hidden',
+      width: 180,
+      height: 180,
+  },
+  image: {
+      width: '100%',
+      height: '100%'
+  },
+  modalContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  },
+  modalBackground: {
+      width: '100%',
+      height: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+  },
+  fullImage: {
+      width: '90%',
+      height: '70%',
+      resizeMode: 'contain',
+  },
 });

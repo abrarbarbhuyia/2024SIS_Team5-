@@ -2,6 +2,7 @@ import { View, Image, StyleSheet, FlatList, Modal, TouchableOpacity } from "reac
 import { Text } from '@rneui/themed';
 import React from "react";
 import pic from '../assets/images/react-logo.png';
+import { styles } from "@/styles/app-styles";
 
 //mock images for gallery tab
 const carouselData = [
@@ -14,13 +15,13 @@ const carouselData = [
     { id: '7', image: pic },
 ];
 
-export default function RestaurantGallery() {
+export default function RestaurantGallery({restaurant}) {
 
     const [modalVisible, setModalVisible] = React.useState(false);
     const [selectedImage, setSelectedImage] = React.useState(null);
 
     //open and close modal
-    const openModal = (image) => {
+    const openModal = (image : any) => {
         setSelectedImage(image);
         setModalVisible(true);
     }
@@ -31,30 +32,30 @@ export default function RestaurantGallery() {
     }
 
     //carousel view + styling
-    const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => openModal(item.image)}>
-        <View style={styles.imageContainer}>
-            <Image source={item.image} style={styles.image} />
+    const renderItem = ({ item } : any) => (
+    <TouchableOpacity onPress={() => openModal({uri: item})}>
+        <View style={styles.galleryImageContainer}>
+            <Image source={{uri: item}} style={styles.image} />
         </View>
     </TouchableOpacity>
     )
 
     return (
         <View style={{padding: 10,}}>
-            <Text h4>Menu</Text>
+            <Text h4>Restaurant Photos</Text>
             <FlatList
-            data={carouselData}
+            data={restaurant?.restaurantPhotos || []}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={(item, index) => index.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.carousel}
             />
-            <Text h4 style={{paddingTop: 25}}>Other</Text>
+            <Text h4 style={{paddingTop: 25}}>Food Photos</Text>
             <FlatList
-            data={carouselData}
+            data={restaurant?.foodPhotos || []}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={(item, index) => index.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.carousel}
@@ -73,40 +74,3 @@ export default function RestaurantGallery() {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    carousel: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 10,
-    },
-    imageContainer: {
-        marginRight: 10,
-        backgroundColor: 'white',
-        borderRadius: 8,
-        overflow: 'hidden',
-        width: 180,
-        height: 180,
-    },
-    image: {
-        width: '100%',
-        height: '100%'
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    },
-    modalBackground: {
-        width: '100%',
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    fullImage: {
-        width: '90%',
-        height: '70%',
-        resizeMode: 'contain',
-    },
-})

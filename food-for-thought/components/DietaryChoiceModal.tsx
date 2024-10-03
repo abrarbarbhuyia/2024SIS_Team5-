@@ -1,16 +1,8 @@
-import {
-  Button,
-  Icon,
-  Overlay,
-  Text,
-  Avatar,
-  ListItem,
-  Divider,
-  CheckBox,
-} from "@rneui/themed";
-import { View, StyleSheet, TextInput, ScrollView, Modal } from "react-native";
-import {Picker} from "@react-native-picker/picker"
-import React, { useState} from 'react';
+import { Button, Icon, Overlay, Avatar, Text, ListItem, CheckBox } from "@rneui/themed";
+import { View, StyleSheet, TextInput, ScrollView } from 'react-native';
+import { SelectList } from "react-native-dropdown-select-list";
+import React, { useState } from "react";
+import { capitaliseFirstLetter, formatTextValue } from "@/utils";
 
 export type DietaryChoiceProps = {
   setShowModal: React.Dispatch<React.SetStateAction<boolean | undefined>>;
@@ -21,9 +13,119 @@ export function DietaryChoiceModal({
   setShowModal,
   isVisible,
 }: DietaryChoiceProps) {
+  const [selectedDietaryFilter, setSelectedDietaryFilter] = useState("");
+  const [newFilter, setNewFilter] = useState("");
+  const [currentFilters, setCurrentFilters] = useState<{ type: string; value: string }[]>([]);
 
-  const [selectedDietaryFilter, setSelectedDietaryFilter] = useState<string>("");
+  const allergens = [
+    "nuts",
+    "eggs",
+    "soy",
+    "crustaceans",
+    "fish",
+    "milk",
+    "peanuts",
+    "sesame",
+    "wheat",
+    "lupin",
+  ];
+  const diets = [
+    "vegetarian",
+    "vegan",
+    "halal",
+    "gluten-free",
+    "keto",
+    "fodmap",
+    "lactose-free",
+    "low-sugar",
+    "pescatarian",
+  ];
+  const cuisine = [
+    "indian",
+    "chinese",
+    "thai",
+    "italian",
+    "mexican",
+  ];
 
+  const data = [
+    {
+      key: "Ingredient",
+      value: (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Icon name="circle" color="#E4EDFF" />
+          <Text> Ingredient</Text>
+        </View>
+      ),
+    },
+    {
+      key: "Cuisine",
+      value: (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Icon name="circle" color="#E7FFE7" />
+          <Text> Cuisine</Text>
+        </View>
+      ),
+    },
+    {
+      key: "Allergen",
+      value: (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Icon name="circle" color="#F3D9FF" />
+          <Text> Allergen</Text>
+        </View>
+      ),
+    },
+    {
+      key: "Diet",
+      value: (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Icon name="circle" color="#FFE7DC" />
+          <Text> Diet</Text>
+        </View>
+      ),
+    },
+  ];
+
+  const addFilter = (filter: string) => {
+    if (filter) {
+      setCurrentFilters((prev) => [
+        ...prev,
+        { type: selectedDietaryFilter, value: formatTextValue(filter) },
+      ]);
+      setNewFilter("");
+    }
+  };
+
+  const onCheckFilter = (filterValue: string) => {
+    const existingFilterIndex = currentFilters.findIndex(
+      (filter) => filter.type === selectedDietaryFilter && filter.value === filterValue
+    );
+
+    if (existingFilterIndex !== -1) {
+      // If the filter already exists, remove it
+      setCurrentFilters((prev) => prev.filter((_, idx) => idx !== existingFilterIndex));
+    } else {
+      // If it does not exist, add it
+      setCurrentFilters((prev) => [
+        ...prev,
+        { type: selectedDietaryFilter, value: filterValue },
+      ]);
+    }
+  };
+
+  const getOptions = () => {
+    switch (selectedDietaryFilter) {
+      case "Allergen":
+        return allergens;
+      case "Diet":
+        return diets;
+      case "Cuisine":
+        return cuisine;
+      default:
+        return [];
+    }
+  };
 
   return (
     <Overlay
@@ -32,16 +134,107 @@ export function DietaryChoiceModal({
       onBackdropPress={() => setShowModal(false)}
     >
       <View style={{ width: "100%", alignItems: "center" }}>
-        <Text h4 style={{fontWeight: "bold", textAlign: "center"}}>Add Dietary Filter</Text>
-        <Picker
-        selectedValue={selectedDietaryFilter}
-        onValueChange={(itemValue) => setSelectedDietaryFilter(itemValue)}
-        style={{height: 50, width: 150}}>
-          <Picker.Item label="Select Dietary Filter" value="" /> {/* Placeholder */}
-          <Picker.Item label="Apple" value="apple" />
-          <Picker.Item label="Banana" value="banana" />
-          <Picker.Item label="Cherry" value="cherry" />
-        </Picker>
+        <Text
+          style={{
+            fontWeight: "bold",
+            textAlign: "center",
+            marginTop: 10,
+            fontSize: 18,
+          }}
+        >
+          Add Dietary Filter
+        </Text>
+        <View style={{ marginTop: 20, width: 250 }}>
+          <SelectList
+            setSelected={(itemKey: string) => setSelectedDietaryFilter(itemKey)}
+            data={data.map((item) => ({
+              key: item.key,
+              value: item.value,
+              label: item.value,
+            }))}
+            save="key"
+            boxStyles={{ borderRadius: 24, paddingTop: 14, paddingBottom: 9 }}
+          />
+        </View>
+        {selectedDietaryFilter !== "" && (
+          <View style={{ flexDirection: "column", marginTop: 0}}>
+            <View style={styles.flexFormGroup}>
+              <TextInput
+                style={styles.input}
+                placeholder={`Enter ${selectedDietaryFilter}...`}
+                value={newFilter}
+                onChangeText={(value) => setNewFilter(value)}
+              />
+              {selectedDietaryFilter && (
+                <Button
+                  buttonStyle={styles.button}
+                  onPress={() => newFilter && addFilter(newFilter)}
+                >
+                  <Icon
+                    name="plus"
+                    type="feather"
+                    iconStyle={styles.icon}
+                    size={22}
+                  />
+                </Button>
+              )}
+            </View>
+            <View>
+              <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+                {getOptions()
+                  .concat(
+                    currentFilters
+                      .filter(
+                        (f) =>
+                          f.type === selectedDietaryFilter &&
+                          !getOptions().includes(f.value)
+                      )
+                      .map((f) => f.value)
+                  )
+                  .map((option) => (
+                    <ListItem
+                      bottomDivider
+                      containerStyle={styles.listItem}
+                      key={`${option}-${selectedDietaryFilter}`}
+                    >
+                      <Avatar
+                        size={32}
+                        rounded
+                        title={option[0].toUpperCase()}
+                        containerStyle={{ backgroundColor: "purple" }}
+                      />
+                      <ListItem.Content>
+                        <ListItem.Title>{capitaliseFirstLetter(option)}</ListItem.Title>
+                      </ListItem.Content>
+                      <CheckBox
+                        checked={
+                          currentFilters.some(
+                            (cur) =>
+                              cur.type === selectedDietaryFilter &&
+                              cur.value === formatTextValue(option)
+                          )
+                        }
+                        onPress={() => onCheckFilter(option)}
+                        checkedColor="#5A428F"
+                        uncheckedColor="#BCBCBC"
+                        checkedIcon={
+                          <Icon
+                            name="check-box"
+                            type="material"
+                            color="#5A428F"
+                            size={25}
+                            iconStyle={styles.checkboxIcon}
+                          />
+                        }
+                        size={25}
+                        containerStyle={styles.checkBoxContainer}
+                      />
+                    </ListItem>
+                  ))}
+              </ScrollView>
+            </View>
+          </View>
+        )}
       </View>
     </Overlay>
   );
@@ -49,31 +242,26 @@ export function DietaryChoiceModal({
 
 const styles = StyleSheet.create({
   modal: {
-    justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#FBF8FF",
     borderRadius: 20,
     width: "80%",
     padding: 15,
+    height: 500,
+    overflow: "hidden"
   },
   flexFormGroup: {
+    marginBottom: 10,
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
     padding: 20,
     paddingBottom: 0,
-    paddingHorizontal: 40,
     flexDirection: "row",
     gap: 15,
   },
-  title: {
-    fontWeight: "600",
-    fontSize: 22,
-    color: "#281554",
-    paddingVertical: 15,
-  },
   input: {
-    width: "100%",
+    width: "70%",
     borderColor: "#CCCCCC",
     borderWidth: 1,
     borderRadius: 4,
@@ -87,15 +275,9 @@ const styles = StyleSheet.create({
   icon: {
     color: "white",
   },
-  checkboxIcon: {
-    marginRight: 3,
-  },
   button: {
     backgroundColor: "#5A428F",
     height: 38,
-  },
-  badgesCross: {
-    color: "#BCBCBC",
   },
   listItem: {
     width: "100%",
@@ -114,5 +296,8 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     padding: 0,
     margin: 0,
+  },
+  checkboxIcon: {
+    marginRight: 3,
   },
 });

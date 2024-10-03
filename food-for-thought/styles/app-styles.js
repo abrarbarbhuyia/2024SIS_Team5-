@@ -414,4 +414,58 @@ export const styles = StyleSheet.create({
       height: '70%',
       resizeMode: 'contain',
   },
+  mealHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingLeft: 20,
+    paddingRight: 20,
+    alignItems: 'center',
+    paddingTop: 5,
+  },
+  mealTitle: {
+      fontSize: 18,
+  },
+  mealFilterList: {
+      flexDirection: 'row',
+      paddingLeft: 25,
+      paddingTop: 8,
+  },
+  ingredientsDropDownInteractable: {
+      flexDirection: 'row',
+      paddingLeft: 35,
+      padding: 5,
+      paddingBottom: 10,
+      alignItems: 'center'
+  }, 
+  ingredientsText: {
+    flex: 1,
+    paddingRight: 10,
+    paddingLeft: 5,
+  },
+  viewIngredientsText: {
+      color: '#A394B8',
+  },
+  appliedFilters: {
+    flexDirection: 'row',
+    paddingLeft: 20,
+  },
+  clipboardLink: {
+      flexDirection: 'row',
+      padding: 20,
+      paddingLeft: 25,
+      paddingBottom: 10,
+      alignItems: 'center',
+  },
+  menuListHeader: {
+      flexDirection: 'row',
+      paddingLeft: 15,
+      paddingTop: 5,
+      paddingBottom: 5,
+  },
+  matchingMealsList: {
+      backgroundColor: '#CFFFF150',
+  },
+  otherMealsList: {
+
+  },
 });

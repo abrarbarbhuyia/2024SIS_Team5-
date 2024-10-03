@@ -1,13 +1,12 @@
 import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { router } from "expo-router";
-import { Text, Icon } from '@rneui/themed';
-import pic from '../assets/images/react-logo.png';        
+import { Text, Icon } from '@rneui/themed';      
 import { useEffect, useState } from "react";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from 'expo-constants';
 
-export default function RecommendedRestaurant({restaurant}) {
+export default function RecommendedRestaurant({restaurant} : any) {
 
     const [isFavourite, setIsFavourite] = useState(false);
     const [menu, setMenu] = useState(null);
@@ -24,7 +23,7 @@ export default function RecommendedRestaurant({restaurant}) {
     }, [restaurantId]);
 
     //fetch menu using restaurantId
-    const fetchMenu = async (restaurantId) => {
+    const fetchMenu = async (restaurantId : any) => {
         try {
             const response = await axios.get(`http://${HOST_IP}:4000/menu/getMenu/${restaurantId}`);
             const menuData = response.data;
@@ -38,7 +37,7 @@ export default function RecommendedRestaurant({restaurant}) {
         }
     };
 
-    const fetchMeals = async (menuId) => {
+    const fetchMeals = async (menuId : any) => {
         try {
             const response = await axios.get(`http://${HOST_IP}:4000/meal/getMealByMenuId/${menuId}`);
             setMeals(response.data);
@@ -58,10 +57,10 @@ export default function RecommendedRestaurant({restaurant}) {
             style={{height: '42%', padding: 3, backgroundColor: 'white', marginBottom: 5, borderRadius: 16}} 
             onPress={() => router.push({pathname: '/restaurant', params: {restaurant: JSON.stringify(item)}})}>
             <View style={{borderRadius: 16, flex: 1, flexDirection: 'row'}}>
-                <Image source={ item.foodPhotos && item.foodPhotos.length > 0 ? { uri: item.foodPhotos[0]} : pic} style={{width: '30%', height: '100%', borderRadius: 16}} />
+                <Image source={ item.foodPhotos && item.foodPhotos.length > 0 ? { uri: item.foodPhotos[0]} : []} style={{width: '30%', height: '100%', borderRadius: 16}} />
                 <View style={{flex: 1, flexDirection: 'column', paddingLeft: 10}}>
                     <Text style={{fontSize: 18, fontWeight: 'bold'}}>{item.name || 'Restaurant Title'}</Text>
-                    <Text numberOfLines={2} style={{fontSize: 12, opacity: 0.7}}>{item.cuisineType?.map(cuisine => cuisine.cuisineType).join('/') || 'Delicious'} food such as {meals.length > 0 ? meals.map(meal => meal.name).slice(0, 3).join(', ') : '<menu item>'}.</Text>
+                    <Text numberOfLines={2} style={{fontSize: 12, opacity: 0.7}}>{item.cuisineType?.map((cuisine : any) => cuisine.cuisineType).join('/') || 'Delicious'} food such as {meals.length > 0 ? meals.map((meal : any) => meal.name).slice(0, 3).join(', ') : '<menu item>'}.</Text>
                     <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row' }}>
                         <Icon
                             name={isFavourite ? "star" : "star-outlined"}

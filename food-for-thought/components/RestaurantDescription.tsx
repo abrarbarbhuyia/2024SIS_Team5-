@@ -4,13 +4,13 @@ import React from "react";
 import { Icon } from "react-native-elements";
 import { styles } from "@/styles/app-styles";
 
-export default function RestaurantDescription({restaurant}) {
+export default function RestaurantDescription({restaurant} : any) {
     const websiteURL = restaurant.website;
 
     return (
         <View style={styles.pageContainer}>
             <View style={styles.textDetail}>
-                <Text style={{fontWeight: 'bold', fontSize: 12, flex: 1}}>{restaurant.cuisineType?.map(cuisine => cuisine.cuisineType).join('/')} Restaurant</Text>
+                <Text style={{fontWeight: 'bold', fontSize: 12, flex: 1}}>{restaurant.cuisineType?.map((cuisine : any) => cuisine.cuisineType).join('/')} Restaurant</Text>
                 <Icon name='dot-single' type='entypo' size={15}></Icon>
                 <Text style={styles.body}>1.2 miles away</Text>
             </View>

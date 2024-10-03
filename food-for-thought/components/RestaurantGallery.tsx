@@ -1,21 +1,9 @@
 import { View, Image, StyleSheet, FlatList, Modal, TouchableOpacity } from "react-native";
 import { Text } from '@rneui/themed';
 import React from "react";
-import pic from '../assets/images/react-logo.png';
 import { styles } from "@/styles/app-styles";
 
-//mock images for gallery tab
-const carouselData = [
-    { id: '1', image: pic },
-    { id: '2', image: pic },
-    { id: '3', image: pic },
-    { id: '4', image: pic },
-    { id: '5', image: pic },
-    { id: '6', image: pic },
-    { id: '7', image: pic },
-];
-
-export default function RestaurantGallery({restaurant}) {
+export default function RestaurantGallery({restaurant} : any) {
 
     const [modalVisible, setModalVisible] = React.useState(false);
     const [selectedImage, setSelectedImage] = React.useState(null);

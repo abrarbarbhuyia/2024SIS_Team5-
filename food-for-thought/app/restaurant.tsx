@@ -32,7 +32,7 @@ export default function Restaurant() {
         <View style={styles.pageContainer} >
             <Header />
             <View style={styles.detailsContainer}>
-                <Text h4 style={{padding: 20,}}>Restaurant Title</Text>
+                <Text h4 style={{padding: 20,}}>{restaurantData.name}</Text>
                 <Card containerStyle={styles.tabContainer}>
                 <ButtonGroup
                     buttonStyle={{  backgroundColor: '#FBF8FF' }}

@@ -2,14 +2,15 @@ import {
   Button,
   Icon,
   Overlay,
+  Text,
   Avatar,
   ListItem,
   Divider,
   CheckBox,
 } from "@rneui/themed";
-import { View, StyleSheet, TextInput, Text, ScrollView, Modal } from "react-native";
-import * as React from "react";
-import { capitaliseFirstLetter, formatTextValue } from "@/utils";
+import { View, StyleSheet, TextInput, ScrollView, Modal } from "react-native";
+import {Picker} from "@react-native-picker/picker"
+import React, { useState} from 'react';
 
 export type DietaryChoiceProps = {
   setShowModal: React.Dispatch<React.SetStateAction<boolean | undefined>>;
@@ -20,6 +21,10 @@ export function DietaryChoiceModal({
   setShowModal,
   isVisible,
 }: DietaryChoiceProps) {
+
+  const [selectedDietaryFilter, setSelectedDietaryFilter] = useState<string>("");
+
+
   return (
     <Overlay
       overlayStyle={styles.modal}
@@ -27,6 +32,16 @@ export function DietaryChoiceModal({
       onBackdropPress={() => setShowModal(false)}
     >
       <View style={{ width: "100%", alignItems: "center" }}>
+        <Text h4 style={{fontWeight: "bold", textAlign: "center"}}>Add Dietary Filter</Text>
+        <Picker
+        selectedValue={selectedDietaryFilter}
+        onValueChange={(itemValue) => setSelectedDietaryFilter(itemValue)}
+        style={{height: 50, width: 150}}>
+          <Picker.Item label="Select Dietary Filter" value="" /> {/* Placeholder */}
+          <Picker.Item label="Apple" value="apple" />
+          <Picker.Item label="Banana" value="banana" />
+          <Picker.Item label="Cherry" value="cherry" />
+        </Picker>
       </View>
     </Overlay>
   );
@@ -38,7 +53,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#FBF8FF",
     borderRadius: 20,
-    width: "90%",
+    width: "80%",
     padding: 15,
   },
   flexFormGroup: {

@@ -240,7 +240,7 @@ export const styles = StyleSheet.create({
     shadowOpacity: 2,
     shadowRadius: 4,
   },
-  map: {
+  homeMap: {
     minWidth: 300,
     width: '100%',
     height: '57%',
@@ -252,7 +252,7 @@ export const styles = StyleSheet.create({
   },
   baseCard: {
     maxHeight: height-160,
-    maxWidth:width+2,
+    maxWidth: width+2,
     backgroundColor: colours.secondary,
     borderRadius: 24,
     marginTop: 5,
@@ -260,6 +260,61 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 0,
     justifyContent: "space-between",
     marginBottom: 5,
+  },
+  mapDisplayCard: {
+    maxHeight: height-160,
+    minWidth: width,
+    backgroundColor: colours.secondary,
+    borderRadius: 24,
+    marginTop: 5,
+    elevation: 4,
+    paddingHorizontal: 0,
+  },
+  mapDisplay: {
+    minWidth: width,
+    width: '100%',
+    height: height-317.5,
+  },
+  restaurantTextContainer: {
+    justifyContent: 'space-around',
+  },
+  restaurantItemContainer: {
+    flexDirection: 'row',
+    padding: 10,
+  },
+  bottomSheetImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 15,
+    marginRight: 10,
+  },
+  formHeaderContainer: {
+    width: '100%',
+    justifyContent: 'flex-start',
+  },
+  formHeaderText: {
+    fontWeight: '600',
+    fontSize: 20,
+    color: '#281554',
+    justifyContent: 'flex-start',
+  },
+  formDescriptionText: {
+    fontWeight: '400',
+    fontSize: 15,
+    color: '#281554',
+    justifyContent: 'flex-start',
+  },
+  formDescriptionTextBold: {
+    fontWeight: '500',
+    fontSize: 16,
+    color: '#281554',
+    justifyContent: 'flex-start',
+  },
+  restaurantDetailsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 10,
   },
   filterBadgeContainer: {
     flexDirection: 'row',
@@ -271,10 +326,13 @@ export const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     gap: 4,
-    height: 20,
     minHeight: 30,
-    width: '100%',
     paddingHorizontal: 10
+  },
+  restaurantItem: { 
+    padding: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: colours.borderGrey,
   },
   typesBackground: {
     backgroundColor: colours.secondary,
@@ -350,13 +408,5 @@ export const styles = StyleSheet.create({
     textAlign: 'center', 
     color: colours.mutedGrey, 
     marginTop: 20 
-  },
-  restaurantItem: { 
-    padding: 10, 
-    borderBottomWidth: 1, 
-    borderBottomColor: colours.borderGrey,
-  },
-  restaurantName: { 
-    fontSize: 18 
   }
 });

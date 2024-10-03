@@ -1,6 +1,6 @@
-import { View, Dimensions, Image, StyleSheet, FlatList, ImageSourcePropType } from "react-native";
-import { Link, router } from "expo-router";
-import { Button, Card, Text, Icon } from '@rneui/themed';
+import { View, Image, FlatList } from "react-native";
+import { router } from "expo-router";
+import { Card, Text, Icon } from '@rneui/themed';
 import SearchBar from "@/components/SearchBar";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Header from "@/components/Header";     
@@ -64,7 +64,7 @@ const Home = () => {
             <SearchBar />             
           </View>
           <MapView
-            style={styles.map}
+            style={styles.homeMap}
             initialRegion={{ // initial region is hardcoded to UTS Tower
               latitude: -33.88336558611229,
               longitude: 151.2009263036271,

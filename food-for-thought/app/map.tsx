@@ -1,8 +1,11 @@
 import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, ScrollView, FlatList, TouchableOpacity } from 'react-native';
+import { View, ScrollView, FlatList, TouchableOpacity, Image } from 'react-native';
+import pic from '../assets/images/react-logo.png'; // Placeholder image
+import { router } from "expo-router";
 import { BottomSheetModal, BottomSheetView, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import SearchBar from "@/components/SearchBar";
-import { Badge, Card, Icon } from "@rneui/themed";
+import MenuItemBadge from '@/components/MenuItemBadge';
+import { Badge, Card, Icon, Text } from "@rneui/themed";
 import axios from 'axios';
 import MapView, { Marker } from 'react-native-maps';
 import { DietaryFilterModal } from '@/components/DietaryFilterModal';
@@ -11,6 +14,7 @@ import { capitaliseFirstLetter } from '@/utils';
 import { RestaurantModal } from '@/components/RestaurantModal';
 import { styles } from '../styles/app-styles'; 
 import Constants from 'expo-constants';
+import { getDistance } from 'geolib';
 
 export type Restaurant = {
   _id: string,
@@ -68,7 +72,6 @@ const RestaurantMap = () => {
         },
       });
       setRestaurants(response.data);
-      console.log("SEARCH RESTAURANTS", JSON.stringify(response.data[6]));
       bottomSheetModalRef.current?.present();
     } catch (error: any) {
       console.error(error.response.data?.message || 'Error searching restaurants. Try again.');
@@ -87,10 +90,26 @@ const RestaurantMap = () => {
     setSearchTerm(search);
   };
 
+  const calculateRestaurantDistance = (userLocation: { latitude: number, longitude: number }, latitude: string, longitude: string) => {
+    const restaurantLocation = { latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
+    const distanceInMeters = getDistance(userLocation, restaurantLocation);
+    return (distanceInMeters / 1000).toFixed(2);
+  }
+
   const renderRestaurant = ({ item }: { item: any }) => (
-    <TouchableOpacity onPress={() => console.log(`Clicked restaurant: ${item.name}`)}>
-      <View style={styles.restaurantItem}>
-        <Text style={styles.restaurantName}>{item.name}</Text>
+    <TouchableOpacity style={styles.restaurantItem} onPress={() => router.push('/restaurant')}>
+      <View style={styles.restaurantItemContainer}>
+          <Image source={ item.restaurantPhotos && item.restaurantPhotos.length > 0 ? { uri: item.restaurantPhotos[0]} : pic} style={styles.bottomSheetImage}/>        
+          <View style={styles.restaurantTextContainer}>
+            <Text style={styles.formHeaderText} numberOfLines={1}>{item.name || 'Restaurant Title'}</Text>
+            <View style={styles.restaurantDetailsContainer}>
+              <MenuItemBadge matches={item.menuItemMatches} />
+              <Text style={styles.formDescriptionText}>
+                {item.cuisineType && item.cuisineType.length > 0 ? item.cuisineType.map((cuisineObj: any) => capitaliseFirstLetter(cuisineObj.cuisineType)).join(', ') : 'Other'} • {'$'.repeat(item.price)} • {calculateRestaurantDistance(userLocation, item.latitude, item.longitude)} km away
+              </Text>
+            </View>
+            {/* some other restaurant data can go here */}
+          </View>
       </View>
     </TouchableOpacity>
   );
@@ -99,7 +118,7 @@ const RestaurantMap = () => {
     <BottomSheetModalProvider>
       <View style={styles.container}>
         <Header />
-        <Card containerStyle={styles.baseCard}>
+        <Card containerStyle={styles.mapDisplayCard}>
           <View style={{ flexDirection: 'column', rowGap: 2 }}>
             <SearchBar onSearch={handleSearch} />
             <View style={styles.flexContainer}>
@@ -158,7 +177,7 @@ const RestaurantMap = () => {
 
             </View>
             <MapView
-              style={styles.map}
+              style={styles.mapDisplay}
               initialRegion={{
                 ...userLocation,
                 latitudeDelta: 0.0922,
@@ -198,7 +217,7 @@ const RestaurantMap = () => {
               index={1}
               snapPoints={snapPoints}
               onChange={handleSheetChanges}>
-              <BottomSheetView style={styles.contentContainer}>
+              <BottomSheetView>
                 {restaurants.length > 0 ? (
                   <FlatList
                     data={restaurants}

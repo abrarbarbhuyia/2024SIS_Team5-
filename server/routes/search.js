@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
 
         if (!isFilterApplied) {
             const allRestaurants = await databaseMaster.dbOp('find', 'RestaurantDetails', {});
-            return res.json(allRestaurants);
+            return res.json(allRestaurants.filter(r => r.hasMenu));
         }
 
         let ingredientQuery = {
@@ -80,7 +80,7 @@ router.get('/', async (req, res) => {
         }
         
         let restaurantResults = await databaseMaster.dbOp('find', 'RestaurantDetails', { query: restaurantQuery });
-        const updatedRestaurantResults = restaurantResults.map(r => ({
+        const updatedRestaurantResults = restaurantResults.filter(r => r.hasMenu).map(r => ({
             ...r, menuItemMatches: menuMealCount.get(r.menuId)
         }));
 

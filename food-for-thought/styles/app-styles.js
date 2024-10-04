@@ -388,5 +388,37 @@ export const styles = StyleSheet.create({
   },
   restaurantName: { 
     fontSize: 18 
-  }
+  },
+  headline: {
+    position: 'absolute',
+    fontFamily: 'Roboto',
+    fontWeight: '600',
+    fontSize: 16,
+    lineHeight: 32,
+    color: '#1D1B20',
+  },
+  divider: {
+    position: 'absolute',
+    width: 407,
+    borderWidth: 1,
+    borderColor: '#CAC4D0',
+  },
+  switch: {
+    position: 'absolute',
+    width: 52,
+    height: 28,
+    left: 330,
+    top: 443,
+    backgroundColor: '#65558F',
+    borderRadius: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 2,
+  },
+  switchHandle: {
+    width: 24,
+    height: 24,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+  },
 });

@@ -58,12 +58,13 @@ router.delete('/deleteFavourite/:menuId', async (req, res) => {
     }
 });
 
-
+/* Get a menu using restaurant Id */
 router.get('/getMenuString/:restaurantId', async (req, res) => {
     const placeId = req.params.restaurantId;
     const url = `https://api.foursquare.com/v3/places/${placeId}/photos?classifications=menu`;
 
     try {
+        // Retrieve menu images by calling Foursquare's place photo request using the restaurant id
         const response = await axios.get(url, {
             headers: {
                 Authorization: `${process.env.FOURSQUARE_API_KEY}`
@@ -72,6 +73,7 @@ router.get('/getMenuString/:restaurantId', async (req, res) => {
 
         const place_photo_array = response.data;
         let menu_items = {};  // Store items and prices as key-value pairs
+        let isMenuFound = false;  // Flag to track menu found
 
         for (let i = 0; i < place_photo_array.length; i++) {
             const menu_image = place_photo_array[i];
@@ -80,26 +82,30 @@ router.get('/getMenuString/:restaurantId', async (req, res) => {
             const result = await (Tesseract.recognize(menu_url, 'eng'));
             const cleaned_string = result.data.text.replace(/\n/g, ' ');
 
-            // Check if is menu
+            // Check if is_menu
             const is_menu_flag = await isMenu(cleaned_string);
             if (is_menu_flag) {
+                isMenuFound = true; 
                 const pricePattern = /\$\d+(?:\.\d{2})?/g;
-                const lines = cleaned_string.split(/[\.,;]\s*/);  // split text by punctuation
-                
+                const lines = cleaned_string.split(/[\.,;]\s*/);  // split the text by punctuation
+
                 // for each line get price, remove price and store item and price as pair
                 lines.forEach(line => {
                     const priceMatch = line.match(pricePattern);
                     if (priceMatch) {
                         const price = priceMatch[0];
-
                         const item = line.replace(price, '').trim();
-
                         if (item.length > 0) {
                             menu_items[item] = price;
                         }
                     }
                 });
             }
+        }
+        if (isMenuFound) {
+            console.log("Item is a menu");
+        } else {
+            console.log("Item is not a menu");
         }
 
         console.log(menu_items);
@@ -115,7 +121,7 @@ async function isMenu(extractedText) {
                             'salads', 'drink', 'drinks', 'entree', 'entrees', 'side',  'sides', 'beverage', 'beverages', 'soup', 'soups', 'main',
                             'mains', 'lunch', 'menu', 'vegetable', 'vegetables',  'breakfast', 'seafood', 'meat', 'chicken', 'fish', 'noodle', 'noodles'];
     
-    const pricePattern = /\d+(\.\d{2})?/g;
+    const pricePattern = /\$\d+(\.\d{2})?/g;
     const textLower = extractedText.toLowerCase();
     const commonKeywordCount = commonKeywords.reduce((count, keyword) => {
         return count + (textLower.includes(keyword) ? 1 : 0);
@@ -124,13 +130,7 @@ async function isMenu(extractedText) {
     const priceCount = (textLower.match(pricePattern) || []).length;
 
     // Check for at least one price and common keyword in the text to determine if it is a menu
-    if (commonKeywordCount >= 1 && priceCount >= 1) {
-        console.log("Item is a menu");
-        return true;
-    }
-
-    console.log("Item is not a menu");
-    return false;
+    return commonKeywordCount >= 1 && priceCount >= 1;
 }
 
 module.exports = router;

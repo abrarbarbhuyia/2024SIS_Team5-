@@ -389,36 +389,79 @@ export const styles = StyleSheet.create({
   restaurantName: { 
     fontSize: 18 
   },
+  switchLabel: {
+    fontSize: 16,
+    color: colours.textSecondary,
+    right: 10
+  },
+  inputWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderColor: colours.grey,
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 5,
+    marginBottom: 15
+  },
+  locationInput: {
+    flex: 1,
+    height: 40,
+    fontSize: 16,
+    paddingLeft: 10,
+  },
+  locationIcon: {
+    paddingRight: 10,
+  },
   headline: {
-    position: 'absolute',
-    fontFamily: 'Roboto',
     fontWeight: '600',
     fontSize: 16,
-    lineHeight: 32,
-    color: '#1D1B20',
+    color: colours.textPrimary,
+    marginTop: 20,
+    marginBottom: 15,
+    textAlign: 'left',
+    width: '100%',
+    left: 10
   },
-  divider: {
-    position: 'absolute',
-    width: 407,
-    borderWidth: 1,
-    borderColor: '#CAC4D0',
+  listItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: colours.grey,
+    marginBottom: 10,
+    marginBottom: 0,
+    left: 4,
+    width: '97.5%',
   },
-  switch: {
-    position: 'absolute',
-    width: 52,
-    height: 28,
-    left: 330,
-    top: 443,
-    backgroundColor: '#65558F',
-    borderRadius: 100,
-    justifyContent: 'center',
+  listItemText: {
+    fontSize: 16,
+    color: colours.textPrimary,
+  },
+  switchRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
     alignItems: 'center',
-    padding: 2,
+    marginBottom: 15,
+    left: 5
   },
-  switchHandle: {
-    width: 24,
-    height: 24,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
+  settingsInputContainer: {
+    paddingHorizontal: 15,
+    marginBottom: 30,
+  },
+  sliderContainer: {
+    paddingHorizontal: 15,
+    marginBottom: 20,
+  },
+  sliderText: {
+    fontSize: 16,
+    color: colours.textSecondary,
+    marginBottom: 10,
+  },
+  slider: {
+    width: width - 60,
+    height: 40,
   },
 });

@@ -1,18 +1,38 @@
 import { router } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import { Card } from '@rneui/themed';
 import { styles } from '../styles/app-styles'; 
 import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
 
 const ChangePassword = () => {
-  const [oldPassword, setUsername] = useState('');
+  const [username, setUsername] = useState('');
+  const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-
+  
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
+
+  const loadUser = useCallback(async () => {
+    const token = await AsyncStorage.getItem('token');
+    if (token) {
+      try {
+        const decodedToken: any = jwtDecode(token);
+        console.log(decodedToken.username)
+        setUsername(decodedToken.username);
+      } catch (error) {
+        console.error("Invalid token");
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
 
   const handleChangePassword = useCallback(async () => {
     if (newPassword !== confirmPassword) {
@@ -20,9 +40,10 @@ const ChangePassword = () => {
       return;
     }
 
+    console.log({ username, oldPassword, newPassword })
+
     try {
-      
-      await axios.post(`http://${HOST_IP}:4000/changepassword`, { username, password });
+      await axios.post(`http://${HOST_IP}:4000/user/changepassword`, { username, oldPassword, newPassword });
       Alert.alert('Change Password Successful');
       router.push('/settings');
     } catch (error: any) {
@@ -42,7 +63,7 @@ const ChangePassword = () => {
           <TextInput
             style={styles.input}
             value={oldPassword}
-            onChangeText={setUsername}
+            onChangeText={setOldPassword}
             secureTextEntry
           />
           <Icon name="lock" size={20} color="#7E7093" style={styles.icon} />

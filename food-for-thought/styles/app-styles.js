@@ -342,7 +342,7 @@ export const styles = StyleSheet.create({
   },
   restaurantDetailsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     gap: 10,
   },
@@ -409,6 +409,18 @@ export const styles = StyleSheet.create({
   mapIcon: {
     color: colours.midPurple,
     paddingHorizontal: 8,
+  },
+  starContainer: {
+    flexDirection: 'row',
+    marginVertical: 5,
+  },
+  filledStar: {
+    marginRight: 4,
+    color: '#FCBE09',
+  },
+  unfilledStar: {
+    marginRight: 4,
+    color: '#D3D3D3',
   },
   badgeScrollView: {
     flexDirection: 'row',

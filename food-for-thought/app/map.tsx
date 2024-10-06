@@ -68,7 +68,10 @@ const RestaurantMap = () => {
           diets: (activeFilters?.filter(f => f.type === 'diets') || []).map(f => f.value) || [],
           cuisine: (activeFilters?.filter(f => f.type === 'cuisine') || []).map(f => f.value) || [],
           meals: (activeFilters?.filter(f => f.type === 'meals') || []).map(f => f.value)[0] || "",
-          searchQuery: searchTerm
+          searchQuery: searchTerm,
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          radius: 2000, // hard-coded to 2000m right now, this can change in user settings
         },
       });
       setRestaurants(response.data);
@@ -95,6 +98,23 @@ const RestaurantMap = () => {
     const distanceInMeters = getDistance(userLocation, restaurantLocation);
     return (distanceInMeters / 1000).toFixed(2);
   }
+  
+  const renderStars = (rating: number) => {
+    const stars = Math.round(rating / 2); // get rating between 0 and 5
+    return (
+      <View style={styles.starContainer}>
+        {Array.from({ length: 5 }).map((_, index) => (
+          <Icon
+            key={index}
+            name='star'
+            type='font-awesome'
+            iconStyle={index < stars ? styles.filledStar : styles.unfilledStar}
+            size={22}
+          />
+        ))}
+      </View>
+    );
+  };
 
   const renderRestaurant = ({ item }: { item: any }) => (
     <TouchableOpacity style={styles.restaurantItem} onPress={() => router.push('/restaurant')}>
@@ -104,11 +124,11 @@ const RestaurantMap = () => {
             <Text style={styles.formHeaderText} numberOfLines={1}>{item.name || 'Restaurant Title'}</Text>
             <View style={styles.restaurantDetailsContainer}>
               <MenuItemBadge matches={item.menuItemMatches} />
-              <Text style={styles.formDescriptionText}>
-                {item.cuisineType && item.cuisineType.length > 0 ? item.cuisineType.map((cuisineObj: any) => capitaliseFirstLetter(cuisineObj.cuisineType)).join(', ') : 'Other'} • {'$'.repeat(item.price)} • {calculateRestaurantDistance(userLocation, item.latitude, item.longitude)} km away
-              </Text>
+              {renderStars(item.rating)}
             </View>
-            {/* some other restaurant data can go here */}
+            <Text style={styles.formDescriptionText}>
+              {item.cuisineType && item.cuisineType.length > 0 ? item.cuisineType.map((cuisineObj: any) => capitaliseFirstLetter(cuisineObj.cuisineType)).join(', ') : 'Other'} • {'$'.repeat(item.price)} • {calculateRestaurantDistance(userLocation, item.latitude, item.longitude)} km away
+            </Text>
           </View>
       </View>
     </TouchableOpacity>

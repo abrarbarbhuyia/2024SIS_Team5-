@@ -72,36 +72,67 @@ router.get('/getMenuString/:restaurantId', async (req, res) => {
         });
 
         const place_photo_array = response.data;
-        let menu_items = {};  // Store items and prices as key-value pairs
-        let isMenuFound = false;  // Flag to track menu found
+        let menu_items = [];  
+        let isMenuFound = false; 
 
         for (let i = 0; i < place_photo_array.length; i++) {
             const menu_image = place_photo_array[i];
             const menu_url = menu_image.prefix + menu_image.width + "x" + menu_image.height + menu_image.suffix;
 
-            const result = await (Tesseract.recognize(menu_url, 'eng'));
-            const cleaned_string = result.data.text.replace(/\n/g, ' ');
+            const result = await Tesseract.recognize(menu_url, 'eng');
+            const cleaned_string = result.data.text.replace(/[^\w\s.$\n-]/g, '').trim();
 
-            // Check if is_menu
+            // Check if the image isMenu
             const is_menu_flag = await isMenu(cleaned_string);
             if (is_menu_flag) {
-                isMenuFound = true; 
-                const pricePattern = /\$\d+(?:\.\d{2})?/g;
-                const lines = cleaned_string.split(/[\.,;]\s*/);  // split the text by punctuation
+                isMenuFound = true;
 
-                // for each line get price, remove price and store item and price as pair
-                lines.forEach(line => {
+                const pricePattern = /\$\d+(?:\.\d{2})?/g;
+                const descriptionPattern = /\(([^)]+)\)/g;  
+                const lines = cleaned_string.split(/\n/);  // split text by newlines
+
+                let currentItem = '';
+                let currentDescription = '';
+                let currentPrice = '';
+
+                lines.forEach((line, index) => {
                     const priceMatch = line.match(pricePattern);
+
                     if (priceMatch) {
-                        const price = priceMatch[0];
-                        const item = line.replace(price, '').trim();
-                        if (item.length > 0) {
-                            menu_items[item] = price;
+                        if (currentItem) {
+                            menu_items.push({
+                                item: currentItem.trim(),
+                                description: currentDescription.trim() || '',
+                                price: currentPrice.trim()
+                            });
+                        }
+
+                        currentPrice = priceMatch[0]; // Get the price
+                        const textWithoutPrice = line.replace(priceMatch[0], '').trim();
+                        const descriptionMatch = textWithoutPrice.match(descriptionPattern);
+                        currentDescription = descriptionMatch ? descriptionMatch[0].replace(/[()]/g, '').trim() : '';
+                        currentItem = textWithoutPrice.replace(descriptionMatch ? descriptionMatch[0] : '', '').trim();
+                    } else if (currentItem) {
+                        // If no price but still part of the same item, set description
+                        if (currentDescription) {
+                            currentDescription += ' ' + line.trim();
+                        } else {
+                            currentDescription = line.trim();
                         }
                     }
                 });
+
+                // Push the last item if exists
+                if (currentItem) {
+                    menu_items.push({
+                        item: currentItem.trim(),
+                        description: currentDescription.trim() || '',
+                        price: currentPrice.trim()
+                    });
+                }
             }
         }
+
         if (isMenuFound) {
             console.log("Item is a menu");
         } else {
@@ -109,7 +140,7 @@ router.get('/getMenuString/:restaurantId', async (req, res) => {
         }
 
         console.log(menu_items);
-        res.json(menu_items);  // Respond with the menu items as key-value pairs
+        res.json(menu_items);  // Respond with the menu items as an object
     } catch (error) {
         console.error(error);
         throw new Error('Menu was not found!');
@@ -120,7 +151,7 @@ async function isMenu(extractedText) {
     const commonKeywords = ['appetizers', 'appetizer', 'appetiser', 'appetisers', 'main course', 'dessert',  'desserts', 'starter',  'starters', 'salad', 
                             'salads', 'drink', 'drinks', 'entree', 'entrees', 'side',  'sides', 'beverage', 'beverages', 'soup', 'soups', 'main',
                             'mains', 'lunch', 'menu', 'vegetable', 'vegetables',  'breakfast', 'seafood', 'meat', 'chicken', 'fish', 'noodle', 'noodles'];
-    
+
     const pricePattern = /\$\d+(\.\d{2})?/g;
     const textLower = extractedText.toLowerCase();
     const commonKeywordCount = commonKeywords.reduce((count, keyword) => {

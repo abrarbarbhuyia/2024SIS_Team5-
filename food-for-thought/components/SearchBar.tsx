@@ -19,7 +19,7 @@ const SearchBarComponent: React.FunctionComponent<SearchBarComponentProps> = ({ 
         setPlaceholder('Search by dietary requirement...');
         break;
       default:
-        setPlaceholder('');
+        setPlaceholder('Search nearby restaurants...');
         break;
     }
   }, [route.name]);

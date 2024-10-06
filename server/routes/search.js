@@ -7,13 +7,15 @@ router.get('/', async (req, res) => {
         const ingredientFilter = req.query.ingredientFilter;
         const allergensFilter = req.query.allergens || [];
         const dietsFilter = req.query.diets || [];
+        const cuisineFilter = req.query.cuisine || [];
+        const mealFilter = req.query.meals;
         const searchQuery = req.query.searchQuery || '';
 
-        const isFilterApplied = ingredientFilter || allergensFilter.length > 0 || dietsFilter.length > 0 || searchQuery;
+        const isFilterApplied = ingredientFilter || allergensFilter.length > 0 || dietsFilter.length > 0 || cuisineFilter.length > 0 || mealFilter || searchQuery;
 
         if (!isFilterApplied) {
             const allRestaurants = await databaseMaster.dbOp('find', 'RestaurantDetails', {});
-            return res.json(allRestaurants);
+            return res.json(allRestaurants.filter(r => r.hasMenu));
         }
 
         let ingredientQuery = {
@@ -32,7 +34,8 @@ router.get('/', async (req, res) => {
         console.log(`ingredientIds that match applied filters ${ingredientIds}`);
         
         let mealQuery = {
-            mealId: { $in: await getMealIdsForIngredients(ingredientIds) }
+            mealId: { $in: await getMealIdsForIngredients(ingredientIds) },
+            name: { $regex: mealFilter, $options: 'i' }
         };
 
         if (dietsFilter.length > 0) { // only add the diets filter if it has values
@@ -42,9 +45,14 @@ router.get('/', async (req, res) => {
         let mealResults = await databaseMaster.dbOp('find', 'MealDetails', { // search for meals that match diet AND whose mealId contains the ingredients before
             query: mealQuery
         });
+        
+        let menuMealCount = mealResults.reduce((map, meal) => { // REDUUUUUUUUUCE !!
+            const menuId = meal.menuId;
+            map.set(menuId, (map.get(menuId) || 0) + 1);
+            return map;
+        }, new Map());
 
-        const mealIds = mealResults.map(meal => meal.mealId);
-        console.log(`mealIds that match applied filters ${mealIds}`);
+        console.log(menuMealCount);
 
         const menuIds = mealResults.map(meal => meal.menuId);
         
@@ -52,6 +60,10 @@ router.get('/', async (req, res) => {
 
         if (menuIds.length > 0) {
             restaurantQuery.menuId = { $in: menuIds };
+        }
+
+        if (cuisineFilter.length > 0) {
+            restaurantQuery.cuisine = { $in: [cuisineFilter] };
         }
         
         if (searchQuery !== '') {
@@ -68,11 +80,14 @@ router.get('/', async (req, res) => {
         }
         
         let restaurantResults = await databaseMaster.dbOp('find', 'RestaurantDetails', { query: restaurantQuery });
+        const updatedRestaurantResults = restaurantResults.filter(r => r.hasMenu).map(r => ({
+            ...r, menuItemMatches: menuMealCount.get(r.menuId)
+        }));
 
-        const restaurantIds = restaurantResults.map(restaurant => restaurant.restaurantId);
-        console.log(`restaurantIds that match applied filters ${restaurantIds}`);
+        res.json(updatedRestaurantResults);
 
-        res.json(restaurantResults);
+        // TO DO: filter by radius by calling external function searchRestaurant/:latitude/:longitude/:radius
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: error.message || 'Internal Server Error' });

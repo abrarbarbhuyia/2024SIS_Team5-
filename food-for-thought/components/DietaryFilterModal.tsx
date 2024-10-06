@@ -14,6 +14,7 @@ export function DietaryFilterModal({ filterType, currentFilters, setActiveFilter
   const [newFilter, setNewFilter] = React.useState<string>();
   const allergens = ['nuts', 'eggs', 'soy', 'crustaceans', 'fish', 'milk', 'peanuts', 'sesame', 'wheat', 'lupin'];
   const diets = ['vegetarian', 'vegan', 'halal', 'gluten-free', 'keto', 'fodmap', 'lactose-free', 'low-sugar', 'pescatarian'];
+  const cuisine = ['thai', 'indian', 'italian', 'chinese', 'japanese', 'mexican', 'korean', 'french', 'greek', 'turkish', 'vietnamese'];
 
   function addFilter(value: string) {
     if (value === null) return;
@@ -125,27 +126,83 @@ export function DietaryFilterModal({ filterType, currentFilters, setActiveFilter
               />
             </ListItem>))}
         </ScrollView>
-          : <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
-            {(currentFilters?.filter(f => f.type === 'ingredients') ?? []).map(f =>
-              <ListItem bottomDivider containerStyle={styles.listItem} key={`${f.value}-ingredients`}>
+        : filterType === 'cuisine' ?
+          <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+            {cuisine.concat(currentFilters.filter(f => (f.type === 'cuisine') && (!diets.includes(f.value))).map(f => f.value) ?? []).map(d => (
+              <ListItem bottomDivider containerStyle={styles.listItem} key={`${d}-cuisine`}>
                 <Avatar
                   size={32}
                   rounded
-                  title={f.value[0].toUpperCase()}
+                  title={d[0].toUpperCase()}
                   containerStyle={{ backgroundColor: "purple" }} />
                 <ListItem.Content>
-                  <ListItem.Title>{capitaliseFirstLetter(f.value)}</ListItem.Title>
+                  <ListItem.Title>{capitaliseFirstLetter(d)}</ListItem.Title>
                 </ListItem.Content>
-                <Icon
-                  name='x'
-                  type='feather'
-                  iconStyle={styles.badgesCross}
-                  size={20}
-                  onPress={() => currentFilters.length > 0
-                    ? setActiveFilters(currentFilters.filter(filter => !(filter === f)))
-                    : null} />
-              </ListItem>)}
-          </ScrollView>}
+                <CheckBox
+                  key={`${d}-cuisine-checkbox`}
+                  checked={currentFilters
+                    ? currentFilters.find(cur => (cur.type === filterType) && (cur.value === formatTextValue(d))) ? true : false
+                    : false}
+                  onPress={() => onCheckFilter(d)}
+                  containerStyle={styles.checkBoxContainer}
+                  checkedColor="#5A428F"
+                  uncheckedColor="#BCBCBC"
+                  checkedIcon={
+                    <Icon
+                      name="check-box"
+                      type="material"
+                      color="#5A428F"
+                      size={25}
+                      iconStyle={styles.checkboxIcon}
+                    />
+                  }
+                  size={25}
+                />
+              </ListItem>))}
+          </ScrollView>
+          : filterType === 'meals' ?
+            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+              {(currentFilters?.filter(f => f.type === 'meals') ?? []).map(f =>
+                <ListItem bottomDivider containerStyle={styles.listItem} key={`${f.value}-meals`}>
+                  <Avatar
+                    size={32}
+                    rounded
+                    title={f.value[0].toUpperCase()}
+                    containerStyle={{ backgroundColor: "purple" }} />
+                  <ListItem.Content>
+                    <ListItem.Title>{capitaliseFirstLetter(f.value)}</ListItem.Title>
+                  </ListItem.Content>
+                  <Icon
+                    name='x'
+                    type='feather'
+                    iconStyle={styles.badgesCross}
+                    size={20}
+                    onPress={() => currentFilters.length > 0
+                      ? setActiveFilters(currentFilters.filter(filter => !(filter === f)))
+                      : null} />
+                </ListItem>)}
+            </ScrollView>
+            : <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+              {(currentFilters?.filter(f => f.type === 'ingredients') ?? []).map(f =>
+                <ListItem bottomDivider containerStyle={styles.listItem} key={`${f.value}-ingredients`}>
+                  <Avatar
+                    size={32}
+                    rounded
+                    title={f.value[0].toUpperCase()}
+                    containerStyle={{ backgroundColor: "purple" }} />
+                  <ListItem.Content>
+                    <ListItem.Title>{capitaliseFirstLetter(f.value)}</ListItem.Title>
+                  </ListItem.Content>
+                  <Icon
+                    name='x'
+                    type='feather'
+                    iconStyle={styles.badgesCross}
+                    size={20}
+                    onPress={() => currentFilters.length > 0
+                      ? setActiveFilters(currentFilters.filter(filter => !(filter === f)))
+                      : null} />
+                </ListItem>)}
+            </ScrollView>}
   </Overlay>
 }
 

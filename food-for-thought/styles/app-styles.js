@@ -118,6 +118,18 @@ export const styles = StyleSheet.create({
     padding: 7,
     alignSelf: 'center'
   },
+  buttonDietPref: {
+    marginTop: 10,
+    minWidth: '50%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colours.primary,
+    borderColor: colours.border,
+    borderWidth: 1,
+    borderRadius: 20,
+    padding: 7,
+    alignSelf: 'center'
+  },
   label: {
     position: 'absolute',
     left: 10,
@@ -131,6 +143,10 @@ export const styles = StyleSheet.create({
     color: colours.white,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  buttonTitle: {
+    fontWeight: '600',
+    fontSize: 14,
   },
   registerText: {
     textDecorationLine: 'underline',
@@ -161,6 +177,20 @@ export const styles = StyleSheet.create({
   finderCard: {
     width: width - 32,
     height: 200,
+    backgroundColor: colours.secondary,
+    padding: 12,
+    borderRadius: 24,
+    marginTop: 5,
+    elevation: 4,
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 2,
+    shadowRadius: 4,
+    justifyContent: "space-between",
+    marginBottom: 5,
+  },
+  dietaryPreferencesCard: {
+    width: width - 32,
+    height: 605,
     backgroundColor: colours.secondary,
     padding: 12,
     borderRadius: 24,

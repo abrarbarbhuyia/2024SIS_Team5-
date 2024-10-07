@@ -19,7 +19,7 @@ export default function Header({homepage=false}) {
             <Card containerStyle={styles.headerCard}>
                 <View style={styles.headerContent}>
                     <View style={styles.leftIcons}>
-                        <Icon style={{ color: '#000000' }} name='account-circle' type='material' size={35} onPress={() => router.push('/user')}/>
+                        <Icon style={{ color: '#000000' }} name='arrow-back' type='material' size={35} onPress={() => router.back()}/>
                     </View>
 
                     <View style={styles.logoContainer}>
@@ -27,8 +27,8 @@ export default function Header({homepage=false}) {
                     </View>
 
                     <View style={styles.rightIcons}>
-                        <Icon style={{ color: '#000000', marginRight: 20 }} name='bell' type='fontisto' size={25} onPress={() => console.log("Notifications click")}/>
-                        <Icon style={{ color: '#000000' }} name='spinner-cog' type='fontisto' size={25} onPress={() => router.push('/settings')}/>
+                        <Icon style={{ color: '#000000' }} name='account-circle' type='material' size={35} onPress={() => router.push('/user')}/>
+                        <Icon style={{ color: '#000000', marginTop: 4, marginLeft: 4 }} name='spinner-cog' type='fontisto' size={25} onPress={() => router.push('/settings')}/>
                     </View>
                 </View>
             </Card>
@@ -40,8 +40,13 @@ const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
         maxHeight: 150,
+        alignItems: 'center',
     },
     headerCard: {
         width: width - 32,
@@ -51,7 +56,7 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         marginTop: 40,
         elevation: 4,
-        shadowOffset: {width: 0, height: 2},
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 2,
         shadowRadius: 4,
     },
@@ -64,7 +69,6 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'flex-start',
-        marginTop: 7,
     },
     logoContainer: {
         flex: 0,
@@ -74,7 +78,6 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'flex-end',
-        marginTop: 10,
     },
     image: {
         width: 135,

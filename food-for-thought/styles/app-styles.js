@@ -34,6 +34,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colours.tertiary,
+    paddingTop: 100
   },
   rectangle: {
     width: '90%',

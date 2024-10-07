@@ -12,6 +12,7 @@ const menuRoutes = require('./routes/menu');
 const ingredientRoutes = require('./routes/ingredient');
 const mealIngredientRoutes = require('./routes/mealIngredient');
 const restaurantRoutes = require('./routes/restaurant');
+const userRoutes = require('./routes/user');
 const { runTests } = require('./allergenTest');
 
 
@@ -30,6 +31,8 @@ app.use('/menu', menuRoutes);
 app.use('/ingredient', ingredientRoutes);
 app.use('/mealIngredient', mealIngredientRoutes);
 app.use('/restaurant', restaurantRoutes);
+app.use('/user', userRoutes);
+
 
 
 app.get('/api/menu', async (req, res) => {

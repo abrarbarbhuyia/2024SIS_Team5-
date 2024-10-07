@@ -29,8 +29,7 @@ router.post('/', [
         if (!passwordMatch) {
             return res.status(400).json({ message: 'Invalid username or password.' });
         }
-
-        const token = jwt.sign({ username: existingUser[0].username }, JWT_SECRET);
+        const token = jwt.sign({ username: existingUser[0].username, userId: existingUser[0]._id }, JWT_SECRET);
 
         res.status(200).json({ message: 'Login successful', token });
     } catch (error) {

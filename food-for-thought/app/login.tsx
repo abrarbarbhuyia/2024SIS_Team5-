@@ -61,7 +61,7 @@ const Login = () => {
         </View>
 
         <TouchableOpacity style={styles.button} >
-          <Text style={styles.buttonText}>LOGIN</Text>
+          <Text style={styles.buttonText} onPress={handleLogin}>LOGIN</Text>
         </TouchableOpacity>
       </Card>
     </View>

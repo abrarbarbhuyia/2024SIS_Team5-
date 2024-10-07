@@ -1,50 +1,44 @@
 import { router } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  Alert,
   FlatList,
 } from "react-native";
-import { Button, Card, Text, Icon } from "@rneui/themed";
+import { Button, Card, Text } from "@rneui/themed";
 import axios from "axios";
 import { styles } from "../styles/app-styles";
 import Header from "@/components/Header";
 import { DietaryChoiceModal } from "@/components/DietaryChoiceModal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {jwtDecode} from "jwt-decode";
+import Constants from "expo-constants";
 
 // Define the type for your table data
 interface TableData {
-  id: string;
   name: string;
-  age: number;
+  type: string;
 }
 
-const tableData = [
-  { id: "1", name: "John", age: 28 },
-  { id: "2", name: "Sarah", age: 24 },
-  { id: "3", name: "Michael", age: 30 },
-  { id: "4", name: "John", age: 28 },
-  { id: "5", name: "Sarah", age: 24 },
-  { id: "6", name: "Michael", age: 30 },
-  { id: "7", name: "John", age: 28 },
-  { id: "8", name: "Sarah", age: 24 },
-  { id: "9", name: "Michael", age: 30 },
-  { id: "10", name: "John", age: 28 },
-  { id: "11", name: "Sarah", age: 24 },
-  { id: "12", name: "Michael", age: 30 },
-  { id: "13", name: "John", age: 28 },
-  { id: "14", name: "Sarah", age: 24 },
-  { id: "15", name: "Michael", age: 30 },
-];
+// Function to get color based on type
+const getTypeColor = (type: string) => {
+  switch (type) {
+    case "Allergen":
+      return "#F3D9FF";
+    case "Ingredient":
+      return "#E4EDFF";
+    case "Diet":
+      return "#FFE7DC";
+    case "Cuisine":
+      return "#FFF2D9";
+    default:
+      return "#CCCCCC";
+  }
+};
 
 const renderRow = ({ item }: { item: TableData }) => (
   // Main box
   <View
     style={{
-      flex: 1,
       flexDirection: "row",
       borderBottomWidth: 1,
       borderColor: "#CCCCCC",
@@ -52,57 +46,57 @@ const renderRow = ({ item }: { item: TableData }) => (
       minHeight: 65,
     }}
   >
-    {/* Column 1 */}
+    {/* Column 1 - Name */}
     <View
       style={{
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        flexDirection: "row",
       }}
     >
-      <Text
-        style={{
-          flex: 1,
-          textAlign: "center",
-        }}
-      >
-        {item.name}
-      </Text>
-      <Text
-        style={{
-          flex: 1,
-          textAlign: "center",
-        }}
-      >
-        {item.id}
-      </Text>
+      <Text style={{ textAlign: "center" }}>{item.name}</Text>
     </View>
 
-    {/* Column 2 */}
+    {/* Divider */}
     <View
       style={{
         width: 1,
         backgroundColor: "#CCCCCC",
         height: "100%",
-        marginHorizontal: 5,
+        marginHorizontal: 10,
       }}
     />
 
+    {/* Column 2 - Type and Delete Button */}
     <View
       style={{
         flex: 1,
         flexDirection: "row",
-        justifyContent: "space-between",
+        justifyContent: "center",
         alignItems: "center",
       }}
     >
-      <Text style={{ flex: 1, textAlign: "center" }}>{item.age}</Text>
+      {/* Type Tag */}
+      <View
+        style={{
+          backgroundColor: getTypeColor(item.type),
+          borderRadius: 24,
+          paddingVertical: 6,
+          paddingHorizontal: 12,
+          minWidth: 100,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ textAlign: "center" }}>{item.type}</Text>
+      </View>
+
+      {/* Delete Button */}
       <Button
         type="clear"
         titleStyle={{ fontSize: 18, color: "grey", fontWeight: "bold" }}
-        buttonStyle={{ backgroundColor: "transparent", }}
-        containerStyle={{flex: 1, alignItems: 'center'}}
+        buttonStyle={{ backgroundColor: "transparent" }}
+        containerStyle={{ marginLeft: 10 }}
       >
         X
       </Button>
@@ -110,12 +104,61 @@ const renderRow = ({ item }: { item: TableData }) => (
   </View>
 );
 
-
-
 const Preferences: React.FC = () => {
-  // const [modalVisible, setModalVisible] = useState(false);
   const [dietaryChoiceModal, setDietaryChoiceModal] = useState<boolean | undefined>(false);
-  // Render individual row
+  const [username, setUsername] = useState<string>("");
+  const [tableData, setTableData] = useState<TableData[]>([]);
+
+  // Get current logged in user ID
+  const loadUser = useCallback(async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (token) {
+        const decodedToken: any = jwtDecode(token);
+        if (decodedToken?.username) {
+          setUsername(decodedToken.username);
+        } else {
+          console.error("Decoded token does not have username");
+        }
+      } else {
+        console.error("No token found");
+      }
+    } catch (error) {
+      console.error("Invalid token or unable to decode", error);
+    }
+  }, []);
+
+  // Get dietary preference table data (user.preferences)
+  const loadPreferences = useCallback(async (username: string) => {
+    if (!username) {
+      console.log("username not fetched, skipping preferences load");
+      return;
+    }
+    const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
+    console.log("HOST IP", HOST_IP);
+    try {
+      const response = await axios.get(
+        `http://${HOST_IP}:4000/user/getUserPreference/${username}`
+      );
+      console.log("Preferences data found", response.data);
+      setTableData(response.data);
+    } catch (error: any) {
+      console.error("Error searching user preferences", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Load user when the component mounts
+    loadUser();
+  }, [loadUser]); // Only run once when the component mounts
+
+  useEffect(() => {
+    // Load preferences when the username is available
+    if (username) {
+      loadPreferences(username);
+    }
+  }, [username, loadPreferences]); // Run whenever 'username' changes
+
   return (
     <View style={styles.container}>
       <Header homepage={false} />
@@ -149,13 +192,18 @@ const Preferences: React.FC = () => {
                 flex: 1,
                 fontWeight: "bold",
                 textAlign: "center",
-                borderRightWidth: 10,
-                borderRightColor: "#CCCCCC",
-                paddingRight: 10,
               }}
             >
               Name
             </Text>
+            <View
+              style={{
+                width: 1,
+                backgroundColor: "#CCCCCC",
+                height: "100%",
+                marginHorizontal: 10,
+              }}
+            />
             <Text style={{ flex: 1, fontWeight: "bold", textAlign: "center" }}>
               Type
             </Text>
@@ -165,7 +213,7 @@ const Preferences: React.FC = () => {
         <FlatList
           data={tableData}
           renderItem={renderRow}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.name}
           style={{ alignSelf: "stretch", maxHeight: 525 }}
         />
       </Card>

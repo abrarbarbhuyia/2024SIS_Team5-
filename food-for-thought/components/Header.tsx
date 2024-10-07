@@ -28,7 +28,7 @@ export default function Header({homepage=false}) {
 
                     <View style={styles.rightIcons}>
                         <Icon style={{ color: '#000000', marginRight: 20 }} name='bell' type='fontisto' size={25} onPress={() => console.log("Notifications click")}/>
-                        <Icon style={{ color: '#000000' }} name='spinner-cog' type='fontisto' size={25} onPress={() => console.log("Settings click")}/>
+                        <Icon style={{ color: '#000000' }} name='spinner-cog' type='fontisto' size={25} onPress={() => router.push('/settings')}/>
                     </View>
                 </View>
             </Card>

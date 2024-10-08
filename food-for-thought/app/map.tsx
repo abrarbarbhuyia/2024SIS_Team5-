@@ -77,7 +77,7 @@ const RestaurantMap = () => {
       setRestaurants(response.data);
       bottomSheetModalRef.current?.present();
     } catch (error: any) {
-      console.error(error.response.data?.message || 'Error searching restaurants. Try again.');
+      console.error(JSON.stringify(error) || 'Error searching restaurants. Try again.');
     }
   };
 
@@ -209,7 +209,7 @@ const RestaurantMap = () => {
                 title={"My location"} >
                 <View style={styles.filledCircle} />
               </Marker>
-              {restaurants.length > 0 && restaurants.map((r, i) =>
+              {restaurants.length > 0 && restaurants.map((r, i) => 
                 <Marker
                   key={`marker-${i}`}
                   coordinate={{ latitude: r.latitude, longitude: r.longitude }}
@@ -219,15 +219,15 @@ const RestaurantMap = () => {
                       name="fmd-good"
                       type="material"
                       color="#EA4335"
-                      size={40}
+                      size={50}
                     />
                     <View style={styles.innerCircle}>
-                      <Icon
-                        name="silverware-fork-knife"
-                        type="material-community"
-                        color="white"
-                        size={16}
-                      />
+                      {r.cuisineType.length > 0 ?
+                        <Image source={{uri: r.cuisineType[r.cuisineType.length - 1].icon}} style={styles.markerIcon}/> :
+                          r.restaurantType.length > 0 ?
+                            <Image source={{uri: r.restaurantType[r.restaurantType.length - 1].icon}} style={styles.markerIcon}/> 
+                        : <Image source={{uri: "https://ss3.4sqi.net/img/categories_v2/food/default_64.png"}}  style={styles.markerIcon}/>
+                      }
                     </View>
                   </View>
                 </Marker>)}

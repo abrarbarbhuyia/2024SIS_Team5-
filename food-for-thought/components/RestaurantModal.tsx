@@ -3,6 +3,7 @@ import { View, StyleSheet, Image, Text } from 'react-native';
 import * as React from "react";
 import { capitaliseFirstLetter, formatTextValue } from "@/utils";
 import { Restaurant } from "@/app/map";
+import { router } from "expo-router";
 
 export type DietaryFilterProps = {
   setShowModal: React.Dispatch<React.SetStateAction<Restaurant | undefined>>,
@@ -79,7 +80,7 @@ export function RestaurantModal({ restaurant, setShowModal, ...rest }: DietaryFi
       <View style={{ ...styles.flexFormGroup, paddingBottom: 10 }}>
         <Text style={styles.formDescriptionTextBold}>Matching menu items: </Text>
       </View>
-      <Button buttonStyle={styles.button} titleStyle={styles.buttonTitle} onPress={() => null} title={('view more').toUpperCase()} />
+      <Button buttonStyle={styles.button} titleStyle={styles.buttonTitle} onPress={() => {router.push('/restaurant'); setShowModal(undefined);}} title={('view more').toUpperCase()} />
     </View>
     <Divider style={{ marginBottom: 10 }} />
   </Overlay>

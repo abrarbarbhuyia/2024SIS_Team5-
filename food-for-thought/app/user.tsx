@@ -48,7 +48,8 @@ const UserProfile = () => {
       if (!isGuest) {
         const response = await axios.get(`http://${HOST_IP}:4000/user/getUser/${username}`);
         setUserFavourites(response.data?.favourites?.length ?? 0);
-        setUserNotes(response.data?.notes?.length ?? 0);
+        // To do: update user notes count
+        // setUserNotes(response.data?.notes?.length ?? 0);
         setUserPreferences(response.data?.preferences?.length ?? 0);
       }
     } catch (error: any) {

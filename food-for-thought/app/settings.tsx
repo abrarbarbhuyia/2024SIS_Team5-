@@ -61,6 +61,11 @@ const Settings = () => {
             <Text style={styles.listItemText}>Change Password</Text>
             <Icon name="chevron-right" size={16} color="#49454F" />
           </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.listItem} onPress={() => router.push('/preferences')}>
+            <Text style={styles.listItemText}>Change Dietary Preferences</Text>
+            <Icon name="chevron-right" size={16} color="#49454F" />
+          </TouchableOpacity>
         </View>
 
         <View>

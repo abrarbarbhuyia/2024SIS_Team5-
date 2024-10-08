@@ -1,119 +1,141 @@
-import { Button, Icon, Overlay, Avatar, Text, ListItem, CheckBox } from "@rneui/themed";
-import { View, StyleSheet, TextInput, ScrollView } from 'react-native';
+import {
+  Button,
+  Icon,
+  Overlay,
+  Avatar,
+  Text,
+  ListItem,
+  CheckBox,
+} from "@rneui/themed";
+import { View, StyleSheet, TextInput, ScrollView } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
-import React, { useState } from "react";
-import { capitaliseFirstLetter, formatTextValue } from "@/utils";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Constants from "expo-constants";
 
 export type DietaryChoiceProps = {
   setShowModal: React.Dispatch<React.SetStateAction<boolean | undefined>>;
   isVisible: boolean;
+  username: string;
+  refreshPreferences: () => void;
 };
 
 export function DietaryChoiceModal({
   setShowModal,
   isVisible,
+  username,
+  refreshPreferences,
 }: DietaryChoiceProps) {
   const [selectedDietaryFilter, setSelectedDietaryFilter] = useState("");
   const [newFilter, setNewFilter] = useState("");
-  const [currentFilters, setCurrentFilters] = useState<{ type: string; value: string }[]>([]);
+  const [currentFilters, setCurrentFilters] = useState<
+    { name: string; type: string }[]
+  >([]);
+
+  const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
+
+  useEffect(() => {
+    if (username) {
+      axios
+        .get(`http://${HOST_IP}:4000/user/getUserPreference/${username}`)
+        .then((response) => {
+          setCurrentFilters(response.data);
+        })
+        .catch((error) => {
+          console.error("Error loading preferences", error);
+        });
+    }
+  }, [username]);
 
   const allergens = [
-    "nuts",
-    "eggs",
-    "soy",
-    "crustaceans",
-    "fish",
-    "milk",
-    "peanuts",
-    "sesame",
-    "wheat",
-    "lupin",
+    "Nuts",
+    "Eggs",
+    "Soy",
+    "Crustaceans",
+    "Fish",
+    "Milk",
+    "Peanuts",
+    "Sesame",
+    "Wheat",
+    "Lupin",
   ];
   const diets = [
-    "vegetarian",
-    "vegan",
-    "halal",
-    "gluten-free",
-    "keto",
-    "fodmap",
-    "lactose-free",
-    "low-sugar",
-    "pescatarian",
+    "Vegetarian",
+    "Vegan",
+    "Halal",
+    "Gluten-Free",
+    "Keto",
+    "Fodmap",
+    "Lactose-Free",
+    "Low-Sugar",
+    "Pescatarian",
   ];
-  const cuisine = [
-    "indian",
-    "chinese",
-    "thai",
-    "italian",
-    "mexican",
-  ];
+  const cuisine = ["Indian", "Chinese", "Thai", "Italian", "Mexican"];
 
   const data = [
-    {
-      key: "Ingredient",
-      value: (
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Icon name="circle" color="#E4EDFF" />
-          <Text> Ingredient</Text>
-        </View>
-      ),
-    },
-    {
-      key: "Cuisine",
-      value: (
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Icon name="circle" color="#E7FFE7" />
-          <Text> Cuisine</Text>
-        </View>
-      ),
-    },
-    {
-      key: "Allergen",
-      value: (
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Icon name="circle" color="#F3D9FF" />
-          <Text> Allergen</Text>
-        </View>
-      ),
-    },
-    {
-      key: "Diet",
-      value: (
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Icon name="circle" color="#FFE7DC" />
-          <Text> Diet</Text>
-        </View>
-      ),
-    },
+    { key: "Ingredient", value: "Ingredient" },
+    { key: "Cuisine", value: "Cuisine" },
+    { key: "Allergen", value: "Allergen" },
+    { key: "Diet", value: "Diet" },
   ];
 
-  const addFilter = (filter: string) => {
+  // Add a new filter (via text input)
+  const addFilter = async (filter: string) => {
     if (filter) {
-      setCurrentFilters((prev) => [
-        ...prev,
-        { type: selectedDietaryFilter, value: formatTextValue(filter) },
-      ]);
-      setNewFilter("");
+      try {
+        const formattedFilter = {
+          type: selectedDietaryFilter,
+          name: filter.trim(), // Preserve original casing
+        };
+        await axios.put(
+          `http://${HOST_IP}:4000/user/createUserPreference/${username}`,
+          { preference: [formattedFilter] }
+        );
+        setCurrentFilters((prev) => [...prev, formattedFilter]);
+        setNewFilter("");
+        refreshPreferences();
+      } catch (error) {
+        console.error("Error adding preference", error);
+      }
     }
   };
 
-  const onCheckFilter = (filterValue: string) => {
-    const existingFilterIndex = currentFilters.findIndex(
-      (filter) => filter.type === selectedDietaryFilter && filter.value === filterValue
+  // Handle checking/unchecking a filter from dropdown options
+  const onCheckFilter = async (filterName: string) => {
+    const formattedFilter = { type: selectedDietaryFilter, name: filterName };
+    const existingFilter = currentFilters.find(
+      (filter) =>
+        filter.type === selectedDietaryFilter && filter.name === filterName
     );
 
-    if (existingFilterIndex !== -1) {
-      // If the filter already exists, remove it
-      setCurrentFilters((prev) => prev.filter((_, idx) => idx !== existingFilterIndex));
+    if (existingFilter) {
+      try {
+        await axios.delete(
+          `http://${HOST_IP}:4000/user/deleteUserPreference/${username}`,
+          { data: { preferenceName: filterName } }
+        );
+        setCurrentFilters(
+          (prev) => prev.filter((filter) => filter.name !== filterName)
+        );
+        refreshPreferences();
+      } catch (error) {
+        console.error("Error deleting preference", error);
+      }
     } else {
-      // If it does not exist, add it
-      setCurrentFilters((prev) => [
-        ...prev,
-        { type: selectedDietaryFilter, value: filterValue },
-      ]);
+      try {
+        await axios.put(
+          `http://${HOST_IP}:4000/user/createUserPreference/${username}`,
+          { preference: [formattedFilter] }
+        );
+        setCurrentFilters((prev) => [...prev, formattedFilter]);
+        refreshPreferences();
+      } catch (error) {
+        console.error("Error adding preference", error);
+      }
     }
   };
 
+  // Get available options based on selected filter type
   const getOptions = () => {
     switch (selectedDietaryFilter) {
       case "Allergen":
@@ -134,30 +156,17 @@ export function DietaryChoiceModal({
       onBackdropPress={() => setShowModal(false)}
     >
       <View style={{ width: "100%", alignItems: "center" }}>
-        <Text
-          style={{
-            fontWeight: "bold",
-            textAlign: "center",
-            marginTop: 10,
-            fontSize: 18,
-          }}
-        >
-          Add Dietary Filter
-        </Text>
-        <View style={{ marginTop: 20, width: 250 }}>
+        <Text style={styles.modalTitle}>Add Dietary Filter</Text>
+        <View style={styles.dropdownContainer}>
           <SelectList
             setSelected={(itemKey: string) => setSelectedDietaryFilter(itemKey)}
-            data={data.map((item) => ({
-              key: item.key,
-              value: item.value,
-              label: item.value,
-            }))}
+            data={data}
             save="key"
-            boxStyles={{ borderRadius: 24, paddingTop: 14, paddingBottom: 9 }}
+            boxStyles={styles.selectBox}
           />
         </View>
         {selectedDietaryFilter !== "" && (
-          <View style={{ flexDirection: "column", marginTop: 0}}>
+          <View style={{ flexDirection: "column", marginTop: 0 }}>
             <View style={styles.flexFormGroup}>
               <TextInput
                 style={styles.input}
@@ -165,31 +174,32 @@ export function DietaryChoiceModal({
                 value={newFilter}
                 onChangeText={(value) => setNewFilter(value)}
               />
-              {selectedDietaryFilter && (
-                <Button
-                  buttonStyle={styles.button}
-                  onPress={() => newFilter && addFilter(newFilter)}
-                >
-                  <Icon
-                    name="plus"
-                    type="feather"
-                    iconStyle={styles.icon}
-                    size={22}
-                  />
-                </Button>
-              )}
+              <Button
+                buttonStyle={styles.button}
+                onPress={() => newFilter && addFilter(newFilter)}
+              >
+                <Icon
+                  name="plus"
+                  type="feather"
+                  iconStyle={styles.icon}
+                  size={22}
+                />
+              </Button>
             </View>
             <View>
-              <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
+              <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollViewContent}
+              >
                 {getOptions()
                   .concat(
                     currentFilters
                       .filter(
                         (f) =>
                           f.type === selectedDietaryFilter &&
-                          !getOptions().includes(f.value)
+                          !getOptions().includes(f.name)
                       )
-                      .map((f) => f.value)
+                      .map((f) => f.name)
                   )
                   .map((option) => (
                     <ListItem
@@ -200,20 +210,18 @@ export function DietaryChoiceModal({
                       <Avatar
                         size={32}
                         rounded
-                        title={option[0].toUpperCase()}
+                        title={option?.[0]?.toUpperCase() || "?"}
                         containerStyle={{ backgroundColor: "purple" }}
                       />
                       <ListItem.Content>
-                        <ListItem.Title>{capitaliseFirstLetter(option)}</ListItem.Title>
+                        <ListItem.Title>{option || "?"}</ListItem.Title>
                       </ListItem.Content>
                       <CheckBox
-                        checked={
-                          currentFilters.some(
-                            (cur) =>
-                              cur.type === selectedDietaryFilter &&
-                              cur.value === formatTextValue(option)
-                          )
-                        }
+                        checked={currentFilters.some(
+                          (cur) =>
+                            cur.type === selectedDietaryFilter &&
+                            cur.name === option
+                        )}
                         onPress={() => onCheckFilter(option)}
                         checkedColor="#5A428F"
                         uncheckedColor="#BCBCBC"
@@ -248,7 +256,22 @@ const styles = StyleSheet.create({
     width: "80%",
     padding: 15,
     height: 500,
-    overflow: "hidden"
+    overflow: "hidden",
+  },
+  modalTitle: {
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 10,
+    fontSize: 18,
+  },
+  dropdownContainer: {
+    marginTop: 20,
+    width: 250,
+  },
+  selectBox: {
+    borderRadius: 24,
+    paddingTop: 14,
+    paddingBottom: 9,
   },
   flexFormGroup: {
     marginBottom: 10,

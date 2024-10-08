@@ -1,16 +1,13 @@
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  View,
-  FlatList,
-} from "react-native";
+import { View, FlatList } from "react-native";
 import { Button, Card, Text } from "@rneui/themed";
 import axios from "axios";
 import { styles } from "../styles/app-styles";
 import Header from "@/components/Header";
 import { DietaryChoiceModal } from "@/components/DietaryChoiceModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import Constants from "expo-constants";
 
 // Define the type for your table data
@@ -35,8 +32,14 @@ const getTypeColor = (type: string) => {
   }
 };
 
-const renderRow = ({ item }: { item: TableData }) => (
-  // Main box
+// Render a row with data and delete functionality
+const renderRow = ({
+  item,
+  handleDelete,
+}: {
+  item: TableData;
+  handleDelete: (name: string) => void;
+}) => (
   <View
     style={{
       flexDirection: "row",
@@ -46,7 +49,6 @@ const renderRow = ({ item }: { item: TableData }) => (
       minHeight: 65,
     }}
   >
-    {/* Column 1 - Name */}
     <View
       style={{
         flex: 1,
@@ -57,7 +59,6 @@ const renderRow = ({ item }: { item: TableData }) => (
       <Text style={{ textAlign: "center" }}>{item.name}</Text>
     </View>
 
-    {/* Divider */}
     <View
       style={{
         width: 1,
@@ -67,7 +68,6 @@ const renderRow = ({ item }: { item: TableData }) => (
       }}
     />
 
-    {/* Column 2 - Type and Delete Button */}
     <View
       style={{
         flex: 1,
@@ -76,7 +76,6 @@ const renderRow = ({ item }: { item: TableData }) => (
         alignItems: "center",
       }}
     >
-      {/* Type Tag */}
       <View
         style={{
           backgroundColor: getTypeColor(item.type),
@@ -91,12 +90,12 @@ const renderRow = ({ item }: { item: TableData }) => (
         <Text style={{ textAlign: "center" }}>{item.type}</Text>
       </View>
 
-      {/* Delete Button */}
       <Button
         type="clear"
         titleStyle={{ fontSize: 18, color: "grey", fontWeight: "bold" }}
         buttonStyle={{ backgroundColor: "transparent" }}
         containerStyle={{ marginLeft: 10 }}
+        onPress={() => handleDelete(item.name)} // Call handleDelete with the preference name
       >
         X
       </Button>
@@ -105,11 +104,13 @@ const renderRow = ({ item }: { item: TableData }) => (
 );
 
 const Preferences: React.FC = () => {
-  const [dietaryChoiceModal, setDietaryChoiceModal] = useState<boolean | undefined>(false);
+  const [dietaryChoiceModal, setDietaryChoiceModal] = useState<
+    boolean | undefined
+  >(false);
   const [username, setUsername] = useState<string>("");
   const [tableData, setTableData] = useState<TableData[]>([]);
 
-  // Get current logged in user ID
+  // Get current logged-in user ID
   const loadUser = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -143,32 +144,58 @@ const Preferences: React.FC = () => {
       console.log("Preferences data found", response.data);
       setTableData(response.data);
     } catch (error: any) {
-      console.error("Error searching user preferences", error);
+      console.error("Error fetching user preferences", error);
     }
   }, []);
 
-  useEffect(() => {
-    // Load user when the component mounts
-    loadUser();
-  }, [loadUser]); // Only run once when the component mounts
+  // Delete dietary preference
+  const handleDeletePreference = async (preferenceName: string) => {
+    try {
+      const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
+      const token = await AsyncStorage.getItem("token");
+      if (token) {
+        const decodedToken: any = jwtDecode(token);
+        const username = decodedToken.username;
+
+        const response = await axios.delete(
+          `http://${HOST_IP}:4000/user/deleteUserPreference/${username}`,
+          {
+            data: { preferenceName },
+          }
+        );
+
+        if (response.status === 200) {
+          console.log("Preference deleted successfully");
+
+          setTableData((prevData) =>
+            prevData.filter((item) => item.name !== preferenceName)
+          );
+        }
+      } else {
+        console.error("No token found");
+      }
+    } catch (error) {
+      console.error("Error deleting user preference", error);
+    }
+  };
 
   useEffect(() => {
-    // Load preferences when the username is available
+    loadUser();
+  }, [loadUser]);
+
+  useEffect(() => {
     if (username) {
       loadPreferences(username);
     }
-  }, [username, loadPreferences]); // Run whenever 'username' changes
+  }, [username, loadPreferences]);
 
   return (
     <View style={styles.container}>
       <Header homepage={false} />
-      {/* Component for Dietary Preferences Heading */}
       <View style={{ alignItems: "center", marginBottom: 16 }}>
         <Text h3 style={{ color: "#1D1B20", fontWeight: "600" }}>
           Dietary Preferences
         </Text>
-
-        {/* Button for adding new Preferences */}
         <Button
           buttonStyle={styles.buttonDietPref}
           titleStyle={styles.buttonTitle}
@@ -176,10 +203,8 @@ const Preferences: React.FC = () => {
           title="Add New Dietary Preferences"
         />
       </View>
-      {/* Table of Dietary Preferences */}
       <Card containerStyle={styles.dietaryPreferencesCard}>
         <View style={{ alignSelf: "stretch", marginBottom: 16 }}>
-          {/* Table Header */}
           <View
             style={{
               flexDirection: "row",
@@ -187,13 +212,7 @@ const Preferences: React.FC = () => {
               padding: 10,
             }}
           >
-            <Text
-              style={{
-                flex: 1,
-                fontWeight: "bold",
-                textAlign: "center",
-              }}
-            >
+            <Text style={{ flex: 1, fontWeight: "bold", textAlign: "center" }}>
               Name
             </Text>
             <View
@@ -209,16 +228,22 @@ const Preferences: React.FC = () => {
             </Text>
           </View>
         </View>
-        {/* Table Body */}
         <FlatList
           data={tableData}
-          renderItem={renderRow}
+          renderItem={({ item }) =>
+            renderRow({ item, handleDelete: handleDeletePreference })
+          }
           keyExtractor={(item) => item.name}
           style={{ alignSelf: "stretch", maxHeight: 525 }}
         />
       </Card>
       {dietaryChoiceModal && (
-        <DietaryChoiceModal setShowModal={setDietaryChoiceModal} isVisible={true} />
+        <DietaryChoiceModal
+          setShowModal={setDietaryChoiceModal}
+          isVisible={dietaryChoiceModal}
+          username={username} // pass username for creation
+          refreshPreferences={() => loadPreferences(username)} // refresh data on adding
+        />
       )}
     </View>
   );

@@ -93,7 +93,7 @@ const UserProfile = () => {
               </Card>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => router.push('/home')}>
+            <TouchableOpacity onPress={() => router.push('/preferences')}>
               <Card containerStyle={styles.user}>
                 <Icon style={styles.userIcon} name='checklist' type='material' size={40} />
                 <Text style={styles.userCount}>{userPreferences}</Text>

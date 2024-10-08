@@ -5,7 +5,7 @@ const {width, height} = Dimensions.get('window');
 const colours = {
   textPrimary: '#1D1B20',
   white: '#FFFFFF',
-  red: '#CB4C4E',
+  red: '#EA4335',
   // Blues
   highlight: '#0B84FF',
   border: '#484DBE',
@@ -374,7 +374,7 @@ export const styles = StyleSheet.create({
   },
   typesText: {
     color: colours.darkPurple,
-    fontWeight: '400',
+    fontWeight: '500',
     fontSize: 11,
     letterSpacing: -0.4,
   },
@@ -391,7 +391,7 @@ export const styles = StyleSheet.create({
   },
   filterText: {
     color: colours.darkPurple,
-    fontWeight: '300',
+    fontWeight: '400',
     fontSize: 11,
     textAlign: 'center',
   },
@@ -432,6 +432,10 @@ export const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 1},
     shadowOpacity: 1,
     shadowRadius: 1,
+  },
+  markerIcon: {
+    height: 32,
+    width: 32,
   },
   innerIcon: {
     position: 'absolute',

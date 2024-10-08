@@ -90,7 +90,7 @@ const UserProfile = () => {
               <Card containerStyle={styles.user}>
                 <Icon style={styles.userIcon} name='favorite' type='material' size={40} />
                 <Text style={styles.userCount}>{userFavourites}</Text>
-                <Text style={styles.userText}>Favorites</Text>
+                <Text style={styles.userText}>Favourites</Text>
               </Card>
             </TouchableOpacity>
 

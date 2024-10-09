@@ -83,24 +83,21 @@ export default function RestaurantMenu({restaurant} : any) {
                         <Icon name='check-circle' type='feather' size={20} color={'#16D59C'}/>
                     </View>
                     {/* {meals.filter(isMealMatching).map((meal) => (
-                        <Meal key={meal.mealId} param={meal}/>
+                        <Meal key={meal.mealId} meal={meal}/>
                     ))} */}
-                    <Meal meal={meals[3]}/>
-                    <Meal meal={meals[4]}/>
+                    <Meal meal={meals[0]}/>
+                    <Meal meal={meals[1]}/>
 
                 </View>
                 <View style={styles.otherMealsList}>
                     <View style={styles.menuListHeader}>
                         <Text style={{paddingRight: 15, fontWeight: 'bold'}}>Other Meals</Text> 
                     </View>
-                    {/* {meals.map((meal) => (
-                        <Meal key={meal.mealId} param={meal}/>
-                    ))} */}
-                    <Meal meal={meals[0]}/>
-                    <Meal meal={meals[1]}/>
-                    <Meal meal={meals[2]}/>
+                    {meals.map((meal) => (
+                        <Meal key={meal.mealId} meal={meal}/>
+                    ))}
                     {/* {meals.filter((meal) => !isMealMatching(meal)).map((meal) => (
-                        <Meal key={meal.mealId} param={meal}/>
+                        <Meal key={meal.mealId} meal={meal}/>
                     ))} */}
                 </View>
             </ScrollView>

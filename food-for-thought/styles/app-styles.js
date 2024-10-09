@@ -367,7 +367,6 @@ export const styles = StyleSheet.create({
       paddingBottom: 25,
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
   },
   ratingsView: {
       flexDirection: 'row',

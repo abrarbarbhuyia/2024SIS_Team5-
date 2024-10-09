@@ -33,7 +33,7 @@
       "typedRoutes": true
     },
     "extra": {
-      "HOST_IP": "172.19.147.232"
+      "HOST_IP": ""
     }
   }
 }

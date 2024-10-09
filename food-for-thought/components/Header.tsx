@@ -1,4 +1,4 @@
-import { Card, Text, Icon } from '@rneui/themed';
+import { Card, Icon } from '@rneui/themed';
 import { View, StyleSheet, Dimensions, Image } from "react-native";
 import React from 'react';
 import { router } from 'expo-router';
@@ -17,18 +17,18 @@ export default function Header({homepage=false}) {
     return (
         <View style={styles.container}>
             <Card containerStyle={styles.headerCard}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 35, marginTop: 7 }}>
-                        <Icon style={{ color: '#000000' }} name='user' type='evilicon' size={35} onPress={() => router.push('/login')}/>
-                        <Text style={{ marginLeft: 8 }}>Nep</Text>
+                <View style={styles.headerContent}>
+                    <View style={styles.leftIcons}>
+                        <Icon style={{ color: '#000000' }} name='arrow-back' type='material' size={35} onPress={() => router.back()}/>
                     </View>
-                    {/* <Icon name='user' type='evilicon' /> */}
-                    {/* also some text alongside the icon */}
-                    <Card.Image source={logo} style={styles.image} onPress={handleHomeRoute}/>
-                    {/* now two more icons on other side of logo, side by side */}
-                    <View style={{ flexDirection: 'row', marginLeft: 35, marginTop: 10}}>
-                        <Icon style={{ color: '#000000', marginRight: 20 }} name='bell' type='fontisto' size={25} onPress={() => console.log("Notifications click")}/>
-                        <Icon style={{ color: '#000000' }} name='spinner-cog' type='fontisto' size={25} onPress={() => console.log("Settings click")}/>
+
+                    <View style={styles.logoContainer}>
+                        <Card.Image source={logo} style={styles.image} onPress={handleHomeRoute}/>
+                    </View>
+
+                    <View style={styles.rightIcons}>
+                        <Icon style={{ color: '#000000' }} name='account-circle' type='material' size={35} onPress={() => router.push('/user')}/>
+                        <Icon style={{ color: '#000000', marginTop: 4, marginLeft: 4 }} name='spinner-cog' type='fontisto' size={25} onPress={() => router.push('/settings')}/>
                     </View>
                 </View>
             </Card>
@@ -40,9 +40,13 @@ const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        flexDirection: 'row',
+        position: 'absolute',
+        top: 20,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
         maxHeight: 150,
+        alignItems: 'center',
     },
     headerCard: {
         width: width - 32,
@@ -52,15 +56,31 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         marginTop: 40,
         elevation: 4,
-        shadowOffset: {width: 0, height: 2},
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 2,
         shadowRadius: 4,
-        justifyContent: "space-between",
-        flexWrap: 'nowrap',
+    },
+    headerContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    leftIcons: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+    },
+    logoContainer: {
+        flex: 0,
+        alignItems: 'center',
+    },
+    rightIcons: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
     },
     image: {
         width: 135,
         height: 59,
-        marginBottom: 6,
-    }
-})
+    },
+});

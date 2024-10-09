@@ -9,11 +9,11 @@ const { testConnection } = require('./databaseMaster');
 const {getIngredientDetails, getMeals, createMeals, createMenu, createIngredient, createMealIngredient, getMenuImage } = require('./allergenMaster');
 const mealRoutes = require('./routes/meal');
 const menuRoutes = require('./routes/menu');
+const userRoutes = require('./routes/user');
 const ingredientRoutes = require('./routes/ingredient');
 const mealIngredientRoutes = require('./routes/mealIngredient');
 const restaurantRoutes = require('./routes/restaurant');
 const { runTests } = require('./allergenTest');
-
 
 const corsOptions = {
   origin: '*',
@@ -25,12 +25,12 @@ app.use(cors(corsOptions));
 app.use('/search', searchRoutes);
 app.use('/login', loginRoutes);
 app.use('/register', registerRoutes);
+app.use('/user', userRoutes);
 app.use('/meal', mealRoutes);
 app.use('/menu', menuRoutes);
 app.use('/ingredient', ingredientRoutes);
 app.use('/mealIngredient', mealIngredientRoutes);
 app.use('/restaurant', restaurantRoutes);
-
 
 app.get('/api/menu', async (req, res) => {
   try {

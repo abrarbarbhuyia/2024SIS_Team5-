@@ -1,10 +1,64 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TouchableOpacity, View, StyleSheet } from "react-native";
 import { Text, Icon, Card } from '@rneui/themed';
+import Constants from "expo-constants";
+import axios from "axios";
+import { styles } from "@/styles/app-styles";
 
-export default function Meal() {
+export default function Meal({meal} : any) {
 
     const [isDropDownSelected, setIsDropDownSelected] = useState(false);
+    const [mealIngredients, setMealIngredients] = useState([]);
+    const [ingredients, setIngredients] = useState<any>([]);
+    const item = meal || {};
+    const mealId = item.mealId;
+
+    const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
+
+    useEffect(() => {
+        if (mealId) {
+            fetchMealIngredients(mealId)
+        }
+    }, [mealId]);
+
+    //fetch a meal Ingredient associated with a meal
+    const fetchMealIngredients = async (mealId : any) => {
+        try {
+            const response = await axios.get(`http://${HOST_IP}:4000/mealIngredient/getMealIngredient/${mealId}`);
+            const mealIngredientData = response.data;
+            setMealIngredients(mealIngredientData);
+
+            // Fetch each ingredient based on the ingredientId from mealIngredients
+            const ingredientPromises = mealIngredientData.map(async (mealIngredient: any) => {
+                return fetchIngredient(mealIngredient.ingredientId); // Fetch ingredient details
+            });
+
+            // Resolve all promises and update ingredients state
+            const ingredientsData = await Promise.all(ingredientPromises);
+            setIngredients(ingredientsData);
+            
+        } catch (error) {
+            console.error("Error fetching meal ingredient:", error);
+        }
+    }
+
+    // Fetch individual ingredient by ingredientId
+    const fetchIngredient = async (ingredientId: any) => {
+        try {
+            const response = await axios.get(`http://${HOST_IP}:4000/ingredient/getIngredient/${ingredientId}`);
+            const ingredientData = response.data;
+
+            // Check if ingredientData is an array and has at least one element
+            if (Array.isArray(ingredientData) && ingredientData.length > 0) {
+                return ingredientData[0].name; // Return the name of the first ingredient
+            } else {
+                return 'Unknown Ingredient';
+            }
+        } catch (error) {
+            console.error("Error fetching ingredient:", error);
+            return 'Unknown Ingredient'; // Fallback in case of error
+        }
+    };
 
     const toggleDropDown = () => {
         setIsDropDownSelected((prev) => !prev);
@@ -13,8 +67,8 @@ export default function Meal() {
     return (
         <View>
             <View style={styles.mealHeader}>
-                <Text style={styles.mealTitle}>Crispy Bean Curd (TOFU)</Text>
-                <Text>$16.90</Text>
+                <Text style={styles.mealTitle}>{item.name}</Text>
+                {/* <Text>$16.90</Text> */}
             </View>
             <View style={styles.mealFilterList}>
                 <Icon name='sliders' type='font-awesome' size={20} color={'#A394B8'}/>
@@ -28,7 +82,7 @@ export default function Meal() {
                 <Text
                     style={isDropDownSelected ? styles.ingredientsText : styles.viewIngredientsText}
                 >
-                    {isDropDownSelected ? 'Tofu, soy sauce, bean curd, sesame seeds, onion, garlic' : 'View ingredients' }
+                    {isDropDownSelected ? ingredients.join(', ') : 'View ingredients' }
                 </Text>
             </TouchableOpacity>
             <View style={{justifyContent: 'center'}}>
@@ -37,35 +91,3 @@ export default function Meal() {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    mealHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingLeft: 20,
-        paddingRight: 20,
-        alignItems: 'center',
-        paddingTop: 5,
-    },
-    mealTitle: {
-        fontSize: 18,
-    },
-    mealFilterList: {
-        flexDirection: 'row',
-        paddingLeft: 25,
-        paddingTop: 8,
-    },
-    ingredientsDropDownInteractable: {
-        flexDirection: 'row',
-        paddingLeft: 35,
-        padding: 5,
-        alignItems: 'center',
-        paddingBottom: 10,
-    }, 
-    ingredientsText: {
-
-    },
-    viewIngredientsText: {
-        color: '#A394B8',
-    }
-})

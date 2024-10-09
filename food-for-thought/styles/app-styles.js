@@ -34,6 +34,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colours.tertiary,
+    paddingTop: 100
   },
   rectangle: {
     width: '90%',
@@ -60,7 +61,7 @@ export const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 32,
     color: colours.textPrimary,
-    marginBottom: 20,
+    marginBottom: 15,
     textAlign: 'center',
   },
   supportingText: {
@@ -154,6 +155,17 @@ export const styles = StyleSheet.create({
   },
   signUpButton: {
     marginBottom: 15,
+    minWidth: '50%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colours.secondary,
+    borderColor: colours.primary,
+    borderWidth: 2,
+    borderRadius: 20,
+    padding: 7,
+    alignSelf: 'center',
+  },
+  logoutButton: {
     minWidth: '50%',
     alignItems: 'center',
     justifyContent: 'center',
@@ -388,6 +400,42 @@ export const styles = StyleSheet.create({
   },
   restaurantName: { 
     fontSize: 18 
+  },
+  userContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 15,
+    marginBottom: 15,
+  },
+  user: {
+    width: 95,
+    height: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5EEFF',
+    borderRadius: 4,
+    shadowColor: 'rgba(0, 0, 0, 0.15)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.8,
+    shadowRadius: 3,
+    elevation: 5,
+    marginBottom: 10,
+  },
+  userIcon: {
+    color: '#65558F',
+    marginBottom: 10,
+  },
+  userCount: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colours.labelColor,
+    textAlign: 'center', 
+  },
+  userText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#2E1C49',
+    textAlign: 'center', 
   },
   switchLabel: {
     fontSize: 16,

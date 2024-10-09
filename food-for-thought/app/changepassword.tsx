@@ -22,7 +22,6 @@ const ChangePassword = () => {
     if (token) {
       try {
         const decodedToken: any = jwtDecode(token);
-        console.log(decodedToken.username)
         setUsername(decodedToken.username);
       } catch (error) {
         console.error("Invalid token");
@@ -39,8 +38,6 @@ const ChangePassword = () => {
       Alert.alert('Change Password Failed', 'Passwords do not match.');
       return;
     }
-
-    console.log({ username, oldPassword, newPassword })
 
     try {
       await axios.post(`http://${HOST_IP}:4000/user/changepassword`, { username, oldPassword, newPassword });

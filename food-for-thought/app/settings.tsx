@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Card, Slider } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
+import Header from "@/components/Header";
 
 const Settings = () => {
   const [filterByDietary, setFilterByDietary] = useState(true);
@@ -47,6 +48,7 @@ const Settings = () => {
 
   return (
     <View style={styles.container}>
+      <Header />
       <Card containerStyle={styles.rectangle}>
         <Text style={[styles.subtitle, { right: 110 }]}>Settings</Text>
 

@@ -3,11 +3,11 @@ const router = express.Router();
 const Note = require('../models/noteModel');
 const databaseMaster = require('../databaseMaster');
 
-/* Get all notes associated with a userId */
-router.get('/getNotes/:userId', async (req, res) => {
+/* Get all notes associated with a username */
+router.get('/getNotes/:username', async (req, res) => {
     try {
-        const userId = req.params.userId;
-        await databaseMaster.dbOp('find', 'NoteDetails', { query: { userId: userId } }).then(data => {
+        const username = req.params.username;
+        await databaseMaster.dbOp('find', 'NoteDetails', { query: { username: username } }).then(data => {
             res.json(data);
         });
     } catch (error) {
@@ -16,12 +16,12 @@ router.get('/getNotes/:userId', async (req, res) => {
     }
 });
 
-/* Get all notes associated with a restaurantId from a given userId */
-router.get('/getNotesRestaurant/:userId/:restaurantId', async (req, res) => {
+/* Get all notes associated with a restaurantId from a given username */
+router.get('/getNotesRestaurant/:username/:restaurantId', async (req, res) => {
     try {
-        const userId = req.params.userId;
+        const username = req.params.username;
         const restaurantId = req.params.restaurantId;
-        const query = { userId: userId, restaurantId: restaurantId }
+        const query = { username: username, restaurantId: restaurantId }
         await databaseMaster.dbOp('find', 'NoteDetails', { query: query }).then(data => {
             res.json(data);
         });
@@ -39,7 +39,7 @@ router.post('/createNote', async (req, res) => {
             date: req.body.date,
             content: req.body.content,
             restaurantId: req.body.restaurantId,
-            userId: req.body.userId,
+            username: req.body.username,
             rating: req.body.rating
         });
         await databaseMaster.dbOp('insert', 'NoteDetails', { docs: [note] });

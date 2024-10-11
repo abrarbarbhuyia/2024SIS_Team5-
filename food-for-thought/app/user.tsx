@@ -86,7 +86,7 @@ const UserProfile = () => {
               </Card>
            </TouchableOpacity>
 
-           <TouchableOpacity onPress={() => router.push('/home')}>
+           <TouchableOpacity onPress={() => router.push('/favourites')}>
               <Card containerStyle={styles.user}>
                 <Icon style={styles.userIcon} name='favorite' type='material' size={40} />
                 <Text style={styles.userCount}>{userFavourites}</Text>

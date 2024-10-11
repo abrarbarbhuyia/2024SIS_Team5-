@@ -1,18 +1,19 @@
 import Header from "@/components/Header";
 import { View, Image } from "react-native";
-import { Card, Icon, Text } from '@rneui/themed';
+import { Icon, Text } from '@rneui/themed';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
 import React from "react";
 import { styles } from '../styles/app-styles';
 import axios from 'axios';
 import Constants from 'expo-constants';
-
 export type Notes = {
     noteId: string,
     date: string,
     content: string,
     restaurantId: string,
     restaurantName: string,
-    userId: string,
+    username: string,
     rating: number,
     restaurantImageUrl: string
 }
@@ -20,8 +21,26 @@ export type Notes = {
 const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
 export default function Notes() {
+    const [username, setUsername] = React.useState<string>();
     const [notes, setNotes] = React.useState<Notes[]>([]);
     const [restaurants, setRestaurants] = React.useState<any>([]);
+
+    const loadUser = React.useCallback(async () => {
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+          try {
+            const decodedToken: any = jwtDecode(token);
+            setUsername(decodedToken.username);
+          } catch (error) {
+            console.error("Invalid token");
+          }
+        }
+      }, []);
+    
+      React.useEffect(() => {
+        loadUser();
+      }, [loadUser]);
+      
     const renderStars = (rating: number) => {
         const stars = Math.round(rating / 2); // get rating between 0 and 5
         return (
@@ -50,8 +69,7 @@ export default function Notes() {
     }
 
     const fetchNotes = async () => {
-        const userId = '123456'
-        const url = `http://${HOST_IP}:4000/note/getNotes/${userId}`;
+        const url = `http://${HOST_IP}:4000/note/getNotes/${username}`;
         await axios.get(url)
             .then(response => {
                 const notesArray = response.data;
@@ -67,12 +85,14 @@ export default function Notes() {
             );
     }
     React.useEffect(() => {
-        fetchNotes();
-    }, [restaurants]); // when the restaurant variable is modified, the useEffect is called
+        if (username && restaurants.length > 0) {
+            fetchNotes();
+        }
+    }, [restaurants, username]); // when the restaurant variable is modified, the useEffect is called
 
     React.useEffect(() => {
         fetchRestaurants();
-    }, []);
+    }, [username]);
     return (
         <View style={{ ...styles.container, justifyContent: 'flex-start' }} >
             <Header />

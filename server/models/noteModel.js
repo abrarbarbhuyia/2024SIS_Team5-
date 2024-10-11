@@ -7,7 +7,7 @@ noteSchema = new schema({
     date: {type: String, required: true},
     content: {type: String, required: true},
     restaurantId: {type: String, required: true},
-    userId: {type: String, required: true},
+    username: {type: String, required: true},
     rating: {type: Number, required: true}
 })
 

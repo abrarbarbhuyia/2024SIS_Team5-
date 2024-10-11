@@ -34,6 +34,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colours.tertiary,
+    paddingTop: 100
   },
   rectangle: {
     width: '90%',
@@ -60,7 +61,7 @@ export const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 32,
     color: colours.textPrimary,
-    marginBottom: 20,
+    marginBottom: 15,
     textAlign: 'center',
   },
   supportingText: {
@@ -154,6 +155,17 @@ export const styles = StyleSheet.create({
   },
   signUpButton: {
     marginBottom: 15,
+    minWidth: '50%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colours.secondary,
+    borderColor: colours.primary,
+    borderWidth: 2,
+    borderRadius: 20,
+    padding: 7,
+    alignSelf: 'center',
+  },
+  logoutButton: {
     minWidth: '50%',
     alignItems: 'center',
     justifyContent: 'center',
@@ -454,5 +466,124 @@ export const styles = StyleSheet.create({
     textAlign: 'center', 
     color: colours.mutedGrey, 
     marginTop: 20 
-  }
+  },
+  restaurantItem: { 
+    padding: 10, 
+    borderBottomWidth: 1, 
+    borderBottomColor: colours.borderGrey,
+  },
+  restaurantName: { 
+    fontSize: 18 
+  },
+  userContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 15,
+    marginBottom: 15,
+  },
+  user: {
+    width: 95,
+    height: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5EEFF',
+    borderRadius: 4,
+    shadowColor: 'rgba(0, 0, 0, 0.15)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.8,
+    shadowRadius: 3,
+    elevation: 5,
+    marginBottom: 10,
+  },
+  userIcon: {
+    color: '#65558F',
+    marginBottom: 10,
+  },
+  userCount: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colours.labelColor,
+    textAlign: 'center', 
+  },
+  userText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#2E1C49',
+    textAlign: 'center', 
+  },
+  switchLabel: {
+    fontSize: 16,
+    color: colours.textSecondary,
+    right: 10
+  },
+  inputWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderColor: colours.grey,
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 5,
+    marginBottom: 15
+  },
+  locationInput: {
+    flex: 1,
+    height: 40,
+    fontSize: 16,
+    paddingLeft: 10,
+  },
+  locationIcon: {
+    paddingRight: 10,
+  },
+  headline: {
+    fontWeight: '600',
+    fontSize: 16,
+    color: colours.textPrimary,
+    marginTop: 20,
+    marginBottom: 15,
+    textAlign: 'left',
+    width: '100%',
+    left: 10
+  },
+  listItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: colours.grey,
+    marginBottom: 10,
+    marginBottom: 0,
+    left: 4,
+    width: '97.5%',
+  },
+  listItemText: {
+    fontSize: 16,
+    color: colours.textPrimary,
+  },
+  switchRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    alignItems: 'center',
+    marginBottom: 15,
+    left: 5
+  },
+  settingsInputContainer: {
+    paddingHorizontal: 15,
+    marginBottom: 30,
+  },
+  sliderContainer: {
+    paddingHorizontal: 15,
+    marginBottom: 20,
+  },
+  sliderText: {
+    fontSize: 16,
+    color: colours.textSecondary,
+    marginBottom: 10,
+  },
+  slider: {
+    width: width - 60,
+    height: 40,
+  },
 });

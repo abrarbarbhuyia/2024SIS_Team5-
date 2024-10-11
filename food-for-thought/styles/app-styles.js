@@ -512,4 +512,44 @@ export const styles = StyleSheet.create({
     width: width - 60,
     height: 40,
   },
+  pageContainer: {
+    backgroundColor: "#E6D7FA",
+    flex: 1,
+  },
+  detailsContainer: {
+      alignItems: 'center',
+      backgroundColor: '#F5EEFF',
+      paddingTop: 10,
+      width: width,
+      height: height,
+      flex: 1,
+  },
+  tabContainer: {
+      flex: 1,
+      backgroundColor: '#FBF8FF',
+      width: width - 32,
+      padding: 2,
+      paddingTop: 0,
+      borderRadius: 24,
+      marginTop: 5,
+      shadowOffset: {width: 0, height: 2},
+      shadowOpacity: 2,
+      shadowRadius: 4,
+      marginBottom: 15,
+  },
+  noteTitle: {
+    fontSize: 18,
+  },
+  starContainer: {
+    flexDirection: 'row',
+    marginVertical: 5,
+  },
+  filledStar: {
+    marginRight: 4,
+    color: '#FCBE09',
+  },
+  unfilledStar: {
+    marginRight: 4,
+    color: '#D3D3D3',
+  },
 });

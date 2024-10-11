@@ -6,6 +6,17 @@ const Restaurant = require('../models/restaurantModel');
 const databaseMaster = require('../databaseMaster');
 const {testFlow} = require('../allergenTest');
 
+router.get('/getRestaurants', async (req, res) => {
+    try {
+        await databaseMaster.dbOp('find', 'RestaurantDetails', {}).then(data => {
+            res.json(data);
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 router.get('/getRestaurant/:restaurantId', async (req, res) => {
     try {
         const restaurantId = req.params.restaurantId;

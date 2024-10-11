@@ -39,7 +39,8 @@ router.post('/createNote', async (req, res) => {
             date: req.body.date,
             content: req.body.content,
             restaurantId: req.body.restaurantId,
-            userId: req.body.userId
+            userId: req.body.userId,
+            rating: req.body.rating
         });
         await databaseMaster.dbOp('insert', 'NoteDetails', { docs: [note] });
     } catch (error) {

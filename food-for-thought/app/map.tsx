@@ -12,7 +12,7 @@ import { DietaryFilterModal } from '@/components/DietaryFilterModal';
 import Header from '@/components/Header';
 import { capitaliseFirstLetter } from '@/utils';
 import { RestaurantModal } from '@/components/RestaurantModal';
-import { styles } from '../styles/app-styles'; 
+import { styles } from '../styles/app-styles';
 import Constants from 'expo-constants';
 import { getDistance } from 'geolib';
 
@@ -23,17 +23,26 @@ export type Restaurant = {
   address: string,
   latitude: string,
   longitude: string,
-  openingHours?: [{ 
-    close: string, day: number, open: string
+  openingHours?: [{
+    close: string,
+    day: number,
+    open: string
   }],
   phoneNumber?: string,
   website?: string,
-  cuisine?: string[],
+  cuisineType?: {
+    cuisineType: string,
+    icon: string
+  }[],
+  restaurantType?: {
+    restaurantType: string,
+    icon: string
+  }[],
   // price rating out of 1: cheap, 2: average, 3: expensive, 4: very expensive 
   price?: number,
   // rating out of 10
   rating?: number,
-  total_ratings?: 232,
+  total_ratings?: number,
   menuId?: string,
   restaurantPhotos?: string[],
   foodPhotos?: string[],
@@ -48,9 +57,9 @@ const RestaurantMap = () => {
   const [activeFilters, setActiveFilters] = useState<{ type: string, value: string }[]>([]);
   const [activeRestaurant, setActiveRestaurant] = useState<Restaurant | undefined>();
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [restaurants, setRestaurants] = useState<any[]>([]);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   // initial region is hardcoded to UTS Tower
-  const [userLocation, setUserLocation] = useState<{ latitude: number, longitude: number }>({ 
+  const [userLocation, setUserLocation] = useState<{ latitude: number, longitude: number }>({
     latitude: -33.88336558611229,
     longitude: 151.2009263036271,
   })
@@ -98,7 +107,7 @@ const RestaurantMap = () => {
     const distanceInMeters = getDistance(userLocation, restaurantLocation);
     return (distanceInMeters / 1000).toFixed(2);
   }
-  
+
   const renderStars = (rating: number) => {
     const stars = Math.round(rating / 2); // get rating between 0 and 5
     return (
@@ -117,19 +126,19 @@ const RestaurantMap = () => {
   };
 
   const renderRestaurant = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.restaurantItem} onPress={() => router.push('/restaurant')}>
+    <TouchableOpacity style={styles.restaurantItem} onPress={() => { router.push('/restaurant'); console.log("item", item) }}>
       <View style={styles.restaurantItemContainer}>
-          <Image source={ item.restaurantPhotos && item.restaurantPhotos.length > 0 ? { uri: item.restaurantPhotos[0]} : pic} style={styles.bottomSheetImage}/>        
-          <View style={styles.restaurantTextContainer}>
-            <Text style={styles.formHeaderText} numberOfLines={1}>{item.name || 'Restaurant Title'}</Text>
-            <View style={styles.restaurantDetailsContainer}>
-              <MenuItemBadge matches={item.menuItemMatches} />
-              {renderStars(item.rating)}
-            </View>
-            <Text style={styles.formDescriptionText}>
-              {item.cuisineType && item.cuisineType.length > 0 ? item.cuisineType.map((cuisineObj: any) => capitaliseFirstLetter(cuisineObj.cuisineType)).join(', ') : 'Other'} • {'$'.repeat(item.price)} • {calculateRestaurantDistance(userLocation, item.latitude, item.longitude)} km away
-            </Text>
+        <Image source={item.restaurantPhotos && item.restaurantPhotos.length > 0 ? { uri: item.restaurantPhotos[0] } : pic} style={styles.bottomSheetImage} />
+        <View style={styles.restaurantTextContainer}>
+          <Text style={styles.formHeaderText} numberOfLines={1}>{item.name || 'Restaurant Title'}</Text>
+          <View style={styles.restaurantDetailsContainer}>
+            <MenuItemBadge matches={item.menuItemMatches} />
+            {renderStars(item.rating)}
           </View>
+          <Text style={styles.formDescriptionText}>
+            {item.cuisineType && item.cuisineType.length > 0 ? item.cuisineType.map((cuisineObj: any) => capitaliseFirstLetter(cuisineObj.cuisineType)).join(', ') : 'Other'} • {'$'.repeat(item.price)} • {calculateRestaurantDistance(userLocation, item.latitude, item.longitude)} km away
+          </Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -194,7 +203,6 @@ const RestaurantMap = () => {
                   </View>}
                   key={f}
                   onPress={() => setFilterType(f)} />)}
-
             </View>
             <MapView
               style={styles.mapDisplay}
@@ -209,10 +217,10 @@ const RestaurantMap = () => {
                 title={"My location"} >
                 <View style={styles.filledCircle} />
               </Marker>
-              {restaurants.length > 0 && restaurants.map((r, i) => 
+              {restaurants.length > 0 && restaurants.map((r, i) =>
                 <Marker
                   key={`marker-${i}`}
-                  coordinate={{ latitude: r.latitude, longitude: r.longitude }}
+                  coordinate={{ latitude: parseFloat(r.latitude), longitude: parseFloat(r.longitude) }}
                   onPress={() => setActiveRestaurant(r)}>
                   <View style={styles.markerContainer}>
                     <Icon
@@ -222,11 +230,11 @@ const RestaurantMap = () => {
                       size={50}
                     />
                     <View style={styles.innerCircle}>
-                      {r.cuisineType.length > 0 ?
-                        <Image source={{uri: r.cuisineType[r.cuisineType.length - 1].icon}} style={styles.markerIcon}/> :
-                          r.restaurantType.length > 0 ?
-                            <Image source={{uri: r.restaurantType[r.restaurantType.length - 1].icon}} style={styles.markerIcon}/> 
-                        : <Image source={{uri: "https://ss3.4sqi.net/img/categories_v2/food/default_64.png"}}  style={styles.markerIcon}/>
+                      {(r.cuisineType && r.cuisineType.length > 0) ?
+                        <Image source={{ uri: r.cuisineType[r.cuisineType.length - 1].icon }} style={styles.markerIcon} /> :
+                        (r.restaurantType && r.restaurantType.length > 0) ?
+                          <Image source={{ uri: r.restaurantType[r.restaurantType.length - 1].icon }} style={styles.markerIcon} />
+                          : <Image source={{ uri: "https://ss3.4sqi.net/img/categories_v2/food/default_64.png" }} style={styles.markerIcon} />
                       }
                     </View>
                   </View>
@@ -258,7 +266,9 @@ const RestaurantMap = () => {
         setShowModal={setFilterType}
         setActiveFilters={setActiveFilters} />}
       {activeRestaurant && <RestaurantModal
-        setShowModal={setActiveRestaurant} restaurant={activeRestaurant} />}
+        setShowModal={setActiveRestaurant}
+        userLocation={userLocation}
+        restaurant={activeRestaurant} />}
     </BottomSheetModalProvider>
   );
 };

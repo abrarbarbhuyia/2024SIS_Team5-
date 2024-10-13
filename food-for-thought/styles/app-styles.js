@@ -106,6 +106,9 @@ export const styles = StyleSheet.create({
     transform: [{ translateY: -10 }],
     zIndex: 1,
   },
+  modalIcon: {
+    color: colours.darkPurple,
+  },
   button: {
     marginTop: 15,
     marginBottom: 10,
@@ -304,11 +307,10 @@ export const styles = StyleSheet.create({
     marginBottom: 5,
   },
   mapDisplayCard: {
-    maxHeight: height-160,
+    maxHeight: height-200,
     minWidth: width,
     backgroundColor: colours.secondary,
     borderRadius: 24,
-    marginTop: 5,
     elevation: 4,
     paddingHorizontal: 0,
   },
@@ -586,4 +588,48 @@ export const styles = StyleSheet.create({
     width: width - 60,
     height: 40,
   },
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FBF8FF',
+    borderRadius: 20,
+    width: '90%',
+    padding: 0,
+  },
+  restaurantFormHeader: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5EAFF',
+    width: '100%',
+    padding: 20,
+    gap: 15,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  flexRowGroup: {
+    flexDirection: 'row',
+    gap: 15,
+  },
+  iconsContainer: {
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    verticalAlign: 'top',
+    height: '100%',
+    gap: 8
+  },
+  verticalFlexFormGroup: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    padding: 20,
+    flexDirection: 'column',
+    gap: 10,
+  },
+  flexFormGroup: {
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    width: '100%',
+    flexDirection: 'row',
+    gap: 10,
+   },
 });

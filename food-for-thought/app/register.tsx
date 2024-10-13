@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import { Card } from '@rneui/themed';
@@ -11,21 +11,23 @@ const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
   const handleRegister = useCallback(async () => {
+    setErrorMessage('');
+
     if (password !== confirmPassword) {
-      Alert.alert('Registration Failed', 'Passwords do not match.');
+      setErrorMessage('Passwords do not match.');
       return;
     }
 
     try {
       const response = await axios.post(`http://${HOST_IP}:4000/register`, { username, password });
-      Alert.alert('Registration Successful', `Welcome ${username}!`);
       router.push('/login');
     } catch (error: any) {
-      Alert.alert('Registration Failed', error.response.data.message || 'Unable to register. Try again later.');
+      setErrorMessage(error.response?.data?.message || 'Unable to register. Try again later.');
     }
   }, [username, password, confirmPassword]);
 
@@ -70,6 +72,10 @@ const Register = () => {
           />
           <Icon name="lock" size={20} color="#7E7093" style={styles.icon} />
         </View>
+
+        {errorMessage ? (
+          <Text style={styles.errorMessage}>{errorMessage}</Text>
+        ) : null}
 
         <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>SIGN UP</Text>

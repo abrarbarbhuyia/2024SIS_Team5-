@@ -512,4 +512,9 @@ export const styles = StyleSheet.create({
     width: width - 60,
     height: 40,
   },
+  errorMessage: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
 });

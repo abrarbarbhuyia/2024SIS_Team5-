@@ -72,11 +72,11 @@ const RestaurantMap = () => {
       const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
       const response = await axios.get(`http://${HOST_IP}:4000/search`, {
         params: {
-          ingredientFilter: (activeFilters?.filter(f => f.type === 'ingredients') || []).map(f => f.value)[0] || "",
+          ingredients: (activeFilters?.filter(f => f.type === 'ingredients') || []).map(f => f.value) || [],
           allergens: (activeFilters?.filter(f => f.type === 'allergens') || []).map(f => f.value) || [],
           diets: (activeFilters?.filter(f => f.type === 'diets') || []).map(f => f.value) || [],
           cuisine: (activeFilters?.filter(f => f.type === 'cuisine') || []).map(f => f.value) || [],
-          meals: (activeFilters?.filter(f => f.type === 'meals') || []).map(f => f.value)[0] || "",
+          meals: (activeFilters?.filter(f => f.type === 'meals') || []).map(f => f.value) || [],
           searchQuery: searchTerm,
           latitude: userLocation.latitude,
           longitude: userLocation.longitude,

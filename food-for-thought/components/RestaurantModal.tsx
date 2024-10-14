@@ -212,9 +212,9 @@ export function RestaurantModal({ restaurant, userLocation, setShowModal, ...res
           type='feather'
           iconStyle={styles.modalIcon}
           size={16} />
-        <View>{isOpen ? <Text>Open</Text> : 
-          nextOpen ? <Text> Closed. Next opens at {formatTime(nextOpen.open)} {getDayName(nextOpen.day)}.</Text>
-            : <Text>Restaurant is closed and no future opening time available.</Text>}
+        <View>{isOpen ? <Text style={styles.formDescriptionText}>Open</Text> : 
+          nextOpen ? <Text style={styles.formDescriptionText}>Closed. Next opens at {formatTime(nextOpen.open)} {getDayName(nextOpen.day)}.</Text>
+            : <Text style={styles.formDescriptionText}>Restaurant is closed and no future opening time available.</Text>}
         </View>
       </View>
       <View style={{ paddingBottom: 10 }}>

@@ -2,17 +2,17 @@ import React from 'react';
 import { Badge } from '@rneui/themed';
 import { StyleSheet } from 'react-native';
 
-const MenuItemBadge = ({ matches }: { matches: number }) => {
-  const handleMenuItemMatches = (matches: number) => {
-    if (matches < 8) {
-      return 'MEH';
-    } else if (matches >= 8 && matches < 15) {
-      return 'OKAY';
-    } else {
-      return 'PERFECT';
-    }
-  };
+export const handleMenuItemMatches = (matches: number) => {
+  if (matches < 8) {
+    return 'MEH';
+  } else if (matches >= 8 && matches < 15) {
+    return 'OKAY';
+  } else {
+    return 'PERFECT';
+  }
+};
 
+const MenuItemBadge = ({ matches }: { matches: number }) => {
   const handleBadgeColor = (matchScore: string) => {
     const colorMap: Record<string, string[]> = {
       MEH: ['#EC6C43', '#D98522'],

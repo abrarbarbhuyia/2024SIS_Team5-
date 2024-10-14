@@ -456,7 +456,6 @@ export const styles = StyleSheet.create({
   },
   innerCircle: {
     position: 'absolute', 
-    backgroundColor: colours.red,
     borderRadius: 20, 
     width: 20,
     height: 25, 

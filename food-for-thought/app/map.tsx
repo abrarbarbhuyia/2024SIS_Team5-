@@ -4,7 +4,7 @@ import pic from '../assets/images/react-logo.png'; // Placeholder image
 import { router } from "expo-router";
 import { BottomSheetModal, BottomSheetView, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import SearchBar from "@/components/SearchBar";
-import MenuItemBadge from '@/components/MenuItemBadge';
+import MenuItemBadge, { handleMenuItemMatches } from '@/components/MenuItemBadge';
 import { Badge, Card, Icon, Text } from "@rneui/themed";
 import axios from 'axios';
 import MapView, { Marker } from 'react-native-maps';
@@ -143,6 +143,12 @@ const RestaurantMap = () => {
     </TouchableOpacity>
   );
 
+  const markerColor: {[key: string]: string} = {
+    'MEH': '#EA4335',
+    'OKAY': '#F2B90F',
+    'PERFECT': '#16CA94',
+  };
+
   return (
     <BottomSheetModalProvider>
       <View style={styles.container}>
@@ -226,10 +232,10 @@ const RestaurantMap = () => {
                     <Icon
                       name="fmd-good"
                       type="material"
-                      color="#EA4335"
+                      color={r.menuItemMatches ? markerColor[handleMenuItemMatches(r.menuItemMatches)] : "#EA4335"}
                       size={50}
                     />
-                    <View style={styles.innerCircle}>
+                    <View style={{...styles.innerCircle, backgroundColor: r.menuItemMatches ? markerColor[handleMenuItemMatches(r.menuItemMatches)] : "#EA4335"}}>
                       {(r.cuisineType && r.cuisineType.length > 0) ?
                         <Image source={{ uri: r.cuisineType[r.cuisineType.length - 1].icon }} style={styles.markerIcon} /> :
                         (r.restaurantType && r.restaurantType.length > 0) ?

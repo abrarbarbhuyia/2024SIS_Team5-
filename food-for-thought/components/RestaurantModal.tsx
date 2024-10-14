@@ -93,7 +93,7 @@ export function RestaurantModal({ restaurant, userLocation, setShowModal, ...res
       return cuisineType.join(', ');
     }
     if (restaurantType && restaurantType.length > 0) {
-      return restaurantType[0].toLowerCase().includes('caf') ? 'Café' : restaurantType[0];
+      return restaurantType[0].toLowerCase().includes('caf') ? 'Cafe' : restaurantType[0];
     }
     return undefined;
   }

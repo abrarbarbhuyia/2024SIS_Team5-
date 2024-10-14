@@ -24,6 +24,11 @@ async function getMeals(query) {
   return callGeminiJSON(prompt);
 }
 
+async function getMealDetails(query){
+  const prompt = 'In a JSON object response, create an object that stores the menu details with the following fields: menu item, description and price based on the menu string ${query}. This is from an OCR reading, do your best to extract actual menu items, its description and its price from this OCR string. The different menu items should be under "menu_items". Do not include your answer inside a string, just a JSON Code block.`'
+  return callGeminiJSON(prompt);
+}
+
 // Takes in a query (menu) and returns a JSON Object that contains eaach ingredient and its associated allergens.
 async function getIngredientDetails(query) {
   const dietaryRequirements =
@@ -298,7 +303,7 @@ async function addDiet(body) {
   }
 }
 
-module.exports = { getIngredientDetails, getMeals, createMeals, createMenu, createIngredient, createMealIngredient, getMenuImage, checkMenu, addDiet };
+module.exports = { getIngredientDetails, getMeals, getMealDetails, createMeals, createMenu, createIngredient, createMealIngredient, getMenuImage, checkMenu, addDiet };
 
 /*
  Flow:

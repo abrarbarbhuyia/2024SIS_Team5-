@@ -24,10 +24,10 @@ const Register = () => {
     }
 
     try {
-      const response = await axios.post(`http://${HOST_IP}:4000/register`, { username, password });
+      await axios.post(`http://${HOST_IP}:4000/register`, { username, password });
       router.push('/login');
     } catch (error: any) {
-      setErrorMessage(error.response?.data?.message || 'Unable to register. Try again later.');
+      setErrorMessage(error?.response?.data?.message || 'Unable to register. Try again later.');
     }
   }, [username, password, confirmPassword]);
 

@@ -178,23 +178,20 @@ export function RestaurantModal({ restaurant, userLocation, setShowModal, ...res
       </View>}
     </View>
     <View style={styles.verticalFlexFormGroup}>
-      <View style={styles.flexFormGroup}>
-        {restaurant.rating && <View style={{ ...styles.flexFormGroup, gap: 7 }}>
-          <Text style={{ ...styles.formDescriptionTextBold, flexDirection: 'row' }}>
-            {Math.round(restaurant.rating / 2)}/5
-          </Text>
-          {renderStars(restaurant.rating ?? 0)}
-          <Text style={{ ...styles.formDescriptionText, flexDirection: 'row', marginLeft: -4 }}>
-            ({restaurant.total_ratings})
-          </Text>
-        </View>}
-        <View style={{ marginLeft: 'auto' }}>{restaurant.menuItemMatches && <MenuItemBadge matches={restaurant.menuItemMatches} />}</View>
-      </View>
-      <View style={styles.flexFormGroup}>
+    <View style={styles.flexFormGroup}>
         <Text style={styles.formDescriptionTextBold}>
           {calculateCategories(restaurant.cuisineType ? restaurant.cuisineType?.map(c => c.cuisineType) : [],
             restaurant.restaurantType ? restaurant.restaurantType?.map(c => c.restaurantType) : [])} • {priceMap[restaurant?.price ?? 1]} • {calculateRestaurantDistance(userLocation, restaurant.latitude, restaurant.longitude)} km away
         </Text>
+      </View>
+      <View style={styles.flexFormGroup}>
+        {restaurant.rating && <View style={{ ...styles.flexFormGroup, gap: 7 }}>
+          {renderStars(restaurant.rating ?? 0)}
+          <Text style={{ ...styles.formDescriptionText, flexDirection: 'row',  marginTop: 2, marginLeft: -4 }}>
+            ({restaurant.total_ratings})
+          </Text>
+        </View>}
+        <View style={{ marginLeft: 'auto' }}>{restaurant.menuItemMatches && <MenuItemBadge matches={restaurant.menuItemMatches} />}</View>
       </View>
       {restaurant.menuItemMatches && <View style={styles.flexFormGroup}>
         <Text style={styles.formDescriptionText}>

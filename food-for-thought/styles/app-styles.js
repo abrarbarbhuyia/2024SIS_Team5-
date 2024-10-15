@@ -34,7 +34,6 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colours.tertiary,
-    paddingTop: 100
   },
   rectangle: {
     width: '90%',
@@ -475,6 +474,114 @@ export const styles = StyleSheet.create({
   },
   restaurantName: { 
     fontSize: 18 
+  },
+  pageContainer: {
+    padding: 15,
+    justifyContent: 'space-between', 
+  },
+  textDetail: {
+      paddingBottom: 25,
+      flexDirection: 'row',
+      alignItems: 'center',
+  },
+  ratingsView: {
+      flexDirection: 'row',
+      alignItems: 'center',
+  },
+  contactCard: {
+      paddingTop: 20,
+  },
+  contactInformation: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingBottom: 10,
+      paddingRight: 10,
+  },
+  body: {
+      fontSize: 12,
+  },
+  galleryImageContainer: {
+      marginRight: 10,
+      backgroundColor: 'white',
+      borderRadius: 8,
+      overflow: 'hidden',
+      width: 180,
+      height: 180,
+  },
+  image: {
+      width: '100%',
+      height: '100%'
+  },
+  modalContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  },
+  modalBackground: {
+      width: '100%',
+      height: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+  },
+  fullImage: {
+      width: '90%',
+      height: '70%',
+      resizeMode: 'contain',
+  },
+  mealHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingLeft: 20,
+    paddingRight: 20,
+    alignItems: 'center',
+    paddingTop: 5,
+  },
+  mealTitle: {
+      fontSize: 18,
+  },
+  mealFilterList: {
+      flexDirection: 'row',
+      paddingLeft: 25,
+      paddingTop: 8,
+  },
+  ingredientsDropDownInteractable: {
+      flexDirection: 'row',
+      paddingLeft: 35,
+      padding: 5,
+      paddingBottom: 10,
+      alignItems: 'center'
+  }, 
+  ingredientsText: {
+    flex: 1,
+    paddingRight: 10,
+    paddingLeft: 5,
+  },
+  viewIngredientsText: {
+      color: '#A394B8',
+  },
+  appliedFilters: {
+    flexDirection: 'row',
+    paddingLeft: 20,
+  },
+  clipboardLink: {
+      flexDirection: 'row',
+      padding: 20,
+      paddingLeft: 25,
+      paddingBottom: 10,
+      alignItems: 'center',
+  },
+  menuListHeader: {
+      flexDirection: 'row',
+      paddingLeft: 15,
+      paddingTop: 5,
+      paddingBottom: 5,
+  },
+  matchingMealsList: {
+      backgroundColor: '#CFFFF150',
+  },
+  otherMealsList: {
+
   },
   userContainer: {
     flexDirection: 'row',

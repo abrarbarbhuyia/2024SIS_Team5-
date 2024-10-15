@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
         const radius = req.query.radius;
 
         /* fetch all restaurants in a given radius by calling searchRestaurant endpoint */
-        const restaurantsInRegion = await axios.get(`http://${process.env.HOST_IP}:4000/restaurant/searchRestaurants/${latitude}/${longitude}/${radius}`);
+        // const restaurantsInRegion = await axios.get(`http://${process.env.HOST_IP}:4000/restaurant/searchRestaurants/${latitude}/${longitude}/${radius}`);
 
         /* a filter is applied if any of the arrays have elements or the strings have contents */
         const isFilterApplied = ingredientFilter.length > 0 || allergensFilter.length > 0 || dietsFilter.length > 0 || cuisineFilter.length > 0 || mealFilter.length > 0 || searchQuery;
@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
         /* if no filter is applied, return all restaurants in the region */
         if (!isFilterApplied) {
             const allRestaurants = await databaseMaster.dbOp('find', 'RestaurantDetails', { 
-                query: { restaurantId: { $in: restaurantsInRegion.data } }
+                // query: { restaurantId: { $in: restaurantsInRegion.data } }
             });
             return res.json(allRestaurants.filter(r => r.hasMenu));
         }
@@ -78,7 +78,7 @@ router.get('/', async (req, res) => {
         /* Core Restaurant Query - Restaurants in the region + menuIds that contain the resulting meals from previous filtering + name regex query */
         const menuIds = mealResults.map(meal => meal.menuId);
         let restaurantQuery = { 
-            restaurantId: { $in: restaurantsInRegion.data },
+            // restaurantId: { $in: restaurantsInRegion.data },
             menuId: { $in: menuIds },
             name: { $regex: searchQuery, $options: 'i' }
         };

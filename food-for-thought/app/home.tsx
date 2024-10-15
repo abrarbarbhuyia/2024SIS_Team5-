@@ -11,11 +11,48 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Constants from 'expo-constants';
 
+export type Restaurant = {
+  _id: string,
+  restaurantId: string,
+  name: string,
+  address: string,
+  latitude: string,
+  longitude: string,
+  openingHours?: [{
+    close: string,
+    day: number,
+    open: string
+  }],
+  phoneNumber: string,
+  website: string,
+  cuisineType?: {
+    cuisineType: string,
+    icon: string
+  }[],
+  restaurantType?: {
+    restaurantType: string,
+    icon: string
+  }[],
+  // price rating out of 1: cheap, 2: average, 3: expensive, 4: very expensive 
+  price: number,
+  // rating out of 10
+  rating: number,
+  total_ratings: number,
+  menuId: string,
+  restaurantPhotos?: string[],
+  foodPhotos?: string[],
+  hasMenu: boolean
+  // number of matching menu items to the current dietary filters
+  menuItemMatches?: number
+}
+
 // Component
 const Home = () => {
-  const [fetchedRestaurants, setFetchedRestaurants] = useState<any[]>([]);
+  const [fetchedRestaurants, setFetchedRestaurants] = useState<Restaurant[]>([]);
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
+
+  const pic = require('../assets/images/react-logo.png'); // placeholder restaurant image
 
   // Fetch specific restaurants by ID
   const fetchRestaurants = async () => {
@@ -41,13 +78,18 @@ const Home = () => {
     fetchRestaurants();
   }, []);
 
+  const handleSearch = (search: string) => {
+    // Temp fix for onSearch error. Potentially route to map.tsx and parse searchFilter.
+    return '';
+  };
+
   // Carousel view + styling
-  const renderItem = ({ item }: { item: any }) => (
+  const renderItem = ({ item }: { item: Restaurant }) => (
     <View style={styles.imageContainer}>
       <TouchableOpacity onPress={() => router.push({pathname: '/restaurant', params: {restaurant: JSON.stringify(item)}})}>
-      <Image source={ item.foodPhotos && item.foodPhotos.length > 0 ? { uri: item.foodPhotos[0]} : []} style={styles.homeImage} />        
+      <Image source={ item.foodPhotos && item.foodPhotos.length > 0 ? { uri: item.foodPhotos[0]} : pic} style={styles.homeImage} />        
         <Text numberOfLines={1} style={styles.recentLabel}>{item.name || 'Restaurant Title'}</Text>
-        <Text numberOfLines={1} style={styles.recentComment}>{item.cuisineType && item.cuisineType.length > 0 ? item.cuisineType.map((cuisine : any) => cuisine.cuisineType).join(', ') : 'Other'}</Text>
+        <Text numberOfLines={1} style={styles.recentComment}>{item.cuisineType && item.cuisineType.length > 0 ? item.cuisineType.map((cuisineObj: any) => cuisineObj.cuisineType).join(', ') : 'Other'}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -59,7 +101,7 @@ const Home = () => {
       <TouchableOpacity onPress={() => router.push('/map')}>
         <Card containerStyle={styles.finderCard}>
           <View>
-            <SearchBar />             
+            <SearchBar onSearch={handleSearch} />
           </View>
           <MapView
             style={styles.homeMap}

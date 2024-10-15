@@ -512,4 +512,11 @@ export const styles = StyleSheet.create({
     width: width - 60,
     height: 40,
   },
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colours.secondary,
+    borderRadius: 30,
+    width: '80%',
+  },
 });

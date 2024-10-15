@@ -58,7 +58,7 @@ const Home = () => {
     <View style={styles.container}>
       <Header homepage={true}></Header>
       {/* Card for the Restaurant finder */}
-      <TouchableOpacity onPress={() => router.push('/map')}>
+      <TouchableOpacity onPress={() => router.push('/warning')}>
         <Card containerStyle={styles.finderCard}>
           <View>
             <SearchBar />             

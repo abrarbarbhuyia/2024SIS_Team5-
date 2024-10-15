@@ -40,13 +40,12 @@ const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
     container: {
-        position: 'absolute',
-        top: 20,
         left: 0,
         right: 0,
         zIndex: 1000,
         maxHeight: 150,
         alignItems: 'center',
+        paddingBottom: 5
     },
     headerCard: {
         width: width - 32,

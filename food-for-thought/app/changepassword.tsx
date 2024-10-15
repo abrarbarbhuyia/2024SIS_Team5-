@@ -14,7 +14,7 @@ const ChangePassword = () => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+  const [errorMessage, setErrorMessage] = useState<string>();
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 

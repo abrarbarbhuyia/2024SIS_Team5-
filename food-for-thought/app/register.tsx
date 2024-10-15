@@ -11,13 +11,11 @@ const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+  const [errorMessage, setErrorMessage] = useState<string>();
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
   const handleRegister = useCallback(async () => {
-    setErrorMessage('');
-
     if (password !== confirmPassword) {
       setErrorMessage('Passwords do not match.');
       return;

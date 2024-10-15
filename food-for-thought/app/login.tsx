@@ -11,13 +11,12 @@ import Constants from 'expo-constants';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+  const [errorMessage, setErrorMessage] = useState<string>();
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
   const handleLogin = useCallback(async () => {
     try {
-      setErrorMessage('');
       const response = await axios.post(`http://${HOST_IP}:4000/login`, { username, password });
       await AsyncStorage.setItem('token', response.data.token);
       router.push('/home'); 

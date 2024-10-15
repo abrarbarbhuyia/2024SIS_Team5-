@@ -14,7 +14,8 @@ const ChangePassword = () => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
+  const [errorMessage, setErrorMessage] = useState<string>();
+
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
   const loadUser = useCallback(async () => {
@@ -24,7 +25,7 @@ const ChangePassword = () => {
         const decodedToken: any = jwtDecode(token);
         setUsername(decodedToken.username);
       } catch (error) {
-        console.error("Invalid token");
+        setErrorMessage("Invalid token");
       }
     }
   }, []);
@@ -35,16 +36,15 @@ const ChangePassword = () => {
 
   const handleChangePassword = useCallback(async () => {
     if (newPassword !== confirmPassword) {
-      Alert.alert('Change Password Failed', 'Passwords do not match.');
+      setErrorMessage('Passwords do not match.');
       return;
     }
 
     try {
       await axios.post(`http://${HOST_IP}:4000/user/changepassword`, { username, oldPassword, newPassword });
-      Alert.alert('Change Password Successful');
       router.push('/settings');
     } catch (error: any) {
-      Alert.alert('Change Password Failed', error.response.data.message || 'Unable to change password. Try again later.');
+      setErrorMessage(error?.response?.data?.message|| 'Unable to change password. Try again later.');
     }
   }, [oldPassword, newPassword, confirmPassword]);
 
@@ -87,6 +87,10 @@ const ChangePassword = () => {
           />
           <Icon name="lock" size={20} color="#7E7093" style={styles.icon} />
         </View>
+
+        {errorMessage && (
+          <Text style={styles.errorMessage}>{errorMessage}</Text>
+        )}
 
         <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
           <Text style={styles.buttonText}>CHANGE PASSWORD</Text>

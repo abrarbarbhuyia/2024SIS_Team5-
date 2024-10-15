@@ -54,7 +54,7 @@ const Settings = () => {
 
         <View>
           <Text style={styles.headline}>Account</Text>
-          <TouchableOpacity style={styles.listItem} onPress={() => router.push('/home')}>
+          <TouchableOpacity style={styles.listItem} onPress={() => router.push('/user')}>
             <Text style={styles.listItemText}>Profile</Text>
             <Icon name="chevron-right" size={16} color="#49454F" />
           </TouchableOpacity>

@@ -11,7 +11,7 @@ const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
@@ -73,9 +73,9 @@ const Register = () => {
           <Icon name="lock" size={20} color="#7E7093" style={styles.icon} />
         </View>
 
-        {errorMessage ? (
+        {errorMessage && (
           <Text style={styles.errorMessage}>{errorMessage}</Text>
-        ) : null}
+        )}
 
         <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>SIGN UP</Text>

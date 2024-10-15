@@ -14,8 +14,8 @@ const ChangePassword = () => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
   const loadUser = useCallback(async () => {
@@ -88,9 +88,9 @@ const ChangePassword = () => {
           <Icon name="lock" size={20} color="#7E7093" style={styles.icon} />
         </View>
 
-        {errorMessage ? (
+        {errorMessage && (
           <Text style={styles.errorMessage}>{errorMessage}</Text>
-        ) : null}
+        )}
 
         <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
           <Text style={styles.buttonText}>CHANGE PASSWORD</Text>

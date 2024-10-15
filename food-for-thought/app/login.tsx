@@ -11,7 +11,7 @@ import Constants from 'expo-constants';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
@@ -61,9 +61,9 @@ const Login = () => {
           <Icon name="lock" size={20} color="#7E7093" style={styles.icon} />
         </View>
 
-        {errorMessage ? (
+        {errorMessage && (
           <Text style={styles.errorMessage}>{errorMessage}</Text>
-        ) : null}
+        )}
 
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>LOGIN</Text>

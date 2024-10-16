@@ -10,6 +10,7 @@ import { styles } from '../styles/app-styles';
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Constants from 'expo-constants';
+import Layout from "@/components/Layout";
 
 // Component
 const Home = () => {
@@ -53,8 +54,7 @@ const Home = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <Header homepage={true}></Header>
+    <Layout>
       {/* Card for the Restaurant finder */}
       <TouchableOpacity onPress={() => router.push('/map')}>
         <Card containerStyle={styles.finderCard}>
@@ -104,7 +104,7 @@ const Home = () => {
         <RecommendedRestaurant restaurant={fetchedRestaurants[2]}/>
         <RecommendedRestaurant restaurant={fetchedRestaurants[0]}/>
       </Card>
-    </View>
+    </Layout>
   );
 }
 

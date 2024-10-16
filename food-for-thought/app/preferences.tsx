@@ -7,6 +7,7 @@ import { styles } from "../styles/app-styles";
 import Header from "@/components/Header";
 import { DietaryChoiceModal } from "@/components/DietaryChoiceModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Layout from "@/components/Layout";
 import { jwtDecode } from "jwt-decode";
 import Constants from "expo-constants";
 
@@ -190,8 +191,7 @@ const Preferences: React.FC = () => {
   }, [username, loadPreferences]);
 
   return (
-    <View style={styles.container}>
-      <Header homepage={false} />
+      <Layout>
       <View style={{ alignItems: "center", marginBottom: 16 }}>
         <Text h3 style={{ color: "#1D1B20", fontWeight: "600" }}>
           Dietary Preferences
@@ -245,7 +245,7 @@ const Preferences: React.FC = () => {
           refreshPreferences={() => loadPreferences(username)} // refresh data on adding
         />
       )}
-    </View>
+      </Layout>
   );
 };
 

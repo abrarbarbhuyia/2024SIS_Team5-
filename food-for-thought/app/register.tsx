@@ -30,7 +30,7 @@ const Register = () => {
   }, [username, password, confirmPassword]);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.loginContainer}>
       <Card containerStyle={styles.rectangle}>
         <Image source={require('../assets/images/food-for-thought-logo.png')} style={styles.logo} />
 

@@ -28,9 +28,7 @@ export function DietaryChoiceModal({
 }: DietaryChoiceProps) {
   const [selectedDietaryFilter, setSelectedDietaryFilter] = useState("");
   const [newFilter, setNewFilter] = useState("");
-  const [currentFilters, setCurrentFilters] = useState<
-    { name: string; type: string }[]
-  >([]);
+  const [currentFilters, setCurrentFilters] = useState<{ name: string; type: string }[]>([]);
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
@@ -187,7 +185,7 @@ export function DietaryChoiceModal({
               </Button>
             </View>
             <View>
-              <ScrollView
+              {currentFilters && <ScrollView
                 style={styles.scrollView}
                 contentContainerStyle={styles.scrollViewContent}
               >
@@ -239,7 +237,7 @@ export function DietaryChoiceModal({
                       />
                     </ListItem>
                   ))}
-              </ScrollView>
+              </ScrollView>}
             </View>
           </View>
         )}

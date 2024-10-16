@@ -370,7 +370,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 4,
     minHeight: 30,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    maxWidth: width,
   },
   restaurantItem: { 
     padding: 5,

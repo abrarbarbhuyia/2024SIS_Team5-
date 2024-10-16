@@ -6,6 +6,7 @@ const {
   createMenu,
   getIngredientDetails,
   getMeals,
+  getMealDetails,
   getMenuImage,
   addDiet,
 } = require("./allergenMaster");
@@ -30,6 +31,15 @@ async function testCreateMenu() {
 async function testgetMeals() {
   try {
     const mealsBody = await getMeals(menuString);
+    console.log("Get Meals function passed", mealsBody);
+  } catch (error) {
+    console.log("Get Meals function failed", error);
+  }
+}
+
+async function testGetMealDetails(){
+  try{
+    const mealsBody = await getMealDetails(menuString);
     console.log("Get Meals function passed", mealsBody);
   } catch (error) {
     console.log("Get Meals function failed", error);
@@ -108,7 +118,7 @@ async function testFlow(restaurantId) {
       console.log(menu);
 
       // get meals
-      const JSONMenuItems = JSON.parse(await getMeals(menuString));
+      const JSONMenuItems = JSON.parse(await getMealDetails(menuString));
       const menuItems = JSONMenuItems.menu_items;
       console.log(menuItems);
 

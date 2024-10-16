@@ -25,7 +25,7 @@ async function getMeals(query) {
 }
 
 async function getMealDetails(query){
-  const prompt = 'In a JSON object response, create an object that stores the menu details with the following fields: menu item, description and price based on the menu string ${query}. This is from an OCR reading, do your best to extract actual menu items, its description and its price from this OCR string. The different menu items should be under "menu_items". Do not include your answer inside a string, just a JSON Code block.`'
+  const prompt = `In a JSON object response, create an object that stores the menu details with the following fields: menu item, description and price based on the menu string ${query}. This is from an OCR reading, do your best to extract actual menu items, its description and its price from this OCR string. The different menu items should be under "menu_items". Do not add any extra entries not from the menu, just use the OCR results. Do not include your answer inside a string, just a JSON Code block.`
   return callGeminiJSON(prompt);
 }
 

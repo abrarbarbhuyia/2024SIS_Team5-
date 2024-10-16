@@ -10,41 +10,7 @@ import { styles } from '../styles/app-styles';
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Constants from 'expo-constants';
-
-export type Restaurant = {
-  _id: string,
-  restaurantId: string,
-  name: string,
-  address: string,
-  latitude: string,
-  longitude: string,
-  openingHours?: [{
-    close: string,
-    day: number,
-    open: string
-  }],
-  phoneNumber: string,
-  website: string,
-  cuisineType?: {
-    cuisineType: string,
-    icon: string
-  }[],
-  restaurantType?: {
-    restaurantType: string,
-    icon: string
-  }[],
-  // price rating out of 1: cheap, 2: average, 3: expensive, 4: very expensive 
-  price: number,
-  // rating out of 10
-  rating: number,
-  total_ratings: number,
-  menuId: string,
-  restaurantPhotos?: string[],
-  foodPhotos?: string[],
-  hasMenu: boolean
-  // number of matching menu items to the current dietary filters
-  menuItemMatches?: number
-}
+import { Restaurant } from "@/app/map";
 
 // Component
 const Home = () => {

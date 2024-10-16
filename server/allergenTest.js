@@ -122,6 +122,7 @@ async function testFlow(restaurantId) {
         const ingredientDetails = await getIngredientDetails(menuItems[i]);
         const JSONIngredients = JSON.parse(ingredientDetails);
         const mealId = mealIdArray[i];
+        console.log("Meal id:", mealId);
         for (let j = 0; j < JSONIngredients.ingredients.length; j++) {
           const createIngredientRequestBody = {name: JSONIngredients.ingredients[j].name, allergens: JSONIngredients.ingredients[j].allergens}
           // grab ingredient for mealIngredient creation

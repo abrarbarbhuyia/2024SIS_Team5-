@@ -126,8 +126,8 @@ const RestaurantMap = () => {
   };
 
   const renderRestaurant = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.restaurantItem} onPress={() => { router.push('/restaurant'); console.log("item", item) }}>
-      <View style={styles.restaurantItemContainer}>
+    <TouchableOpacity style={styles.restaurantItem} onPress={() => { router.push({pathname: '/restaurant', params: {restaurant: JSON.stringify(item)}}) }}>      
+     <View style={styles.restaurantItemContainer}>
         <Image source={item.restaurantPhotos && item.restaurantPhotos.length > 0 ? { uri: item.restaurantPhotos[0] } : pic} style={styles.bottomSheetImage} />
         <View style={styles.restaurantTextContainer}>
           <Text style={styles.formHeaderText} numberOfLines={1}>{item.name || 'Restaurant Title'}</Text>

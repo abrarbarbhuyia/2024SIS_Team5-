@@ -47,6 +47,6 @@ app.get('/', (req, res) => {
 
 app.listen(port, async () => {
   await testConnection();
-  //await runTests();
+  // await runTests();
   console.log(`Example app listening on port ${port}`);
 });

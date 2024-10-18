@@ -11,6 +11,7 @@ import Constants from 'expo-constants';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string>();
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
@@ -18,10 +19,9 @@ const Login = () => {
     try {
       const response = await axios.post(`http://${HOST_IP}:4000/login`, { username, password });
       await AsyncStorage.setItem('token', response.data.token);
-      Alert.alert('Login Successful', `Welcome ${username}!`);
       router.push('/home'); 
     } catch (error: any) {
-      Alert.alert('Login Failed', error.response.data.message || 'Invalid username or password. Try again.');
+      setErrorMessage(error?.response?.data?.message || 'Invalid username or password. Try again.');
     }
   }, [username, password]);
 
@@ -59,6 +59,10 @@ const Login = () => {
           />
           <Icon name="lock" size={20} color="#7E7093" style={styles.icon} />
         </View>
+
+        {errorMessage && (
+          <Text style={styles.errorMessage}>{errorMessage}</Text>
+        )}
 
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>LOGIN</Text>

@@ -1,10 +1,9 @@
-import { View, Dimensions, Image, StyleSheet, FlatList, ImageSourcePropType } from "react-native";
-import { Link, router } from "expo-router";
-import { Button, Card, Text, Icon } from '@rneui/themed';
+import { View, Image, FlatList } from "react-native";
+import { router } from "expo-router";
+import { Card, Text, Icon } from '@rneui/themed';
 import SearchBar from "@/components/SearchBar";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import Header from "@/components/Header";     
-import pic from '../assets/images/react-logo.png'; // Placeholder image
+import Header from "@/components/Header";
 import RecommendedRestaurant from "@/components/RecommendedRestaurant";
 import MapView, { Marker } from "react-native-maps";
 import { styles } from '../styles/app-styles'; 
@@ -24,7 +23,6 @@ const Home = () => {
     const restaurantIds = ['4e4a1510483b16676e3a760f', '5296bc3011d29d380e6f36d2', '4b679079f964a52078552be3', '592fcdf29ef8ef6604fa5b64', '4b09eb00f964a520bf1f23e3'];
     const promises = restaurantIds.map(id => {
       const url = `http://${HOST_IP}:4000/restaurant/getRestaurant/${id}`;
-      console.log("Fetching:", url);
       return axios.get(url)
         .then(response => response.data) // Return only the data part
         .catch(error => {
@@ -46,10 +44,10 @@ const Home = () => {
   // Carousel view + styling
   const renderItem = ({ item }: { item: any }) => (
     <View style={styles.imageContainer}>
-      <TouchableOpacity onPress={() => router.push('/restaurant')}>
-      <Image source={ item.foodPhotos && item.foodPhotos.length > 0 ? { uri: item.foodPhotos[0]} : pic} style={styles.homeImage} />        
+      <TouchableOpacity onPress={() => router.push({pathname: '/restaurant', params: {restaurant: JSON.stringify(item)}})}>
+      <Image source={ item.foodPhotos && item.foodPhotos.length > 0 ? { uri: item.foodPhotos[0]} : []} style={styles.homeImage} />        
         <Text numberOfLines={1} style={styles.recentLabel}>{item.name || 'Restaurant Title'}</Text>
-        <Text numberOfLines={1} style={styles.recentComment}>{item.cuisineType && item.cuisineType.length > 0 ? item.cuisineType.map(cuisine => cuisine.cuisineType).join(', ') : 'Other'}</Text>
+        <Text numberOfLines={1} style={styles.recentComment}>{item.cuisineType && item.cuisineType.length > 0 ? item.cuisineType.map((cuisine : any) => cuisine.cuisineType).join(', ') : 'Other'}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -64,7 +62,7 @@ const Home = () => {
             <SearchBar />             
           </View>
           <MapView
-            style={styles.map}
+            style={styles.homeMap}
             initialRegion={{ // initial region is hardcoded to UTS Tower
               latitude: -33.88336558611229,
               longitude: 151.2009263036271,

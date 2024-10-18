@@ -72,7 +72,7 @@ const UserProfile = () => {
           <Text style={styles.subtitle}>{username}</Text>
         )}
 
-        <TouchableOpacity style={styles.button} onPress={() => router.push('/home')}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push('/settings')}>
           <Text style={styles.buttonText}>SETTINGS</Text>
         </TouchableOpacity>
 

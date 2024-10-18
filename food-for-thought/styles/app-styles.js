@@ -748,4 +748,32 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
    },
+  pageContainer: {
+    backgroundColor: "#E6D7FA",
+    flex: 1,
+  },
+  detailsContainer: {
+      alignItems: 'center',
+      backgroundColor: '#F5EEFF',
+      paddingTop: 10,
+      width: width,
+      height: height,
+      flex: 1,
+  },
+  tabContainer: {
+      flex: 1,
+      backgroundColor: '#FBF8FF',
+      width: width - 32,
+      padding: 2,
+      paddingTop: 0,
+      borderRadius: 24,
+      marginTop: 5,
+      shadowOffset: {width: 0, height: 2},
+      shadowOpacity: 2,
+      shadowRadius: 4,
+      marginBottom: 15,
+  },
+  noteTitle: {
+    fontSize: 18,
+  },
 });

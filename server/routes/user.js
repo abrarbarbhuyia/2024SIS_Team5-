@@ -91,4 +91,26 @@ router.delete('/deleteUserPreference/:username', async (req, res) => {
     }
 });
 
+/* Delete a user favourites */
+router.delete('/deleteFavourite/:username/:restaurantId', async(req,res) => 
+{
+    try {
+        const restaurantId = req.params.restaurantId; 
+        const query = { username: req.params.username };
+        const docs = { $pull: { favourites: restaurantId } }; 
+
+        const result = await databaseMaster.dbOp('update', 'User', { query, docs });
+
+        if (result.modifiedCount > 0) {
+            res.status(200).json({ message: 'Favourite deleted successfully' });
+        } else {
+            res.status(404).json({ message: 'Favourite not found' });
+        }
+    
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+})
+
 module.exports = router

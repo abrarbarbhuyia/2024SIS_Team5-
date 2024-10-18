@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Card, Icon } from '@rneui/themed';
 import { router } from 'expo-router';
-import Header from "@/components/Header";     
+import Header from "@/components/Header";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 import { styles } from '../styles/app-styles';
@@ -10,7 +10,7 @@ import axios from 'axios';
 import Constants from 'expo-constants';
 
 const UserProfile = () => {
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState<string>();
   const [isGuest, setIsGuest] = useState(true);
   const [userNotes, setUserNotes] = useState(0);
   const [userFavourites, setUserFavourites] = useState(0);
@@ -31,31 +31,41 @@ const UserProfile = () => {
 
   useEffect(() => {
     loadUser();
-    handleUserDetails();
   }, [loadUser]);
+
+  useEffect(() => {
+    if (username) {
+      handleUserDetails();
+      fetchNotes();
+    }
+  }, [loadUser, username]);
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
-    setUsername('');
+    setUsername(undefined);
     setIsGuest(true);
     router.push('/');
   };
 
+  const fetchNotes = useCallback(async () => {
+    const url = `http://${HOST_IP}:4000/note/getNotes/${username}`;
+    await axios.get(url)
+      .then(response => setUserNotes(response?.data?.length))
+      .catch(error => console.error("Error fetching all restaurants", error));
+  }, [userNotes])
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
   const handleUserDetails = useCallback(async () => {
     try {
       if (!isGuest) {
         const response = await axios.get(`http://${HOST_IP}:4000/user/getUser/${username}`);
-        setUserFavourites(response.data?.favourites?.length ?? 0);
-        // To do: update user notes count
-        // setUserNotes(response.data?.notes?.length ?? 0);
-        setUserPreferences(response.data?.preferences?.length ?? 0);
+        setUserFavourites(response.data[0]?.favourites?.length ?? 0);
+        setUserPreferences(response.data[0]?.preferences?.length ?? 0);
       }
     } catch (error: any) {
       console.error(error);
     }
-  }, [userNotes, userFavourites, userPreferences]);
+  }, [userFavourites, userPreferences]);
 
   return (
     <View style={styles.container}>
@@ -84,9 +94,9 @@ const UserProfile = () => {
                 <Text style={styles.userCount}>{userNotes}</Text>
                 <Text style={styles.userText}>Notes</Text>
               </Card>
-           </TouchableOpacity>
+            </TouchableOpacity>
 
-           <TouchableOpacity onPress={() => router.push('/favourites')}>
+            <TouchableOpacity onPress={() => router.push('/favourites')}>
               <Card containerStyle={styles.user}>
                 <Icon style={styles.userIcon} name='favorite' type='material' size={40} />
                 <Text style={styles.userCount}>{userFavourites}</Text>

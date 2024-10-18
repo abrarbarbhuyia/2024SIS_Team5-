@@ -66,7 +66,12 @@ router.put('/editNote/:noteId', async (req, res) => {
 router.delete('/deleteNote/:noteId', async (req, res) => {
     try {
         const noteId = req.params.noteId;
-        await databaseMaster.dbOp('delete', 'NoteDetails', { query: { noteId: noteId } } );
+        const result = await databaseMaster.dbOp('delete', 'NoteDetails', { query: { noteId: noteId } } );
+        if (result.deletedCount > 0) {
+            res.status(200).json({ message: 'Note deleted successfully' });
+        } else {
+            res.status(404).json({ message: 'Note not found' });
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });

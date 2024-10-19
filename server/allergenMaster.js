@@ -21,7 +21,7 @@ async function getMenuImage(body) {
 
 // Takes in a menu string (from OCR) and converts it into a JSON list of menu items extracted from the string
 async function getMeals(query) {
-  const prompt = `In a JSON object response, provide seperate FOOD MENU ITEMS based on the following menu string  ${query}. This is from an OCR reading, do your best to extract actual menu items from this OCR string. Do not categorise the items at all, and ignore all other information. The different menu items should be under "menu_items". Do not include your answer inside a string, just a JSON Code block. Important points to consider in your response: 1. Cross-reference the spelling of menu items 2.Ensure there are no unnecessary special characters are not present in your response. 3. Remove menu items that do not seem like they are menu items. Such as names & singular numbers. Structure the response like this {menu_items: ['Menu item 1', 'Menu Item 2', ...]}`;
+  const prompt = `In a JSON object response, provide seperate FOOD MENU ITEMS based on the following menu string  ${query}. This is from an OCR reading, do your best to extract actual menu items from this OCR string. Do not categorise the items at all, and ignore all other information. The different menu items should be under "menu_items". Do not include your answer inside a string, just a JSON Code block. Important points to consider in your response: 1. Cross-reference the spelling of menu items 2.Ensure there are no unnecessary special characters are not present in your response. 3. Remove menu items that do not seem like they are menu items. Such as names & singular numbers. 4. Ensure consistent capitalisation, new words will always start with a capital letter, and lowercase for the rest, such as "Chicken Pot Pie". 5. Structure the response like this {menu_items: ['Menu item 1', 'Menu Item 2', ...]}`;
   await new Promise(resolve => setTimeout(resolve, 5000));
   // return callGeminiJSON(prompt);
   return callGPTJSON(prompt);
@@ -32,8 +32,8 @@ async function getIngredientDetails(query) {
   const dietaryRequirements =
   "ALCOHOL,CELERY,CRUSTACEAN,DAIRY,DASH,EGG,FISH,FODMAP,GLUTEN,IMMUNO_SUPPORTIVE,NON_KETO_FRIENDLY,NON_KIDNEY_FRIENDLY,KOSHER,HIGH_POTASSIUM,HIGH_SUGAR,LUPINE,MEDITERRANEAN,MOLLUSK,MUSTARD,OIL_ADDED,NON_PALEO_FRIENDLY,PEANUT,NON_PESCATARIAN,PORK,RED_MEAT,SESAME,SHELLFISH,SOY,SULPHITE,TREE_NUT,NON_VEGAN,NON_VEGETARIAN,WHEAT";
 
-  const prompt = `In only a JSON object response, provide the ingredients for ${query}, inside each ingredient, map a list of allergens to each ingredient. Given these allergens come from the following list ${dietaryRequirements}. Do not include your answer inside a string, just a JSON Code block. Be very accurate with the ingredients you list, ensuring to take inspiration from the dish name. Do not list the amount of ingredients, simply identify them. Structure the JSON so that it is exactly like {ingredients: [{name:"", allergens:[]}, and so on]} RETURN A JSON AND PUT ALL THIS UNDER INGREDIENTS:`;
-  await new Promise(resolve => setTimeout(resolve, 5000));
+  const prompt = `In only a JSON object response, provide the ingredients for ${query}, inside each ingredient, map a list of allergens to each ingredient. Given these allergens come from the following list ${dietaryRequirements}. Do not include your answer inside a string, just a JSON Code block. Be very accurate with the ingredients you list, ensuring to take inspiration from the dish name. Do not list the amount of ingredients, simply identify them. Do not include more than 25 ingredients per meal. Structure the JSON so that it is exactly like {ingredients: [{name:"", allergens:[]}, and so on]} RETURN A JSON AND PUT ALL THIS UNDER INGREDIENTS:`;
+  await new Promise(resolve => setTimeout(resolve, 10000));
   return callGeminiJSON(prompt);
   // return callGPTJSON(prompt);
 }
@@ -70,7 +70,7 @@ async function createMenu(body) {
       process.env.BACKEND_URL + `/menu/createMenu/`,
       requestBody
     );
-    console.log("Created Menu: ", response.data);
+    // console.log("Created Menu: ", response.data);
     return response.data
   } catch (error) {
     console.error(error.message);
@@ -82,46 +82,62 @@ async function createMeals(body) {
   const menuItems = body.menuItems;
   const menuId = body.menuId;
   let mealIdArray = [];
-  console.log(body);
 
-  //Extract each menu item in a loop, check if it exists. If not, post it. 
+  console.log("Received body:", body);
+
   for (let i = 0; i < menuItems.length; i++) {
     const requestBody = {
       name: menuItems[i],
       menuId: menuId,
     };
 
-    //Before posting, check if the menuItem already exists in the DB
     try {
+      // Check if the meal exists
       const response = await axios.get(
-        process.env.BACKEND_URL + `/meal/getMealByName/${requestBody.name}`,
-        requestBody
+        process.env.BACKEND_URL + `/meal/getMealByName/${requestBody.name}`
       );
-      //If it exists (Response array is longer than 1), do not post and continue to next iteration
       if (response.data.length > 0) {
-        console.log("Menu item already exists: ", response.data);
-        mealIdArray.push(response.data.mealId);
-        continue;  
+        console.log("Menu item already exists:", response.data);
+        if (response.data[0]?.mealId) {
+          mealIdArray.push(response.data[0].mealId); 
+        } else {
+          console.warn(`No mealId found for ${menuItems[i]}`);
+        }
+        continue;
       }
     } catch (error) {
-      console.error(error.message);
+      console.error(`Error checking meal existence for ${menuItems[i]}:`, error.message);
+      continue;
     }
 
-    //After checking, post menu items that do not already exist
     try {
+      // Create the meal if it doesn't exist
       const response = await axios.post(
         process.env.BACKEND_URL + `/meal/createMeal/`,
         requestBody
       );
-      if (!response.data.mealId) {
-        console.error("meal id is undefined in creation loop");
+      console.log("Created Menu Item:", response.data);
+
+      if (response.data?.mealId) {
+        mealIdArray.push(response.data.mealId);
+      } else {
+        console.error(`mealId is undefined for ${menuItems[i]} during creation.`);
       }
-      console.log("Created Menu Item: ", response.data);
-      mealIdArray.push(response.data.mealId);
     } catch (error) {
-      console.error(error.message);
+      console.error(`Error creating meal ${menuItems[i]}:`, error.message);
     }
   }
+
+  // Final validation of mealIdArray before returning
+  if (mealIdArray.length !== menuItems.length) {
+    console.warn(
+      "Mismatch in meal items and mealIdArray. Items:",
+      menuItems,
+      "IDs:",
+      mealIdArray
+    );
+  }
+
   return mealIdArray;
 }
 

@@ -105,12 +105,12 @@ async function testFlow(restaurantId) {
       // // create menu
       const createMenuRequestBody = {restaurantId: restaurantId, menuString: menuString};
       const menu = await createMenu(createMenuRequestBody);
-      console.log(menu);
+      // console.log(menu);
 
       // get meals
       const JSONMenuItems = JSON.parse(await getMeals(menuString));
       const menuItems = JSONMenuItems.menu_items;
-      console.log(menuItems);
+      // console.log(menuItems);
 
       // create meals in db
       const createMealsRequestBody = {menuItems: menuItems, menuId: menu.menuId};

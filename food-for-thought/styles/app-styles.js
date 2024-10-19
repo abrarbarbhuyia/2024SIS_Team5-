@@ -31,6 +31,12 @@ const colours = {
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: 'center',
+    backgroundColor: colours.tertiary,
+    paddingTop: 30
+  },
+  loginContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colours.tertiary,
@@ -370,7 +376,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 4,
     minHeight: 30,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    maxWidth: width,
   },
   restaurantItem: { 
     padding: 5,

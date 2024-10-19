@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import { View, StyleSheet, Dimensions } from "react-native";
 import { Card, Text } from '@rneui/themed';
 import React from "react";
@@ -12,7 +11,7 @@ import Layout from "@/components/Layout";
 export default function Restaurant() {
     const [selectedIndex, setSelectedIndex] = React.useState(0);
     //need to get the restaurant data from path route - object was stringified
-    const {restaurant} = useLocalSearchParams();
+    const {restaurant}: {restaurant: string} = useLocalSearchParams();
     const restaurantData = JSON.parse(restaurant);
 
     // Components to load based on selected index, passes restaurant data

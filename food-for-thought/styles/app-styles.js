@@ -31,6 +31,12 @@ const colours = {
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: 'center',
+    backgroundColor: colours.tertiary,
+    paddingTop: 30
+  },
+  loginContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colours.tertiary,
@@ -135,7 +141,7 @@ export const styles = StyleSheet.create({
   },
   label: {
     position: 'absolute',
-    left: 10,
+    left: 30,
     backgroundColor: 'transparent',
     top: -18,
     fontSize: 12,
@@ -628,11 +634,13 @@ export const styles = StyleSheet.create({
   inputWithIcon: {
     flexDirection: 'row',
     alignItems: 'center',
+    width: '95%',
     borderColor: colours.grey,
     borderWidth: 1,
     borderRadius: 4,
     padding: 5,
-    marginBottom: 15
+    marginBottom: 15,
+    left: 10
   },
   locationInput: {
     flex: 1,
@@ -651,7 +659,7 @@ export const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'left',
     width: '100%',
-    left: 10
+    left: 20
   },
   listItem: {
     flexDirection: 'row',
@@ -663,20 +671,21 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
     marginBottom: 0,
     left: 4,
-    width: '97.5%',
+    width: '98.5%',
   },
   listItemText: {
     fontSize: 16,
     color: colours.textPrimary,
+    left: 10,
   },
   switchRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 12,
-    paddingHorizontal: 15,
+    paddingHorizontal: 30,
     alignItems: 'center',
     marginBottom: 15,
-    left: 5
+    left: 10
   },
   settingsInputContainer: {
     paddingHorizontal: 15,
@@ -690,10 +699,17 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     color: colours.textSecondary,
     marginBottom: 10,
+    left: 15,
   },
   slider: {
-    width: width - 60,
+    width: '95%',
     height: 40,
+    left: 10,
+  },
+  errorMessage: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 10,
   },
   modal: {
     justifyContent: 'center',

@@ -5,12 +5,12 @@ const bcrypt = require('bcryptjs');
 const router = express.Router();
 
 router.post('/', [
-    body('username').not().isEmpty().withMessage('Username is required'),
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters').matches(/[!@#$%^&*]/).withMessage('Password must contain at least one special character')
+    body('username').not().isEmpty().withMessage('Username is required.'),
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters.').matches(/[!@#$%^&*]/).withMessage('Password must contain at least one special character')
 ], async (req, res) => {
     const validationFailures = validationResult(req);
     if (!validationFailures.isEmpty()) {
-        return res.status(400).json({ message: validationFailures.array() });
+        return res.status(400).json({ message: validationFailures.array()[0].msg });
     }
 
     const { username, password } = req.body;

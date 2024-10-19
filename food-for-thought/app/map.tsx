@@ -90,6 +90,7 @@ const RestaurantMap = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [username, setUsername] = useState<string>();
+  const [filterByDietary, setFilterByDietary] = useState<boolean>(false);
   // initial region is hardcoded to UTS Tower
   const [userLocation, setUserLocation] = useState<{
     latitude: number;
@@ -106,12 +107,25 @@ const RestaurantMap = () => {
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
+  //Load the filterByDietary toggle value
+  const loadSettings = async () => {
+    try {
+      const storedFilterByDietary = await AsyncStorage.getItem(
+        "filterByDietary"
+      );
+      if (storedFilterByDietary !== null) {
+        setFilterByDietary(JSON.parse(storedFilterByDietary));
+      }
+    } catch (error) {
+      console.error("Error loading settings", error);
+    }
+  };
+
   const loadUser = React.useCallback(async () => {
     const token = await AsyncStorage.getItem("token");
     if (token) {
       try {
         const decodedToken: any = jwtDecode(token);
-        console.log(decodedToken.username);
         setUsername(decodedToken.username);
       } catch (error) {
         console.error("Invalid token");
@@ -121,30 +135,33 @@ const RestaurantMap = () => {
 
   React.useEffect(() => {
     loadUser();
+    loadSettings();
   }, [loadUser]);
 
   const fetchUserPreferences = async (username: string) => {
+    // if a user is logged in AND has filter by dietary preferences toggleOn - we can fetch their filters - otherwise we use state
     /* if they're logged in, grab the preferences associated with this username */
-    try {
-      console.log(username);
-      await axios
-        .get(`http://${HOST_IP}:4000/user/getUserPreference/${username}`)
-        .then((response) => {
-          /* set the active filters to these preferences */
-          if (response.data.length > 0) {
-            setActiveFilters(
-              response.data.map((p: UserPreferences) => ({
-                type:
-                  p.type == "Cuisine"
-                    ? formatTextValue(`${p.type}`)
-                    : formatTextValue(`${p.type}s`),
-                value: p.name,
-              }))
-            );
-          }
-        });
-    } catch (error) {
-      console.error("Error fetching user preferences", error);
+    if (filterByDietary) {
+      try {
+        await axios
+          .get(`http://${HOST_IP}:4000/user/getUserPreference/${username}`)
+          .then((response) => {
+            /* set the active filters to these preferences */
+            if (response.data.length > 0) {
+              setActiveFilters(
+                response.data.map((p: UserPreferences) => ({
+                  type:
+                    p.type == "Cuisine"
+                      ? formatTextValue(`${p.type}`)
+                      : formatTextValue(`${p.type}s`),
+                  value: p.name,
+                }))
+              );
+            }
+          });
+      } catch (error) {
+        console.error("Error fetching user preferences", error);
+      }
     }
   };
 
@@ -188,10 +205,10 @@ const RestaurantMap = () => {
   };
 
   useEffect(() => {
-    if (username) {
+    if (username && filterByDietary) {
       fetchUserPreferences(username);
     }
-  }, [username]);
+  }, [filterByDietary]);
 
   useEffect(() => {
     fetchRestaurants();

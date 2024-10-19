@@ -13,7 +13,7 @@ async function callGeminiJSON(prompt) {
     const trimmedResponse = lines.slice(1, -1).join('\n'); 
 
     // return a json object
-    console.log(trimmedResponse);
+    // console.log(trimmedResponse);
     return trimmedResponse;
 }
 

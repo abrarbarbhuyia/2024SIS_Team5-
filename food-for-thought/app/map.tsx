@@ -12,7 +12,6 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import pic from "../assets/images/react-logo.png"; // Placeholder image
 import { router } from "expo-router";
 import {
   BottomSheetModal,
@@ -28,12 +27,19 @@ import axios from "axios";
 import MapView, { Marker } from "react-native-maps";
 import { DietaryFilterModal } from "@/components/DietaryFilterModal";
 import Header from "@/components/Header";
-import { capitaliseFirstLetter } from "@/utils";
+import { capitaliseFirstLetter, formatTextValue } from "@/utils";
 import { RestaurantModal } from "@/components/RestaurantModal";
 import { styles } from "../styles/app-styles";
 import Constants from "expo-constants";
 import { getDistance } from "geolib";
 import Layout from "@/components/Layout";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
+
+interface UserPreferences {
+  name: string;
+  type: string;
+}
 
 export type Restaurant = {
   _id: string;
@@ -49,8 +55,8 @@ export type Restaurant = {
       open: string;
     }
   ];
-  phoneNumber?: string;
-  website?: string;
+  phoneNumber: string;
+  website: string;
   cuisineType?: {
     cuisineType: string;
     icon: string;
@@ -60,14 +66,14 @@ export type Restaurant = {
     icon: string;
   }[];
   // price rating out of 1: cheap, 2: average, 3: expensive, 4: very expensive
-  price?: number;
+  price: number;
   // rating out of 10
-  rating?: number;
-  total_ratings?: number;
-  menuId?: string;
+  rating: number;
+  total_ratings: number;
+  menuId: string;
   restaurantPhotos?: string[];
   foodPhotos?: string[];
-  hasMenu?: boolean;
+  hasMenu: boolean;
   // number of matching menu items to the current dietary filters
   menuItemMatches?: number;
 };
@@ -83,6 +89,8 @@ const RestaurantMap = () => {
   >();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [username, setUsername] = useState<string>();
+  const [filterByDietary, setFilterByDietary] = useState<boolean>(false);
   // initial region is hardcoded to UTS Tower
   const [userLocation, setUserLocation] = useState<{
     latitude: number;
@@ -95,9 +103,70 @@ const RestaurantMap = () => {
   const filterTypes = ["diets", "allergens", "ingredients", "cuisine", "meals"];
   const snapPoints = useMemo(() => ["25%", "50%"], []);
 
+  const pic = require("../assets/images/react-logo.png"); // placeholder restaurant image
+
+  const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
+
+  //Load the filterByDietary toggle value
+  const loadSettings = async () => {
+    try {
+      const storedFilterByDietary = await AsyncStorage.getItem(
+        "filterByDietary"
+      );
+      if (storedFilterByDietary !== null) {
+        setFilterByDietary(JSON.parse(storedFilterByDietary));
+      }
+    } catch (error) {
+      console.error("Error loading settings", error);
+    }
+  };
+
+  const loadUser = React.useCallback(async () => {
+    const token = await AsyncStorage.getItem("token");
+    if (token) {
+      try {
+        const decodedToken: any = jwtDecode(token);
+        setUsername(decodedToken.username);
+      } catch (error) {
+        console.error("Invalid token");
+      }
+    }
+  }, []);
+
+  React.useEffect(() => {
+    loadUser();
+    loadSettings();
+  }, [loadUser]);
+
+  const fetchUserPreferences = async (username: string) => {
+    // if a user is logged in AND has filter by dietary preferences toggleOn - we can fetch their filters - otherwise we use state
+    /* if they're logged in, grab the preferences associated with this username */
+    if (filterByDietary) {
+      try {
+        await axios
+          .get(`http://${HOST_IP}:4000/user/getUserPreference/${username}`)
+          .then((response) => {
+            /* set the active filters to these preferences */
+            if (response.data.length > 0) {
+              setActiveFilters(
+                response.data.map((p: UserPreferences) => ({
+                  type:
+                    p.type == "Cuisine"
+                      ? formatTextValue(`${p.type}`)
+                      : formatTextValue(`${p.type}s`),
+                  value: p.name,
+                }))
+              );
+            }
+          });
+      } catch (error) {
+        console.error("Error fetching user preferences", error);
+      }
+    }
+  };
+
   const fetchRestaurants = async () => {
     try {
-      const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
       const response = await axios.get(`http://${HOST_IP}:4000/search`, {
         params: {
           ingredients:
@@ -134,6 +203,12 @@ const RestaurantMap = () => {
       );
     }
   };
+
+  useEffect(() => {
+    if (username && filterByDietary) {
+      fetchUserPreferences(username);
+    }
+  }, [filterByDietary]);
 
   useEffect(() => {
     fetchRestaurants();
@@ -177,12 +252,14 @@ const RestaurantMap = () => {
     );
   };
 
-  const renderRestaurant = ({ item }: { item: any }) => (
+  const renderRestaurant = ({ item }: { item: Restaurant }) => (
     <TouchableOpacity
       style={styles.restaurantItem}
       onPress={() => {
-        router.push("/restaurant");
-        console.log("item", item);
+        router.push({
+          pathname: "/restaurant",
+          params: { restaurant: JSON.stringify(item) },
+        });
       }}
     >
       <View style={styles.restaurantItemContainer}>
@@ -199,7 +276,9 @@ const RestaurantMap = () => {
             {item.name || "Restaurant Title"}
           </Text>
           <View style={styles.restaurantDetailsContainer}>
-            <MenuItemBadge matches={item.menuItemMatches} />
+            <MenuItemBadge
+              matches={item.menuItemMatches ? item.menuItemMatches : 15}
+            />
             {renderStars(item.rating)}
           </View>
           <Text style={styles.formDescriptionText}>
@@ -288,7 +367,13 @@ const RestaurantMap = () => {
                 )}
               </ScrollView>
             </View>
-            <View style={{ ...styles.flexContainer, paddingBottom: 6 }}>
+            <View
+              style={{
+                ...styles.flexContainer,
+                paddingBottom: 6,
+                overflow: "scroll",
+              }}
+            >
               {filterTypes.map((f) => (
                 <Badge
                   containerStyle={{ flex: 1 }}

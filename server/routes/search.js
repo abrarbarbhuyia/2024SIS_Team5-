@@ -1,36 +1,56 @@
 const express = require('express');
 const router = express.Router();
 const databaseMaster = require('../databaseMaster');
+const axios = require('axios');
 
 router.get('/', async (req, res) => {
     try {
-        const ingredientFilter = req.query.ingredientFilter;
+        const ingredientFilter = req.query.ingredients || [];
         const allergensFilter = req.query.allergens || [];
         const dietsFilter = req.query.diets || [];
+        const cuisineFilter = req.query.cuisine || [];
+        const mealFilter = req.query.meals || [];
         const searchQuery = req.query.searchQuery || '';
+        // user location details
+        const latitude = req.query.latitude;
+        const longitude = req.query.longitude;
+        const radius = req.query.radius;
 
-        const isFilterApplied = ingredientFilter || allergensFilter.length > 0 || dietsFilter.length > 0 || searchQuery;
+        /* fetch all restaurants in a given radius by calling searchRestaurant endpoint */
+        const restaurantsInRegion = await axios.get(`http://${process.env.HOST_IP}:4000/restaurant/searchRestaurants/${latitude}/${longitude}/${radius}`);
 
+        /* a filter is applied if any of the arrays have elements or the strings have contents */
+        const isFilterApplied = ingredientFilter.length > 0 || allergensFilter.length > 0 || dietsFilter.length > 0 || cuisineFilter.length > 0 || mealFilter.length > 0 || searchQuery;
+
+        /* if no filter is applied, return all restaurants in the region */
         if (!isFilterApplied) {
-            const allRestaurants = await databaseMaster.dbOp('find', 'RestaurantDetails', {});
-            return res.json(allRestaurants);
+            const allRestaurants = await databaseMaster.dbOp('find', 'RestaurantDetails', { 
+                query: { restaurantId: { $in: restaurantsInRegion.data } }
+            });
+            return res.json(allRestaurants.filter(r => r.hasMenu));
         }
 
-        let ingredientQuery = {
-            name: { $regex: ingredientFilter, $options: 'i' }  // construct core query for ingredients - "name" will always return
-        };
+        /* Query for Ingredients and Allergens Filters (IngredientDetails) */
+        let ingredientQuery = {};
+
+        if (ingredientFilter.length > 0) {
+            ingredientQuery.$or = ingredientFilter.map(ingredient => ({ // create a regex query for each element in the ingredientFilter
+                name: { $regex: ingredient, $options: 'i' } // return any ingredients that match the filter
+            }));
+        }
 
         if (allergensFilter.length > 0) { // only add the allergens filter if it's not empty
             ingredientQuery.allergens = { $nin: [allergensFilter] };
         }
 
-        let filteredIngredients = await databaseMaster.dbOp('find', 'IngredientDetails', {
+        const filteredIngredients = await databaseMaster.dbOp('find', 'IngredientDetails', {
             query: ingredientQuery
         });
 
         const ingredientIds = filteredIngredients.map(ingredient => ingredient.ingredientId); // create an array of ingredientIds
         console.log(`ingredientIds that match applied filters ${ingredientIds}`);
         
+        /* Ingredient Results + Query for Diets and Meals (MealDetails) */
         let mealQuery = {
             mealId: { $in: await getMealIdsForIngredients(ingredientIds) }
         };
@@ -39,40 +59,42 @@ router.get('/', async (req, res) => {
             mealQuery.diet = { $in: [dietsFilter] };
         }
 
-        let mealResults = await databaseMaster.dbOp('find', 'MealDetails', { // search for meals that match diet AND whose mealId contains the ingredients before
+        if (mealFilter.length > 0) {
+            mealQuery.$or = mealFilter.map(meal => ({
+                name: { $regex: meal, $options: 'i' }
+            }));
+        }
+
+        const mealResults = await databaseMaster.dbOp('find', 'MealDetails', { // search for meals that match diet AND whose mealId contains the ingredients before
             query: mealQuery
         });
+        
+        let menuMealCount = mealResults.reduce((map, meal) => { // REDUUUUUUUUUCE !!
+            const menuId = meal.menuId;
+            map.set(menuId, (map.get(menuId) || 0) + 1);
+            return map;
+        }, new Map());
 
-        const mealIds = mealResults.map(meal => meal.mealId);
-        console.log(`mealIds that match applied filters ${mealIds}`);
-
+        /* Core Restaurant Query - Restaurants in the region + menuIds that contain the resulting meals from previous filtering + name regex query */
         const menuIds = mealResults.map(meal => meal.menuId);
-        
-        let restaurantQuery = {};
+        let restaurantQuery = { 
+            restaurantId: { $in: restaurantsInRegion.data },
+            menuId: { $in: menuIds },
+            name: { $regex: searchQuery, $options: 'i' }
+        };
 
-        if (menuIds.length > 0) {
-            restaurantQuery.menuId = { $in: menuIds };
+        if (cuisineFilter.length > 0) {
+            restaurantQuery.$or = cuisineFilter.map(cuisine => ({
+                cuisineType: { $elemMatch: { cuisineType: { $regex: cuisine, $options: 'i' } } }
+            }));
         }
         
-        if (searchQuery !== '') {
-            restaurantQuery.name = { $regex: searchQuery, $options: 'i' };
-        }
-        
-        if (menuIds.length > 0 && searchQuery !== '') {
-            restaurantQuery = {
-                $and: [
-                    { menuId: { $in: menuIds } },
-                    { name: { $regex: searchQuery, $options: 'i' } }
-                ]
-            };
-        }
-        
-        let restaurantResults = await databaseMaster.dbOp('find', 'RestaurantDetails', { query: restaurantQuery });
+        const restaurantResults = await databaseMaster.dbOp('find', 'RestaurantDetails', { query: restaurantQuery });
+        const updatedRestaurantResults = restaurantResults.filter(r => r.hasMenu).map(r => ({
+            ...r, menuItemMatches: menuMealCount.get(r.menuId)
+        }));
 
-        const restaurantIds = restaurantResults.map(restaurant => restaurant.restaurantId);
-        console.log(`restaurantIds that match applied filters ${restaurantIds}`);
-
-        res.json(restaurantResults);
+        res.json(updatedRestaurantResults);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: error.message || 'Internal Server Error' });

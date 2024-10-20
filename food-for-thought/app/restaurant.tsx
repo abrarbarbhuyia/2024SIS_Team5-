@@ -6,30 +6,33 @@ import { ButtonGroup } from "react-native-elements";
 import RestaurantGallery from "@/components/RestaurantGallery";
 import RestaurantDescription from "@/components/RestaurantDescription";
 import RestaurantMenu from "@/components/RestaurantMenu";
+import { useLocalSearchParams } from "expo-router";
+import Layout from "@/components/Layout";
 
 export default function Restaurant() {
-    //stuff
     const [selectedIndex, setSelectedIndex] = React.useState(0);
+    //need to get the restaurant data from path route - object was stringified
+    const {restaurant} = useLocalSearchParams();
+    const restaurantData = JSON.parse(restaurant);
 
-    // Components to load based on selected index
+    // Components to load based on selected index, passes restaurant data
     const renderContent = () => {
         switch (selectedIndex) {
             case 0:
-                return <RestaurantMenu/>;
+                return <RestaurantMenu restaurant={restaurantData}/>;
             case 1:
-                return <RestaurantDescription/>;
+                return <RestaurantDescription restaurant={restaurantData}/>;
             case 2:
-                return <RestaurantGallery/>;
+                return <RestaurantGallery restaurant={restaurantData}/>;
             default:
                 return null;
         }
     };
 
     return (
-        <View style={styles.pageContainer} >
-            <Header />
+        <Layout>
             <View style={styles.detailsContainer}>
-                <Text h4 style={{padding: 20,}}>Restaurant Title</Text>
+                <Text h4 style={{padding: 15,}}>{restaurantData.name}</Text>
                 <Card containerStyle={styles.tabContainer}>
                 <ButtonGroup
                     buttonStyle={{  backgroundColor: '#FBF8FF' }}
@@ -48,7 +51,7 @@ export default function Restaurant() {
                 {renderContent()}
                 </Card>
             </View>
-        </View>
+        </Layout>
     )
 }
 

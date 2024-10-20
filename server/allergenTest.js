@@ -97,7 +97,7 @@ async function testgetMenuImage() {
 async function testFlow(restaurantId) {
   //Check if Restaurant exists - Create if not exists and go through flow of retrieving menus, meals, ingredients and allergens
   //returns true if the restaurant has a valid menu, returns false if not
-  //const restaurantId = "4e4a1510483b16676e3a760f";
+  // restaurantId = "4e4a1510483b16676e3a760f";
   const menuExists = await checkMenu(restaurantId);
   if (!menuExists) {
 
@@ -115,12 +115,12 @@ async function testFlow(restaurantId) {
       // // create menu
       const createMenuRequestBody = {restaurantId: restaurantId, menuString: menuString};
       const menu = await createMenu(createMenuRequestBody);
-      console.log(menu);
+      // console.log(menu);
 
       // get meals
       const JSONMenuItems = JSON.parse(await getMealDetails(menuString));
       const menuItems = JSONMenuItems.menu_items;
-      console.log(menuItems);
+      // console.log(menuItems);
 
       // create meals in db
       const createMealsRequestBody = {menuItems: menuItems, menuId: menu.menuId};
@@ -132,6 +132,7 @@ async function testFlow(restaurantId) {
         const ingredientDetails = await getIngredientDetails(menuItems[i]);
         const JSONIngredients = JSON.parse(ingredientDetails);
         const mealId = mealIdArray[i];
+        console.log("Meal id:", mealId);
         for (let j = 0; j < JSONIngredients.ingredients.length; j++) {
           const createIngredientRequestBody = {name: JSONIngredients.ingredients[j].name, allergens: JSONIngredients.ingredients[j].allergens}
           // grab ingredient for mealIngredient creation

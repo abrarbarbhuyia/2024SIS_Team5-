@@ -8,6 +8,7 @@ import { jwtDecode } from 'jwt-decode';
 import { styles } from '../styles/app-styles';
 import axios from 'axios';
 import Constants from 'expo-constants';
+import Layout from '@/components/Layout';
 
 const UserProfile = () => {
   const [username, setUsername] = useState<string>();
@@ -68,9 +69,7 @@ const UserProfile = () => {
   }, [userFavourites, userPreferences]);
 
   return (
-    <View style={styles.container}>
-      <Header />
-
+    <Layout>
       <Card containerStyle={styles.rectangle}>
         <Icon style={{ color: '#000000' }} name='account-circle' type='material' size={75} />
 
@@ -122,7 +121,7 @@ const UserProfile = () => {
           </View>
         )}
       </Card>
-    </View>
+    </Layout>
   );
 };
 

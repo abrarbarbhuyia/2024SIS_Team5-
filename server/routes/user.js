@@ -91,6 +91,42 @@ router.delete('/deleteUserPreference/:username', async (req, res) => {
     }
 });
 
+/* Add a user favourite */
+router.put('/addFavourite/:username/:restaurantId', async (req, res) => {
+    try {
+        const query = { username: req.params.username };
+        const docs = { $addToSet: { favourites: req.params.restaurantId } };
+        const result = await databaseMaster.dbOp('update', 'User', { query, docs });
+        if (result.modifiedCount > 0) {
+            res.status(200).json({ message: 'Restaurant successfully added to user favourites' });
+        } else {
+            res.status(404).json({ message: 'Restaurant not found' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+/* Get user favourites */
+router.get('/getFavourites/:username/', async (req, res) => {
+    try {
+        const restaurantId = req.params.restaurantId;
+        const query = { username: req.params.username };
+        const user = await databaseMaster.dbOp('find', 'User', {query: query});
+        if (user.length == 0) {
+            res.status(404).json({ message: 'User not found' });
+        } else{
+            // const isFavourited = user[0].favourites.includes(restaurantId);        
+            console.log(user[0].favourites)
+            res.status(200).json(user[0].favourites);
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({error: 'Internal server error'});
+    }
+});
+
 /* Delete a user favourites */
 router.delete('/deleteFavourite/:username/:restaurantId', async(req,res) => 
 {

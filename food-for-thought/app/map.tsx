@@ -508,11 +508,12 @@ const RestaurantMap = () => {
             setActiveFilters={setActiveFilters}
           />
         )}
-        {activeRestaurant && (
+        {activeRestaurant && username && (
           <RestaurantModal
             setShowModal={setActiveRestaurant}
             userLocation={userLocation}
             restaurant={activeRestaurant}
+            username={username}
           />
         )}
       </BottomSheetModalProvider>

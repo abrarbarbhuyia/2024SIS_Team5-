@@ -9,11 +9,13 @@ import MenuItemBadge from "./MenuItemBadge";
 import { getDistance } from "geolib";
 import axios from "axios";
 import Constants from "expo-constants";
+import { isSearchBarAvailableForCurrentPlatform } from "react-native-screens";
 
 export type RestaurantModalProps = {
   setShowModal: React.Dispatch<React.SetStateAction<Restaurant | undefined>>,
   restaurant: Restaurant,
-  userLocation: { latitude: number, longitude: number }
+  userLocation: { latitude: number, longitude: number },
+  username: string
 };
 
 export type Meal = {
@@ -46,12 +48,24 @@ const renderStars = (rating: number) => {
   );
 };
 
-export function RestaurantModal({ restaurant, userLocation, setShowModal, ...rest }: RestaurantModalProps) {
+export function RestaurantModal({ restaurant, userLocation, username, setShowModal, ...rest }: RestaurantModalProps) {
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
   const [meals, setMeals] = React.useState<Meal[]>();
   const [isOpen, setIsOpen] = React.useState(false);
   const [nextOpen, setNextOpen] = React.useState<{ day: number, open: string } | null>(null);
+  const [isFavourited, setIsFavourited] = React.useState(false);
 
+  const fetchFavouriteStatus = async () => {
+    try {
+      const response = await axios.get(`http://${HOST_IP}:4000/user/getFavourites/${username}`);
+      if (response.data.includes(restaurant.restaurantId)) {
+        setIsFavourited(true);  // If the restaurant is favorited, set the state to true
+      }
+    } catch (error) {
+      console.error('Error fetching favorite status:', error);
+    }
+  };
+  
   const fetchMeals = async () => {
     try {
       const response = await axios.get(`http://${HOST_IP}:4000/meal/getMealByMenuId/${restaurant.menuId}`);
@@ -59,6 +73,26 @@ export function RestaurantModal({ restaurant, userLocation, setShowModal, ...res
 
     } catch (error) {
       console.error("Error fetching meals:", error);
+    }
+  };
+
+  const handleFavoriteToggle = async () => {
+    setIsFavourited(!isFavourited);
+
+    try {
+      if (!isFavourited) {
+        const response = await axios.put(`http://${HOST_IP}:4000/user/addFavourite/${username}/${restaurant.restaurantId}`);
+        if (response.status !== 200) {
+          console.log("Error adding favourite:", response);
+        }
+      } else {
+        const response = await axios.delete(`http://${HOST_IP}:4000/user/deleteFavourite/${username}/${restaurant.restaurantId}`);
+        if (response.status !== 200) {
+          console.log("Error deleting favourite:", response);
+        }
+      }
+    } catch (error) {  
+      console.error('Error updating favorite status:', error);
     }
   };
 
@@ -74,6 +108,10 @@ export function RestaurantModal({ restaurant, userLocation, setShowModal, ...res
     }
   }, [restaurant]);
 
+  React.useEffect(() => {
+    fetchFavouriteStatus();
+  }, [restaurant]);
+  
   // price rating out of 1: cheap, 2: average, 3: expensive, 4: very expensive 
   const priceMap: { [key: number]: string } = {
     1: '$',
@@ -162,10 +200,11 @@ export function RestaurantModal({ restaurant, userLocation, setShowModal, ...res
             size={22}
             onPress={() => setShowModal(undefined)} />
           <Icon
-            name='star'
-            type='feather'
-            iconStyle={styles.modalIcon}
-            size={22} />
+            name={'star'}
+            type='font-awesome'
+            iconStyle={isFavourited ? styles.modalIcon : styles.unfilledStar}
+            size={22} 
+            onPress={handleFavoriteToggle}/>
           <Icon
             name='edit'
             type='feather'

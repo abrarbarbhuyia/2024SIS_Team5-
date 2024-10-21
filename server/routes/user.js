@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const databaseMaster = require('../databaseMaster');
 const bcrypt = require('bcrypt');
-const User = require('../models/userModel');
 
 router.get('/getUser/:userName', async (req, res) => {
     try {
@@ -12,7 +11,7 @@ router.get('/getUser/:userName', async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
@@ -23,12 +22,12 @@ router.post('/changePassword/', async (req, res) => {
         const user = await databaseMaster.dbOp('find', 'User', { query: { username: username } });
         
         if (user.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ message: 'User not found' });
         }
 
         const isPasswordValid = await bcrypt.compare(oldPassword, user[0].password);
         if (!isPasswordValid) {
-            return res.status(400).json({ error: 'Old password is incorrect' });
+            return res.status(400).json({ message: 'Old password is incorrect' });
         }
 
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
@@ -41,7 +40,7 @@ router.post('/changePassword/', async (req, res) => {
         res.status(200).json({ message: 'Password changed successfully' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 

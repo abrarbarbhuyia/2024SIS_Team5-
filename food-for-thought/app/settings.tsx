@@ -6,6 +6,7 @@ import { Card, Slider } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import Header from "@/components/Header";
+import Layout from '@/components/Layout';
 
 const Settings = () => {
   const [filterByDietary, setFilterByDietary] = useState(true);
@@ -47,14 +48,13 @@ const Settings = () => {
   const toggleSwitch = () => setFilterByDietary((prevState) => !prevState);
 
   return (
-    <View style={styles.container}>
-      <Header />
+    <Layout>
       <Card containerStyle={styles.rectangle}>
         <Text style={[styles.subtitle, { right: 110 }]}>Settings</Text>
 
         <View>
           <Text style={styles.headline}>Account</Text>
-          <TouchableOpacity style={styles.listItem} onPress={() => router.push('/home')}>
+          <TouchableOpacity style={styles.listItem} onPress={() => router.push('/user')}>
             <Text style={styles.listItemText}>Profile</Text>
             <Icon name="chevron-right" size={16} color="#49454F" />
           </TouchableOpacity>
@@ -113,7 +113,7 @@ const Settings = () => {
           </View>
         </View>
       </Card>
-    </View>
+    </Layout>
   );
 };
 

@@ -7,6 +7,7 @@ import RestaurantGallery from "@/components/RestaurantGallery";
 import RestaurantDescription from "@/components/RestaurantDescription";
 import RestaurantMenu from "@/components/RestaurantMenu";
 import { useLocalSearchParams } from "expo-router";
+import Layout from "@/components/Layout";
 
 export default function Restaurant() {
     const [selectedIndex, setSelectedIndex] = React.useState(0);
@@ -29,8 +30,7 @@ export default function Restaurant() {
     };
 
     return (
-        <View style={styles.pageContainer} >
-            <Header />
+        <Layout>
             <View style={styles.detailsContainer}>
                 <Text h4 style={{padding: 15,}}>{restaurantData.name}</Text>
                 <Card containerStyle={styles.tabContainer}>
@@ -51,7 +51,7 @@ export default function Restaurant() {
                 {renderContent()}
                 </Card>
             </View>
-        </View>
+        </Layout>
     )
 }
 

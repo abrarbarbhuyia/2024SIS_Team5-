@@ -15,7 +15,6 @@ export default function RootLayout() {
             <Stack.Screen name ="preferences" options={{headerShown:false,fullScreenGestureEnabled:true,gestureDirection:'horizontal'}}/>
             <Stack.Screen name ="settings" options={{headerShown:false,fullScreenGestureEnabled:true,gestureDirection:'horizontal'}}/>
             <Stack.Screen name ="changepassword" options={{headerShown:false,fullScreenGestureEnabled:true,gestureDirection:'horizontal'}}/>
-            <Stack.Screen name ="warning" options={{headerShown:false,fullScreenGestureEnabled:true,gestureDirection:'horizontal'}}/>
           </Stack>
       </GestureHandlerRootView>
   );

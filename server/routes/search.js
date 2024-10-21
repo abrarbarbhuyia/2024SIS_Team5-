@@ -71,7 +71,7 @@ router.get('/', async (req, res) => {
         
         let menuMealCount = mealResults.reduce((map, meal) => { // REDUUUUUUUUUCE !!
             const menuId = meal.menuId;
-            map.set(menuId, (map.get(menuId) || 0) + 1);
+            map.set(menuId, [...(map.get(menuId) || []), meal.mealId]);
             return map;
         }, new Map());
 

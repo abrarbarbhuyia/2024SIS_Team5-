@@ -9,7 +9,7 @@ import MenuItemBadge from "./MenuItemBadge";
 import { getDistance } from "geolib";
 import axios from "axios";
 import Constants from "expo-constants";
-import { isSearchBarAvailableForCurrentPlatform } from "react-native-screens";
+import {NoteModal} from "@/components/NoteModal"
 
 export type RestaurantModalProps = {
   setShowModal: React.Dispatch<React.SetStateAction<Restaurant | undefined>>,
@@ -24,6 +24,15 @@ export type Meal = {
   name: string,
   diet: string[],
   menuId: string
+}
+
+export type Note = {
+  noteId: string,
+  date?: string,
+  content?: string,
+  restaurantId: string,
+  username: string,
+  rating?: number,
 }
 
 export function getRestaurantPhoto(restaurantPhotos?: string[], foodPhotos?: string[]) {
@@ -54,6 +63,11 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
   const [isOpen, setIsOpen] = React.useState(false);
   const [nextOpen, setNextOpen] = React.useState<{ day: number, open: string } | null>(null);
   const [isFavourited, setIsFavourited] = React.useState(false);
+  // const [noteModalVisible, setNoteModalVisible] = React.useState<boolean>(false);
+  const [activeNote, setActiveNote] = React.useState<
+    Note | undefined
+  >();
+  const [showNoteModal, setShowNoteModal] = React.useState<boolean>(false);
 
   const fetchFavouriteStatus = async () => {
     try {
@@ -66,6 +80,28 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
     }
   };
   
+  const fetchNote = async() => {
+    try {
+      const response = await axios.get(`http://${HOST_IP}:4000/note/getNotesRestaurant/${username}/${restaurant.restaurantId}`);
+      if (response.data.length > 0) {
+        setActiveNote(response.data[0]); 
+      }
+      // else {
+      //   // Create a temporary new note (not in DB)
+      //   console.log("Creating new note")
+      //   const newNote: Note = {
+      //     noteId: "temp-" + new Date().getTime(),
+      //     date: new Date().toISOString(),
+      //     restaurantId: restaurant.restaurantId,
+      //     username: username
+      //   };
+      //   setActiveNote(newNote);
+      // }
+    } catch (error) {
+      console.error('Error fetching or creating new note:', error);
+    }  
+  }
+
   const fetchMeals = async () => {
     try {
       const response = await axios.get(`http://${HOST_IP}:4000/meal/getMealByMenuId/${restaurant.menuId}`);
@@ -184,7 +220,10 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
     return `${formattedHours}:${minutes} ${suffix}`;
   };
 
-  return <Overlay overlayStyle={styles.modal} isVisible={true} onBackdropPress={() => setShowModal(undefined)}>
+  return (
+  <>
+  {!showNoteModal && 
+  <Overlay overlayStyle={styles.modal} isVisible={true} onBackdropPress={() => setShowModal(undefined)}>
     <View style={styles.restaurantFormHeader}>
       <View style={styles.flexRowGroup}>
         <View style={{ ...styles.imageContainer, height: 160, width: '90%', marginRight: 0 }}>
@@ -209,7 +248,12 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
             name='edit'
             type='feather'
             iconStyle={styles.modalIcon}
-            size={22} />
+            size={22}
+            onPress={() => {
+              fetchNote();
+              // setShowModal(undefined);
+              setShowNoteModal(true);
+            }} />
         </View>
       </View>
       {restaurant.name && <View style={styles.formHeaderContainer}>
@@ -263,5 +307,16 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
       </View>
       <Button buttonStyle={{ ...styles.button, paddingHorizontal: 25, marginTop: 0 }} titleStyle={{ ...styles.buttonTitle, fontSize: 12 }} onPress={() => { router.push('/restaurant'); setShowModal(undefined); }} title={('view more').toUpperCase()} />
     </View>
-  </Overlay>
+    </Overlay>
+    }
+    {showNoteModal && (<NoteModal
+      setShowNoteModal={setShowNoteModal}
+      restaurant={restaurant}
+      note={activeNote}
+      username={username}
+      />
+    )}
+  
+  </>
+  );
 }

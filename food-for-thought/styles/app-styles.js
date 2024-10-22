@@ -783,4 +783,38 @@ export const styles = StyleSheet.create({
   noteTitle: {
     fontSize: 18,
   },
+  noteFormHeader: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5EAFF',
+    width: '100%',
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  noteImageContainer: {
+    flex: 1,
+    marginRight: 10,
+    backgroundColor: colours.white,
+    borderRadius: 8,
+    overflow: 'hidden',
+    width: 110,
+    height: 80,
+  },
+  noteDetailContainer: {
+    flex: 3, 
+    paddingLeft: 16
+  },
+  saveNoteButton: {
+    marginBottom: 15,
+    minWidth: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colours.secondary,
+    borderColor: colours.primary,
+    borderWidth: 2,
+    borderRadius: 20,
+    padding: 7,
+    alignSelf: 'center',
+  },
 });

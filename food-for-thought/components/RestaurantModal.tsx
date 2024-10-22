@@ -27,12 +27,12 @@ export type Meal = {
 }
 
 export type Note = {
-  noteId: string,
-  date?: string,
-  content?: string,
+  noteId?: string,
+  date: string,
+  content: string,
   restaurantId: string,
   username: string,
-  rating?: number,
+  rating: number,
 }
 
 export function getRestaurantPhoto(restaurantPhotos?: string[], foodPhotos?: string[]) {
@@ -223,7 +223,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
   return (
   <>
   {!showNoteModal && 
-  <Overlay overlayStyle={styles.modal} isVisible={true} onBackdropPress={() => setShowModal(undefined)}>
+  <Overlay overlayStyle={styles.mapModal} isVisible={true} onBackdropPress={() => setShowModal(undefined)}>
     <View style={styles.restaurantFormHeader}>
       <View style={styles.flexRowGroup}>
         <View style={{ ...styles.imageContainer, height: 160, width: '90%', marginRight: 0 }}>
@@ -312,7 +312,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
     {showNoteModal && (<NoteModal
       setShowNoteModal={setShowNoteModal}
       restaurant={restaurant}
-      note={activeNote}
+      initialNote={activeNote}
       username={username}
       />
     )}

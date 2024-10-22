@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Note = require('../models/noteModel');
 const databaseMaster = require('../databaseMaster');
+const { v4: uuidv4 } = require('uuid');
 
 /* Get all notes associated with a username */
 router.get('/getNotes/:username', async (req, res) => {
@@ -31,18 +32,35 @@ router.get('/getNotesRestaurant/:username/:restaurantId', async (req, res) => {
     }
 });
 
+/* Get all notes associated with a restaurantId from a given username */
+router.get('/getNote/:noteId', async (req, res) => {
+    try {
+        const query = { noteId: req.params.noteId }
+        await databaseMaster.dbOp('find', 'NoteDetails', { query: query }).then(data => {
+            res.json(data);
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 /* Create a note */
 router.post('/createNote', async (req, res) => {
     try {
+        const noteId = uuidv4();
+
         const note = new Note({
-            noteId: req.body.noteId,
+            noteId: noteId,
             date: req.body.date,
             content: req.body.content,
             restaurantId: req.body.restaurantId,
             username: req.body.username,
             rating: req.body.rating
         });
+
         await databaseMaster.dbOp('insert', 'NoteDetails', { docs: [note] });
+        res.status(201).json(note);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -52,10 +70,11 @@ router.post('/createNote', async (req, res) => {
 /* Update the content of a given note (noteId) */
 router.put('/editNote/:noteId', async (req, res) => {
     try {
-        const { date, content } = req.body;
+        const { date, content,rating } = req.body;
         const query = { noteId : req.params.noteId }
-        const docs = { $set: { date: date, content: content } };
-        await databaseMaster.dbOp('update', 'NoteDetails', { query, docs });
+        const docs = { $set: { date: date, content: content, rating: rating } };
+        const response = await databaseMaster.dbOp('update', 'NoteDetails', { query, docs });
+        res.status(201).json(response);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });

@@ -113,6 +113,7 @@ export const styles = StyleSheet.create({
   },
   modalIcon: {
     color: colours.darkPurple,
+    marginRight: 4,
   },
   button: {
     marginTop: 15,
@@ -711,7 +712,7 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 10,
   },
-  modal: {
+  mapModal: {
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FBF8FF',

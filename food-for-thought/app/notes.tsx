@@ -130,7 +130,7 @@ export default function Notes() {
                             </View>
                         </View>)}
                     {noteToRemove && <Overlay
-                        overlayStyle={{ ...styles.modal }}
+                        overlayStyle={styles.modal}
                         isVisible={noteToRemove !== undefined}
                         onBackdropPress={() => setNoteToRemove(undefined)}>
                         <View style={{ padding: 20, flexDirection: 'column', alignItems: 'center' }}>

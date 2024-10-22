@@ -7,6 +7,14 @@ import Meal from "./Meal";
 import Constants from "expo-constants";
 import axios from "axios";
 import { styles } from "@/styles/app-styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
+import { formatTextValue } from "@/utils";
+
+interface UserPreferences {
+    name: string;
+    type: string;
+  }
 
 export default function RestaurantMenu({restaurant} : any) {
     const menuURL = 'https://irp.cdn-website.com/1efc617b/files/uploaded/takeawaymenu_2021_Aug.pdf';
@@ -18,8 +26,80 @@ export default function RestaurantMenu({restaurant} : any) {
     const [cachedMenu, setCachedMenu] = useState<any>(null); // For caching menu data
     const item = restaurant || {};
     const restaurantId = item.restaurantId;
+    const [username, setUsername] = useState<string>();
+    const [activeFilters, setActiveFilters] = useState<
+        { type: string; value: string }[]
+    >([]);
+    const [filterByDietary, setFilterByDietary] = useState<boolean>(false);
 
     const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
+
+    console.log("Filtersssssssssss", activeFilters);
+
+
+    const loadUser = React.useCallback(async () => {
+        const token = await AsyncStorage.getItem("token");
+        if (token) {
+          try {
+            const decodedToken: any = jwtDecode(token);
+            setUsername(decodedToken.username);
+          } catch (error) {
+            console.error("Invalid token");
+          }
+        }
+      }, []);
+    
+      //Load the filterByDietary toggle value
+      const loadSettings = async () => {
+        try {
+          const storedFilterByDietary = await AsyncStorage.getItem(
+            "filterByDietary"
+          );
+          if (storedFilterByDietary !== null) {
+            setFilterByDietary(JSON.parse(storedFilterByDietary));
+          }
+        } catch (error) {
+          console.error("Error loading settings", error);
+        }
+      };
+    
+      React.useEffect(() => {
+        loadUser();
+        loadSettings();
+      }, [loadUser]);
+    
+      const fetchUserPreferences = async (username: string) => {
+        // if a user is logged in AND has filter by dietary preferences toggleOn - we can fetch their filters - otherwise we use state
+        /* if they're logged in, grab the preferences associated with this username */
+        if (filterByDietary) {
+          try {
+            await axios
+              .get(`http://${HOST_IP}:4000/user/getUserPreference/${username}`)
+              .then((response) => {
+                /* set the active filters to these preferences */
+                if (response.data.length > 0) {
+                  setActiveFilters(
+                    response.data.map((p: UserPreferences) => ({
+                      type:
+                        p.type == "Cuisine"
+                          ? formatTextValue(`${p.type}`)
+                          : formatTextValue(`${p.type}s`),
+                      value: p.name,
+                    }))
+                  );
+                }
+              });
+          } catch (error) {
+            console.error("Error fetching user preferences", error);
+          }
+        }
+      };
+    
+      useEffect(() => {
+        if (username && filterByDietary) {
+          fetchUserPreferences(username);
+        }
+      }, [filterByDietary]);
 
     useEffect(() => {
         if (!cachedMenu && restaurantId) {

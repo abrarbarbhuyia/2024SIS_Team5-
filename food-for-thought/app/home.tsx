@@ -12,14 +12,91 @@ import axios from "axios";
 import Constants from 'expo-constants';
 import { Restaurant } from "@/app/map";
 import Layout from "@/components/Layout";
+import { jwtDecode } from "jwt-decode";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { formatTextValue } from "@/utils";
+
+interface UserPreferences {
+  name: string;
+  type: string;
+}
 
 // Component
 const Home = () => {
   const [fetchedRestaurants, setFetchedRestaurants] = useState<Restaurant[]>([]);
+  const [username, setUsername] = useState<string>();
+  const [activeFilters, setActiveFilters] = useState<
+    { type: string; value: string }[]
+  >([]);
+  const [filterByDietary, setFilterByDietary] = useState<boolean>(false);
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
   const pic = require('../assets/images/react-logo.png'); // placeholder restaurant image
+
+  const loadUser = React.useCallback(async () => {
+    const token = await AsyncStorage.getItem("token");
+    if (token) {
+      try {
+        const decodedToken: any = jwtDecode(token);
+        setUsername(decodedToken.username);
+      } catch (error) {
+        console.error("Invalid token");
+      }
+    }
+  }, []);
+
+  //Load the filterByDietary toggle value
+  const loadSettings = async () => {
+    try {
+      const storedFilterByDietary = await AsyncStorage.getItem(
+        "filterByDietary"
+      );
+      if (storedFilterByDietary !== null) {
+        setFilterByDietary(JSON.parse(storedFilterByDietary));
+      }
+    } catch (error) {
+      console.error("Error loading settings", error);
+    }
+  };
+
+  React.useEffect(() => {
+    loadUser();
+    loadSettings();
+  }, [loadUser]);
+
+  const fetchUserPreferences = async (username: string) => {
+    // if a user is logged in AND has filter by dietary preferences toggleOn - we can fetch their filters - otherwise we use state
+    /* if they're logged in, grab the preferences associated with this username */
+    if (filterByDietary) {
+      try {
+        await axios
+          .get(`http://${HOST_IP}:4000/user/getUserPreference/${username}`)
+          .then((response) => {
+            /* set the active filters to these preferences */
+            if (response.data.length > 0) {
+              setActiveFilters(
+                response.data.map((p: UserPreferences) => ({
+                  type:
+                    p.type == "Cuisine"
+                      ? formatTextValue(`${p.type}`)
+                      : formatTextValue(`${p.type}s`),
+                  value: p.name,
+                }))
+              );
+            }
+          });
+      } catch (error) {
+        console.error("Error fetching user preferences", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (username && filterByDietary) {
+      fetchUserPreferences(username);
+    }
+  }, [filterByDietary]);
 
   // Fetch specific restaurants by ID
   const fetchRestaurants = async () => {
@@ -53,7 +130,7 @@ const Home = () => {
   // Carousel view + styling
   const renderItem = ({ item }: { item: Restaurant }) => (
     <View style={styles.imageContainer}>
-      <TouchableOpacity onPress={() => router.push({pathname: '/restaurant', params: {restaurant: JSON.stringify(item)}})}>
+      <TouchableOpacity onPress={() => router.push({pathname: '/restaurant', params: {restaurant: JSON.stringify(item), activeFilters: JSON.stringify(activeFilters)}})}>
       <Image source={ item.foodPhotos && item.foodPhotos.length > 0 ? { uri: item.foodPhotos[0]} : pic} style={styles.homeImage} />        
         <Text numberOfLines={1} style={styles.recentLabel}>{item.name || 'Restaurant Title'}</Text>
         <Text numberOfLines={1} style={styles.recentComment}>{item.cuisineType && item.cuisineType.length > 0 ? item.cuisineType.map((cuisineObj: any) => cuisineObj.cuisineType).join(', ') : 'Other'}</Text>
@@ -109,8 +186,14 @@ const Home = () => {
           <Icon name="arrowright" type="antdesign" size={25} onPress={() => console.log("Recommendations arrow clicked")} />
         </View>
         {/* passing in static restaurants, but can handle any passed in */}
-        <RecommendedRestaurant restaurant={fetchedRestaurants[2]}/>
-        <RecommendedRestaurant restaurant={fetchedRestaurants[0]}/>
+        {activeFilters.length > 0 ? (
+          <>
+            <RecommendedRestaurant restaurant={fetchedRestaurants[0]} />
+            <RecommendedRestaurant restaurant={fetchedRestaurants[2]} />
+          </>
+        ) : (
+          <Text>No filters available</Text> // This can help with debugging too
+        )}
       </Card>
     </Layout>
   );

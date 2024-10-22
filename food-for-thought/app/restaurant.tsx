@@ -7,13 +7,14 @@ import RestaurantGallery from "@/components/RestaurantGallery";
 import RestaurantDescription from "@/components/RestaurantDescription";
 import RestaurantMenu from "@/components/RestaurantMenu";
 import { useLocalSearchParams } from "expo-router";
-import Layout from "@/components/Layout";
 
 export default function Restaurant() {
     const [selectedIndex, setSelectedIndex] = React.useState(0);
     //need to get the restaurant data from path route - object was stringified
-    const {restaurant} = useLocalSearchParams();
+    const {restaurant, activeFilters} = useLocalSearchParams();
+    const filters: {type: String, value: String}[] = activeFilters ? JSON.parse(activeFilters.toString()) : [];
     const restaurantData = JSON.parse(restaurant);
+    console.log("Filters", activeFilters);
 
     // Components to load based on selected index, passes restaurant data
     const renderContent = () => {
@@ -30,7 +31,8 @@ export default function Restaurant() {
     };
 
     return (
-        <Layout>
+        <View style={styles.pageContainer} >
+            <Header />
             <View style={styles.detailsContainer}>
                 <Text h4 style={{padding: 15,}}>{restaurantData.name}</Text>
                 <Card containerStyle={styles.tabContainer}>
@@ -51,7 +53,7 @@ export default function Restaurant() {
                 {renderContent()}
                 </Card>
             </View>
-        </Layout>
+        </View>
     )
 }
 

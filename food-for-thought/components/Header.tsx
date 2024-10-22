@@ -1,15 +1,14 @@
 import { Card, Icon } from '@rneui/themed';
 import { View, StyleSheet, Dimensions, Image } from "react-native";
 import React from 'react';
-import { router } from 'expo-router';
+import { router, usePathname } from 'expo-router';
 import logo from '../assets/images/logo.png';        
 
-export default function Header({homepage=false}) {
-
-    //dont want to clear stack if already at homepage (top of stack)
-    //dont need to pass in prop in any other page as false default is expected functionality
+export default function Header() {
+    const isHomePage = usePathname() === '/home';
+    
     const handleHomeRoute = () => {
-        if (!homepage) {
+        if (!isHomePage) {
             router.push('/home');
         }
     }
@@ -19,7 +18,9 @@ export default function Header({homepage=false}) {
             <Card containerStyle={styles.headerCard}>
                 <View style={styles.headerContent}>
                     <View style={styles.leftIcons}>
-                        <Icon style={{ color: '#000000' }} name='arrow-back' type='material' size={35} onPress={() => router.back()}/>
+                        {!isHomePage && (
+                            <Icon style={{ color: '#000000' }} name='arrow-back' type='material' size={35} onPress={() => router.back()}/>
+                        )}
                     </View>
 
                     <View style={styles.logoContainer}>

@@ -1,21 +1,14 @@
-import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { View, FlatList } from "react-native";
 import { Button, Card, Text } from "@rneui/themed";
 import axios from "axios";
 import { styles } from "../styles/app-styles";
-import Header from "@/components/Header";
 import { DietaryChoiceModal } from "@/components/DietaryChoiceModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Layout from "@/components/Layout";
 import { jwtDecode } from "jwt-decode";
 import Constants from "expo-constants";
-
-// Define the type for your table data
-interface TableData {
-  name: string;
-  type: string;
-}
+import { UserPreferences } from "@/constants/interfaces";
 
 // Function to get color based on type
 const getTypeColor = (type: string) => {
@@ -38,7 +31,7 @@ const renderRow = ({
   item,
   handleDelete,
 }: {
-  item: TableData;
+  item: UserPreferences;
   handleDelete: (name: string) => void;
 }) => (
   <View
@@ -109,7 +102,7 @@ const Preferences: React.FC = () => {
     boolean | undefined
   >(false);
   const [username, setUsername] = useState<string>("");
-  const [tableData, setTableData] = useState<TableData[]>([]);
+  const [tableData, setTableData] = useState<UserPreferences[]>([]);
 
   // Get current logged-in user ID
   const loadUser = useCallback(async () => {
@@ -137,7 +130,6 @@ const Preferences: React.FC = () => {
       return;
     }
     const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
-    console.log("HOST IP", HOST_IP);
     try {
       const response = await axios.get(
         `http://${HOST_IP}:4000/user/getUserPreference/${username}`

@@ -1,27 +1,28 @@
-import { View, Image, StyleSheet, FlatList, Modal, TouchableOpacity } from "react-native";
+import { View, Image, FlatList, Modal, TouchableOpacity } from "react-native";
 import { Text } from '@rneui/themed';
 import React from "react";
 import { styles } from "@/styles/app-styles";
+import { Restaurant } from "@/constants/interfaces";
 
-export default function RestaurantGallery({restaurant} : any) {
+export default function RestaurantGallery({ restaurant }: { restaurant: Restaurant }) {
 
-    const [modalVisible, setModalVisible] = React.useState(false);
-    const [selectedImage, setSelectedImage] = React.useState(null);
+    const [modalVisible, setModalVisible] = React.useState<boolean>(false);
+    const [selectedImage, setSelectedImage] = React.useState<string>("");
 
     //open and close modal
-    const openModal = (image : any) => {
+    const openModal = (image: string) => {
         setSelectedImage(image);
         setModalVisible(true);
     }
 
     const closeModal = () => {
-        setSelectedImage(null);
+        setSelectedImage("");
         setModalVisible(false);
     }
 
     //carousel view + styling
-    const renderItem = ({ item } : any) => (
-    <TouchableOpacity onPress={() => openModal({uri: item})}>
+    const renderItem = ({ item } : { item: string }) => (
+    <TouchableOpacity onPress={() => openModal(item)}>
         <View style={styles.galleryImageContainer}>
             <Image source={{uri: item}} style={styles.image} />
         </View>
@@ -54,7 +55,7 @@ export default function RestaurantGallery({restaurant} : any) {
                 <View style={styles.modalContainer}>
                     <TouchableOpacity style={styles.modalBackground} onPress={closeModal}>
                         {selectedImage && (
-                            <Image source={selectedImage} style={styles.fullImage}/>
+                            <Image source={{uri: selectedImage}} style={styles.fullImage}/>
                         )}
                     </TouchableOpacity>
                 </View>

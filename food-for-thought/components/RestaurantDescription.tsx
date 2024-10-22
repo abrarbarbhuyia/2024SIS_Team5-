@@ -1,13 +1,14 @@
-import { View, StyleSheet, Dimensions, Linking } from "react-native";
-import { Card, Text } from '@rneui/themed';
+import { View, Linking } from "react-native";
+import { Text } from '@rneui/themed';
 import React from "react";
 import { Icon } from "react-native-elements";
 import { styles } from "@/styles/app-styles";
+import { cuisineType, openingHours, Restaurant } from "@/constants/interfaces";
 
 // Utility function to convert 2400 time to standard time
-const formatTime = (time : any) => {
-    const hours = Math.floor(time / 100);
-    const minutes = time % 100;
+const formatTime = (time: string) => {
+    const hours = Math.floor(parseFloat(time) / 100);
+    const minutes = parseFloat(time) % 100;
 
     // Format hours and minutes
     const formattedHours = hours % 12 || 12; // Convert to 12-hour format
@@ -23,17 +24,17 @@ const formatTime = (time : any) => {
 
 
 // Group opening hours by day and format them
-const formatOpeningHours = (openingHours : any) => {
+const formatOpeningHours = (openingHours: openingHours[]) => {
     const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-    const groupedHours = {};
+    const groupedHours: { [key: string]: string | string[] } = {};
 
     // Initialize all days as "CLOSED"
-    daysOfWeek.forEach((day) => {
+    daysOfWeek.forEach((day: string) => {
         groupedHours[day] = "CLOSED";
     });
 
     // Group time slots by day
-    openingHours.forEach(({ day, open, close } : any) => {
+    openingHours.forEach(({ day, open, close }: openingHours) => {
         const dayName = daysOfWeek[day - 1]; // Adjust day to index (1 = Monday, etc.)
         const timeSlot = `${formatTime(open)} - ${formatTime(close)}`;
 
@@ -41,7 +42,7 @@ const formatOpeningHours = (openingHours : any) => {
         if (groupedHours[dayName] === "CLOSED") {
             groupedHours[dayName] = [timeSlot];
         } else {
-            groupedHours[dayName].push(timeSlot);
+            (groupedHours[dayName] as string[]).push(timeSlot);
         }
     });
 
@@ -49,19 +50,19 @@ const formatOpeningHours = (openingHours : any) => {
 };
 
 
-export default function RestaurantDescription({restaurant} : any) {
+export default function RestaurantDescription({ restaurant }: { restaurant: Restaurant }) {
     const websiteURL = restaurant.website;
     const rating = restaurant.rating / 2;
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 >= 0.4;
     const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-    const openingHours = restaurant.openingHours || [];
+    const openingHours: openingHours[] = restaurant.openingHours || [];
     const groupedOpeningHours = formatOpeningHours(openingHours);
 
     return (
         <View style={styles.pageContainer}>
             <View style={styles.textDetail}>
-                <Text style={{fontWeight: 'bold', fontSize: 12, flexDirection: 'row'}}>{restaurant.cuisineType?.map((cuisine : any) => cuisine.cuisineType).join('/')} Restaurant</Text>
+                <Text style={{fontWeight: 'bold', fontSize: 12, flexDirection: 'row'}}>{restaurant.cuisineType?.map((cuisine : cuisineType) => cuisine.cuisineType).join('/')} Restaurant</Text>
                 <Icon name='dot-single' type='entypo' size={15}></Icon>
                 <Text style={styles.body}>*distance* kms</Text>
             </View>

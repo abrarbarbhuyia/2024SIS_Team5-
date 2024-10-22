@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Card, Icon } from '@rneui/themed';
-import { router } from 'expo-router';
-import Header from "@/components/Header";     
+import { router } from 'expo-router';  
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 import { styles } from '../styles/app-styles';
@@ -11,11 +10,11 @@ import Constants from 'expo-constants';
 import Layout from '@/components/Layout';
 
 const UserProfile = () => {
-  const [username, setUsername] = useState('');
-  const [isGuest, setIsGuest] = useState(true);
-  const [userNotes, setUserNotes] = useState(0);
-  const [userFavourites, setUserFavourites] = useState(0);
-  const [userPreferences, setUserPreferences] = useState(0);
+  const [username, setUsername] = useState<string>('');
+  const [isGuest, setIsGuest] = useState<boolean>(true);
+  const [userNotes, setUserNotes] = useState<number>(0);
+  const [userFavourites, setUserFavourites] = useState<number>(0);
+  const [userPreferences, setUserPreferences] = useState<number>(0);
 
   const loadUser = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');

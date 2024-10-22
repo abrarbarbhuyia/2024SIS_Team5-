@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,8 +9,8 @@ import { styles } from '../styles/app-styles';
 import Constants from 'expo-constants';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>();
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;

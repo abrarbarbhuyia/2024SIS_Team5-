@@ -1,5 +1,5 @@
 import { Button, Icon, Overlay } from "@rneui/themed";
-import { View, Image, Text, TextInput } from "react-native";
+import { View, Image, Text, TextInput, Keyboard } from "react-native";
 import * as React from "react";
 import pic from "../assets/images/react-logo.png"; // Placeholder image
 import { Restaurant } from "@/app/map";
@@ -7,6 +7,7 @@ import { styles } from "../styles/app-styles";
 import axios from "axios";
 import Constants from "expo-constants";
 import { Note } from "@/components/RestaurantModal";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 export type NoteModalProps = {
   setShowNoteModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -67,20 +68,22 @@ export function NoteModal({
       overlayStyle={styles.mapModal}
       isVisible={true}
       onBackdropPress={() => setShowNoteModal(false)} >
-      <View style={{ ...styles.noteFormHeader, ...styles.flexRowGroup }}>
-        <View style={{ flex: 2 }}>
-          <Text style={styles.subtitle}>Restaurant Note</Text>
-          <Text style={styles.userText}>{newNote.noteId ? "Your thoughts on your recent visits" : "You have no existing notes, create one below"}</Text>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={{ ...styles.noteFormHeader, ...styles.flexRowGroup }}>
+          <View style={{ flex: 2 }}>
+            <Text style={styles.subtitle}>Restaurant Note</Text>
+            <Text style={styles.userText}>{newNote.noteId ? "Your thoughts on your recent visits" : "You have no existing notes, create one below"}</Text>
+          </View>
+          <View style={{ height: '100%', flex: 0.15, marginLeft: 'auto' }}>
+            <Icon
+              name='x'
+              type='feather'
+              iconStyle={styles.modalIcon}
+              size={22}
+              onPress={() => setShowNoteModal(false)} />
+          </View>
         </View>
-        <View style={{ height: '100%', flex: 0.15, marginLeft: 'auto' }}>
-          <Icon
-            name='x'
-            type='feather'
-            iconStyle={styles.modalIcon}
-            size={22}
-            onPress={() => setShowNoteModal(false)} />
-        </View>
-      </View>
+      </ TouchableWithoutFeedback >
       <View style={styles.verticalFlexFormGroup}>
         <View style={styles.flexFormGroup}>
           <View style={{ ...styles.noteImageContainer, marginRight: 0 }}>

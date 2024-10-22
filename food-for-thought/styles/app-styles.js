@@ -755,6 +755,13 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
    },
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colours.secondary,
+    borderRadius: 30,
+    width: '80%',
+  },
   pageContainer: {
     backgroundColor: "#E6D7FA",
     flex: 1,

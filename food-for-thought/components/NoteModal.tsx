@@ -1,5 +1,5 @@
 import { Button, Icon, Overlay } from "@rneui/themed";
-import { View, Image, Text, TextInput, Keyboard } from "react-native";
+import { View, Image, Text, TextInput, Keyboard, NativeSyntheticEvent, TextInputKeyPressEventData } from "react-native";
 import * as React from "react";
 import pic from "../assets/images/react-logo.png"; // Placeholder image
 import { Restaurant } from "@/app/map";
@@ -121,6 +121,12 @@ export function NoteModal({
                     placeholder="Write your note here..."
                     multiline
                     value={newNote.content}
+                    onKeyPress={(e: NativeSyntheticEvent<TextInputKeyPressEventData>)  => {
+                      if (e.nativeEvent.key === "Enter") {
+                        e.target.blur();
+                      }
+                    }}
+                    onBlur={() => Keyboard.dismiss()}
                     onChangeText={(value) => setNewNote({ ...newNote, content: value })}
                     style={{ fontSize: 16, height: 50 }} // Adjust height as needed
                   />

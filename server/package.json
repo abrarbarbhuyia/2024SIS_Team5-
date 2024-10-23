@@ -14,7 +14,7 @@
     "mongodb": "^6.8.0",
     "mongoose": "^8.6.2",
     "node-fetch": "^2.7.0",
-    "openai": "^4.67.3",
+    "openai": "^4.68.1",
     "tesseract.js": "^5.1.1",
     "uuid": "^10.0.0"
   },

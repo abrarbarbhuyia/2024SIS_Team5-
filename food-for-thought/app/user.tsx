@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Card, Icon } from '@rneui/themed';
 import { router } from 'expo-router';
-import Header from "@/components/Header";     
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 import { styles } from '../styles/app-styles';
@@ -11,11 +10,11 @@ import Constants from 'expo-constants';
 import Layout from '@/components/Layout';
 
 const UserProfile = () => {
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState<string>();
   const [isGuest, setIsGuest] = useState(true);
-  const [userNotes, setUserNotes] = useState(0);
-  const [userFavourites, setUserFavourites] = useState(0);
-  const [userPreferences, setUserPreferences] = useState(0);
+  const [userNotes, setUserNotes] = useState();
+  const [userFavourites, setUserFavourites] = useState();
+  const [userPreferences, setUserPreferences] = useState();
 
   const loadUser = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
@@ -32,31 +31,45 @@ const UserProfile = () => {
 
   useEffect(() => {
     loadUser();
-    handleUserDetails();
   }, [loadUser]);
+
+  useEffect(() => {
+    if (username) {
+      handleUserDetails();
+      fetchNotes();
+    }
+  }, [loadUser, username]);
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
-    setUsername('');
+    setUsername(undefined);
     setIsGuest(true);
     router.push('/');
   };
 
+  const fetchNotes = async () => {
+    if (username) {
+      const url = `http://${HOST_IP}:4000/note/getNotes/${username}`;
+      await axios.get(url)
+        .then(response => {
+          setUserNotes(response?.data?.length);
+        })
+        .catch(error => console.error("Error fetching all restaurants", error));
+    }
+  };
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
-  const handleUserDetails = useCallback(async () => {
+  const handleUserDetails = async () => {
     try {
-      if (!isGuest) {
+      if (username) {
         const response = await axios.get(`http://${HOST_IP}:4000/user/getUser/${username}`);
-        setUserFavourites(response.data?.favourites?.length ?? 0);
-        // To do: update user notes count
-        // setUserNotes(response.data?.notes?.length ?? 0);
-        setUserPreferences(response.data?.preferences?.length ?? 0);
+        setUserFavourites(response.data[0]?.favourites?.length ?? 0);
+        setUserPreferences(response.data[0]?.preferences?.length ?? 0);
       }
     } catch (error: any) {
-      console.error(error);
+      console.error('Unable to get user details', error);
     }
-  }, [userNotes, userFavourites, userPreferences]);
+  };
 
   return (
     <Layout>
@@ -77,15 +90,15 @@ const UserProfile = () => {
 
         {!isGuest && (
           <View style={styles.userContainer}>
-            <TouchableOpacity onPress={() => router.push('/home')}>
+            <TouchableOpacity onPress={() => router.push('/notes')}>
               <Card containerStyle={styles.user}>
                 <Icon style={styles.userIcon} name='note' type='material' size={40} />
                 <Text style={styles.userCount}>{userNotes}</Text>
                 <Text style={styles.userText}>Notes</Text>
               </Card>
-           </TouchableOpacity>
+            </TouchableOpacity>
 
-           <TouchableOpacity onPress={() => router.push('/home')}>
+            <TouchableOpacity onPress={() => router.push('/favourites')}>
               <Card containerStyle={styles.user}>
                 <Icon style={styles.userIcon} name='favorite' type='material' size={40} />
                 <Text style={styles.userCount}>{userFavourites}</Text>

@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Card, Icon } from '@rneui/themed';
 import { router } from 'expo-router';
-import Header from "@/components/Header";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 import { styles } from '../styles/app-styles';
@@ -13,9 +12,9 @@ import Layout from '@/components/Layout';
 const UserProfile = () => {
   const [username, setUsername] = useState<string>();
   const [isGuest, setIsGuest] = useState(true);
-  const [userNotes, setUserNotes] = useState(0);
-  const [userFavourites, setUserFavourites] = useState(0);
-  const [userPreferences, setUserPreferences] = useState(0);
+  const [userNotes, setUserNotes] = useState();
+  const [userFavourites, setUserFavourites] = useState();
+  const [userPreferences, setUserPreferences] = useState();
 
   const loadUser = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
@@ -48,25 +47,29 @@ const UserProfile = () => {
     router.push('/');
   };
 
-  const fetchNotes = useCallback(async () => {
-    const url = `http://${HOST_IP}:4000/note/getNotes/${username}`;
-    await axios.get(url)
-      .then(response => setUserNotes(response?.data?.length))
-      .catch(error => console.error("Error fetching all restaurants", error));
-  }, [userNotes])
+  const fetchNotes = async () => {
+    if (username) {
+      const url = `http://${HOST_IP}:4000/note/getNotes/${username}`;
+      await axios.get(url)
+        .then(response => {
+          setUserNotes(response?.data?.length);
+        })
+        .catch(error => console.error("Error fetching all restaurants", error));
+    }
+  };
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
-  const handleUserDetails = useCallback(async () => {
+  const handleUserDetails = async () => {
     try {
-      if (!isGuest) {
+      if (username) {
         const response = await axios.get(`http://${HOST_IP}:4000/user/getUser/${username}`);
         setUserFavourites(response.data[0]?.favourites?.length ?? 0);
         setUserPreferences(response.data[0]?.preferences?.length ?? 0);
       }
     } catch (error: any) {
-      console.error(error);
+      console.error('Unable to get user details', error);
     }
-  }, [userFavourites, userPreferences]);
+  };
 
   return (
     <Layout>

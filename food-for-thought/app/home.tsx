@@ -3,7 +3,6 @@ import { router } from "expo-router";
 import { Card, Text, Icon } from '@rneui/themed';
 import SearchBar from "@/components/SearchBar";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import Header from "@/components/Header";
 import RecommendedRestaurant from "@/components/RecommendedRestaurant";
 import MapView, { Marker } from "react-native-maps";
 import { styles } from '../styles/app-styles'; 
@@ -12,6 +11,7 @@ import axios from "axios";
 import Constants from 'expo-constants';
 import { Restaurant } from "@/app/map";
 import Layout from "@/components/Layout";
+import SafetyWarning from "@/components/SafetyWarning";
 import { jwtDecode } from "jwt-decode";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { formatTextValue } from "@/utils";
@@ -24,6 +24,7 @@ interface UserPreferences {
 // Component
 const Home = () => {
   const [fetchedRestaurants, setFetchedRestaurants] = useState<Restaurant[]>([]);
+  const [showModal, setShowModal] = useState<boolean>(true);
   const [username, setUsername] = useState<string>();
   const [activeFilters, setActiveFilters] = useState<
     { type: string; value: string }[]
@@ -31,7 +32,6 @@ const Home = () => {
   const [filterByDietary, setFilterByDietary] = useState<boolean>(false);
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
-
   const pic = require('../assets/images/react-logo.png'); // placeholder restaurant image
 
   const loadUser = React.useCallback(async () => {
@@ -122,6 +122,10 @@ const Home = () => {
     fetchRestaurants();
   }, []);
 
+  const handleNotedPress = () => {
+    setShowModal(false);
+  };
+
   const handleSearch = (search: string) => {
     // Temp fix for onSearch error. Potentially route to map.tsx and parse searchFilter.
     return '';
@@ -140,6 +144,7 @@ const Home = () => {
 
   return (
     <Layout>
+      {showModal && <SafetyWarning handleNotedPress={ handleNotedPress } />} 
       {/* Card for the Restaurant finder */}
       <TouchableOpacity onPress={() => router.push('/map')}>
         <Card containerStyle={styles.finderCard}>

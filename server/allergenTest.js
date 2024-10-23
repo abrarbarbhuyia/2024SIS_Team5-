@@ -6,6 +6,7 @@ const {
   createMenu,
   getIngredientDetails,
   getMeals,
+  getMealDetails,
   getMenuImage,
   addDiet,
 } = require("./allergenMaster");
@@ -30,6 +31,15 @@ async function testCreateMenu() {
 async function testgetMeals() {
   try {
     const mealsBody = await getMeals(menuString);
+    console.log("Get Meals function passed", mealsBody);
+  } catch (error) {
+    console.log("Get Meals function failed", error);
+  }
+}
+
+async function testGetMealDetails(){
+  try{
+    const mealsBody = await getMealDetails(menuString);
     console.log("Get Meals function passed", mealsBody);
   } catch (error) {
     console.log("Get Meals function failed", error);
@@ -87,9 +97,10 @@ async function testgetMenuImage() {
 async function testFlow(restaurantId) {
   //Check if Restaurant exists - Create if not exists and go through flow of retrieving menus, meals, ingredients and allergens
   //returns true if the restaurant has a valid menu, returns false if not
-  // restaurantId = "4e4a1510483b16676e3a760f";
+  restaurantId = "5296bc3011d29d380e6f36d2";
   const menuExists = await checkMenu(restaurantId);
   if (!menuExists) {
+    console.log("Menu does not exist");
 
     // menu does not exist we can proceed
     const menuStringRequestBody = {restaurantId: restaurantId}
@@ -108,7 +119,7 @@ async function testFlow(restaurantId) {
       // console.log(menu);
 
       // get meals
-      const JSONMenuItems = JSON.parse(await getMeals(menuString));
+      const JSONMenuItems = JSON.parse(await getMealDetails(menuString));
       const menuItems = JSONMenuItems.menu_items;
       // console.log(menuItems);
 

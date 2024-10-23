@@ -93,8 +93,10 @@ async function createMeals(body) {
 
   for (let i = 0; i < menuItems.length; i++) {
     const requestBody = {
-      name: menuItems[i],
+      name: menuItems[i].menu_item,
       menuId: menuId,
+      description: menuItems[i].description,
+      price: menuItems[i].price,
     };
 
     try {

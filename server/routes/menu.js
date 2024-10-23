@@ -18,6 +18,7 @@ router.get('/getMenu/:restaurantId', async (req, res) => {
         //     res.status(200).json(data);
         // });
         if(data) {
+            console.log("GET menu", data);
             res.status(200).json(data);
         } else {
             res.status(404).json({ error: 'Menu not found' })

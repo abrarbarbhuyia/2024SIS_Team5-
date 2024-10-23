@@ -97,9 +97,10 @@ async function testgetMenuImage() {
 async function testFlow(restaurantId) {
   //Check if Restaurant exists - Create if not exists and go through flow of retrieving menus, meals, ingredients and allergens
   //returns true if the restaurant has a valid menu, returns false if not
-  // restaurantId = "4e4a1510483b16676e3a760f";
+  restaurantId = "5296bc3011d29d380e6f36d2";
   const menuExists = await checkMenu(restaurantId);
   if (!menuExists) {
+    console.log("Menu does not exist");
 
     // menu does not exist we can proceed
     const menuStringRequestBody = {restaurantId: restaurantId}

@@ -180,7 +180,7 @@ export default function RestaurantMenu({ restaurant }: any) {
             const activeFilter = matchingFilter ? matchingFilter.value : null;
     
             return (
-                <Meal key={meal.mealId} meal={meal} activeFilter={activeFilter} />
+                <Meal key={meal.mealId} meal={meal} state={true} />
             );
         });
     };

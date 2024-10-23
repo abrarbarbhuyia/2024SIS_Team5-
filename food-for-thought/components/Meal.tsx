@@ -4,8 +4,9 @@ import { Text, Icon, Card } from '@rneui/themed';
 import Constants from "expo-constants";
 import axios from "axios";
 import { styles } from "@/styles/app-styles";
+import MenuItemBadge from "./MenuItemBadge";
 
-export default function Meal({meal} : any) {
+export default function Meal({meal, state} : any) {
 
     const [isDropDownSelected, setIsDropDownSelected] = useState(false);
     const [mealIngredients, setMealIngredients] = useState([]);
@@ -72,6 +73,9 @@ export default function Meal({meal} : any) {
             </View>
             <View style={styles.mealFilterList}>
                 <Icon name='sliders' type='font-awesome' size={20} color={'#A394B8'}/>
+                <View style={{paddingLeft: 8, paddingTop: 2}}>
+                    <MenuItemBadge matches={state ? 15 : 0}/>  
+                </View>
             </View>
             <TouchableOpacity style={styles.ingredientsDropDownInteractable} onPress={toggleDropDown}>
                 <Icon 

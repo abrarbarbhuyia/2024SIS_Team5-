@@ -14,7 +14,6 @@ export default function Restaurant() {
     const {restaurant, activeFilters} = useLocalSearchParams();
     const filters: {type: String, value: String}[] = activeFilters ? JSON.parse(activeFilters.toString()) : [];
     const restaurantData = JSON.parse(restaurant);
-    console.log("Filters", activeFilters);
 
     // Components to load based on selected index, passes restaurant data
     const renderContent = () => {

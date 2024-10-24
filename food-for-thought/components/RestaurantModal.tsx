@@ -3,7 +3,7 @@ import { View, Image, Text } from 'react-native';
 import * as React from "react";
 import pic from '../assets/images/react-logo.png'; // Placeholder image
 import { Restaurant } from "@/app/map";
-import { styles } from '../styles/app-styles';
+import { currentFont, styles } from '../styles/app-styles';
 import { router } from "expo-router";
 import MenuItemBadge from "./MenuItemBadge";
 import { getDistance } from "geolib";
@@ -146,7 +146,7 @@ export function RestaurantModal({ restaurant, userLocation, setShowModal, ...res
     return `${formattedHours}:${minutes} ${suffix}`;
   };
 
-  return <Overlay overlayStyle={styles.modal} isVisible={true} onBackdropPress={() => setShowModal(undefined)}>
+  return <Overlay overlayStyle={styles.mapModal} isVisible={true} onBackdropPress={() => setShowModal(undefined)}>
     <View style={styles.restaurantFormHeader}>
       <View style={styles.flexRowGroup}>
         <View style={{ ...styles.imageContainer, height: 160, width: '90%', marginRight: 0 }}>
@@ -194,7 +194,7 @@ export function RestaurantModal({ restaurant, userLocation, setShowModal, ...res
         <View style={{ marginLeft: 'auto' }}>{restaurant.menuItemMatches && <MenuItemBadge matches={restaurant.menuItemMatches.length} />}</View>
       </View>
       {restaurant.menuItemMatches && <View style={styles.flexFormGroup}>
-        <Text style={styles.formDescriptionText}>
+        <Text style={{...styles.formDescriptionText, fontWeight: '500'}}>
           {restaurant.menuItemMatches.length} menu items matches your dietary filters!
         </Text>
       </View>}
@@ -217,10 +217,10 @@ export function RestaurantModal({ restaurant, userLocation, setShowModal, ...res
             : <Text style={styles.formDescriptionText}>Restaurant is closed and no future opening time available.</Text>}
         </View>
       </View>
-      <View style={{ paddingBottom: 10 }}>
+      <View style={{ paddingBottom: 10, width: '100%' }}>
         <Text style={styles.formDescriptionTextBold}>Matching menu items </Text>
-        {meals && <View style={{ paddingTop: 4 }}>
-          <Text numberOfLines={2} style={{ fontSize: 14, opacity: 0.8 }}>{meals.length > 0 ? meals.map(meal => meal.name.toLocaleLowerCase()).join(', ') : '<menu item>'}.</Text></View>}
+        {restaurant.menuItemMatches && restaurant.menuItemMatches?.length > 0 && <View style={{ paddingTop: 4 }}>
+          <Text numberOfLines={2} style={{ fontSize: 14, opacity: 0.8, ...currentFont }}>{restaurant.menuItemMatches.map(meal => meals?.find(m => m.mealId === meal)?.name ?? 'No meal'.toLocaleLowerCase()).join(', ')}</Text></View>}
       </View>
       <Button buttonStyle={{ ...styles.button, paddingHorizontal: 25, marginTop: 0 }} titleStyle={{ ...styles.buttonTitle, fontSize: 12 }} onPress={() => { router.push({ pathname: "/restaurant", params: { restaurant: JSON.stringify(restaurant) } }); setShowModal(undefined); }} title={('view more').toUpperCase()} />
     </View>

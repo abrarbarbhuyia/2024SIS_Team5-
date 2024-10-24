@@ -8,6 +8,7 @@ import RestaurantDescription from "@/components/RestaurantDescription";
 import RestaurantMenu from "@/components/RestaurantMenu";
 import { useLocalSearchParams } from "expo-router";
 import Layout from "@/components/Layout";
+import { currentFont } from "@/styles/app-styles";
 
 export default function Restaurant() {
     const [selectedIndex, setSelectedIndex] = React.useState(0);
@@ -32,15 +33,15 @@ export default function Restaurant() {
     return (
         <Layout>
             <View style={styles.detailsContainer}>
-                <Text h4 style={{padding: 15,}}>{restaurantData.name}</Text>
+                <Text h4 style={{padding: 15, ...currentFont}}>{restaurantData.name}</Text>
                 <Card containerStyle={styles.tabContainer}>
                 <ButtonGroup
                     buttonStyle={{  backgroundColor: '#FBF8FF' }}
                     selectedButtonStyle={{ backgroundColor: '#E8DEF8' }}
                     buttons={[
-                    <Text>Menu</Text>,
-                    <Text>Description</Text>,
-                    <Text>Gallery</Text>
+                    <Text style={{...currentFont}}>Menu</Text>,
+                    <Text style={{...currentFont}}>Description</Text>,
+                    <Text style={{...currentFont}}>Gallery</Text>
                     ]}
                     selectedIndex={selectedIndex}
                     onPress={setSelectedIndex}

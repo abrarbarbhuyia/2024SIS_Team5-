@@ -298,10 +298,10 @@ const RestaurantMap = () => {
           <Text style={styles.formDescriptionText}>
             {item.cuisineType && item.cuisineType.length > 0
               ? item.cuisineType
-                  .map((cuisineObj: any) =>
-                    capitaliseFirstLetter(cuisineObj.cuisineType)
-                  )
-                  .join(", ")
+                .map((cuisineObj: any) =>
+                  capitaliseFirstLetter(cuisineObj.cuisineType)
+                )
+                .join(", ")
               : "Other"}{" "}
             • {"$".repeat(item.price)} •{" "}
             {calculateRestaurantDistance(
@@ -352,9 +352,8 @@ const RestaurantMap = () => {
                       key={`${f.type}-${f.value}`}
                       value={
                         <Text style={styles.filterText}>
-                          {`${
-                            f.type === "allergens" ? "No" : ""
-                          } ${capitaliseFirstLetter(f.value)}`}
+                          {`${f.type === "allergens" ? "No" : ""
+                            } ${capitaliseFirstLetter(f.value)}`}
                           <Icon
                             name="x"
                             type="feather"
@@ -363,10 +362,10 @@ const RestaurantMap = () => {
                             onPress={() =>
                               activeFilters.length > 0
                                 ? setActiveFilters(
-                                    activeFilters.filter(
-                                      (filter) => !(filter === f)
-                                    )
+                                  activeFilters.filter(
+                                    (filter) => !(filter === f)
                                   )
+                                )
                                 : null
                             }
                           />
@@ -410,7 +409,7 @@ const RestaurantMap = () => {
                           size={13}
                         />
                       )}
-                      <Text style={styles.typesText}>
+                      <Text style={{ ...styles.typesText, fontFamily: 'Roboto' }}>
                         {capitaliseFirstLetter(f)}
                       </Text>
                     </View>

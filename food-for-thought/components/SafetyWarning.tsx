@@ -11,7 +11,7 @@ const SafetyWarning: React.FC<SafetyWarningProps> = ({ handleNotedPress }) => {
   return (
     <Overlay 
       isVisible={true}
-      overlayStyle={[styles.modal, { backgroundColor: 'rgba(255, 255, 255, 1)', shadowOpacity: 0 }]}
+      overlayStyle={[styles.modal, { backgroundColor: 'rgba(255, 255, 255, 1)', shadowOpacity: 0, paddingVertical: 20 }]}
       onBackdropPress={() => {}}
       animationType="fade"
     >

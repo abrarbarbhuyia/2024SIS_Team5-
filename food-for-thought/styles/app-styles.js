@@ -570,6 +570,7 @@ export const styles = StyleSheet.create({
   appliedFilters: {
     flexDirection: 'row',
     paddingLeft: 20,
+    overflow: 'hidden'
   },
   clipboardLink: {
       flexDirection: 'row',

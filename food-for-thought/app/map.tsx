@@ -271,7 +271,7 @@ const RestaurantMap = () => {
       onPress={() => {
         router.push({
           pathname: "/restaurant",
-          params: { restaurant: JSON.stringify(item) },
+          params: { restaurant: JSON.stringify(item), activeFilters: JSON.stringify(activeFilters) },
         });
       }}
     >

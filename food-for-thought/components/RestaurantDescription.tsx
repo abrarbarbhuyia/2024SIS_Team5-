@@ -1,8 +1,10 @@
 import { View, StyleSheet, Dimensions, Linking } from "react-native";
 import { Card, Text } from '@rneui/themed';
-import React from "react";
+import React, { useEffect } from "react";
 import { Icon } from "react-native-elements";
 import { styles } from "@/styles/app-styles";
+import { getDistance } from 'geolib';
+import { useState } from "react";
 
 // Utility function to convert 2400 time to standard time
 const formatTime = (time : any) => {
@@ -48,6 +50,13 @@ const formatOpeningHours = (openingHours : any) => {
     return groupedHours;
 };
 
+//calculate distance from user to restuarant
+const calculateRestaurantDistance = (userLocation: { latitude: number, longitude: number }, latitude: string, longitude: string) => {
+    const restaurantLocation = { latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
+    const distanceInMeters = getDistance(userLocation, restaurantLocation);
+    return (distanceInMeters / 1000).toFixed(2);
+};
+
 
 export default function RestaurantDescription({restaurant} : any) {
     const websiteURL = restaurant.website;
@@ -58,19 +67,32 @@ export default function RestaurantDescription({restaurant} : any) {
     const openingHours = restaurant.openingHours || [];
     const groupedOpeningHours = formatOpeningHours(openingHours);
 
+    // initial region is hardcoded to UTS Tower
+    const [userLocation, setUserLocation] = useState<{ latitude: number, longitude: number }>({
+        latitude: -33.88336558611229,
+        longitude: 151.2009263036271,
+    })
+
     return (
         <View style={styles.pageContainer}>
             <View style={styles.textDetail}>
-                <Text style={{fontWeight: 'bold', fontSize: 12, flexDirection: 'row'}}>{restaurant.cuisineType?.map((cuisine : any) => cuisine.cuisineType).join('/')} Restaurant</Text>
-                <Icon name='dot-single' type='entypo' size={15}></Icon>
-                <Text style={styles.body}>*distance* kms</Text>
+            <Text style={{ fontWeight: 'bold', fontSize: 12, flexDirection: 'row' }}>
+                {restaurant.cuisineType && restaurant.cuisineType.length > 0 ? (
+                    restaurant.cuisineType.map((cuisine: any) => cuisine.cuisineType).join('/')
+                ) : (
+                    <Text style={{ fontWeight: 'bold', fontSize: 12 }}>Miscellaneous</Text>
+                )} 
+                <Text style={{ fontWeight: 'bold', fontSize: 12 }}> Restaurant</Text>
+            </Text>
+            <Icon name='dot-single' type='entypo' size={15}></Icon>
+                <Text style={styles.body}>{calculateRestaurantDistance(userLocation, restaurant.latitude, restaurant.longitude)} kms</Text>
             </View>
             <View style={styles.textDetail}>
                 <Text style={styles.body}>Mixed Asian vegetarian meals like san chow pow, in a basic space with simple seating and comfy vibe.</Text>
             </View>
-            <View style={styles.textDetail}>
-                <Text style={styles.body}>*Count* menu items that match your dietary requirements!</Text>
-            </View>
+            {/* <View style={styles.textDetail}>
+                <Text style={styles.body}>{restaurant.menuItemMatches ? restaurant.menuItemMatches : 0} menu items that match your dietary requirements!</Text>
+            </View> */}
             <View style={styles.ratingsView}>
                 <Text style={styles.body}>{rating.toFixed(2)}</Text>
                 <View style={{flexDirection: 'row', paddingRight: 10, paddingLeft: 5}}>

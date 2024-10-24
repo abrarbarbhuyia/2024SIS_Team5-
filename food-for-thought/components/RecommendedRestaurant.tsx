@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from 'expo-constants';
+import { currentFont, styles } from "@/styles/app-styles";
 
 export default function RecommendedRestaurant({restaurant} : any) {
 
@@ -59,17 +60,16 @@ export default function RecommendedRestaurant({restaurant} : any) {
             <View style={{borderRadius: 16, flex: 1, flexDirection: 'row'}}>
                 <Image source={ item.foodPhotos && item.foodPhotos.length > 0 ? { uri: item.foodPhotos[0]} : []} style={{width: '30%', height: '100%', borderRadius: 16}} />
                 <View style={{flex: 1, flexDirection: 'column', paddingLeft: 10}}>
-                    <Text style={{fontSize: 18, fontWeight: 'bold'}}>{item.name || 'Restaurant Title'}</Text>
-                    <Text numberOfLines={2} style={{fontSize: 12, opacity: 0.7}}>{item.cuisineType?.map((cuisine : any) => cuisine.cuisineType).join('/') || 'Delicious'} food such as {meals.length > 0 ? meals.map((meal : any) => meal.name).slice(0, 3).join(', ') : '<menu item>'}.</Text>
-                    <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row' }}>
+                    <Text style={{fontSize: 18, fontWeight: '600', ...currentFont}}>{item.name || 'Restaurant Title'}</Text>
+                    <Text numberOfLines={2} style={{fontSize: 12, opacity: 0.7, ...currentFont}}>{item.cuisineType?.map((cuisine : any) => cuisine.cuisineType).join('/') || 'Delicious'} food such as {meals.length > 0 ? meals.map((meal : any) => meal.name).slice(0, 3).join(', ') : '<menu item>'}.</Text>
+                    <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row' }}>  
                         <Icon
-                            name={isFavourite ? "star" : "star-outlined"}
-                            type="entypo"
-                            size={25}
-                            onPress={toggleFavourite}
-                            color={isFavourite ? '#FCBE09' : 'black'}
+                            name='star'
+                            type='font-awesome'
+                            iconStyle={isFavourite ? styles.filledStar : styles.unfilledStar}
+                            size={22}
                         />
-                        <Text style={{ fontSize: 11, padding: 5 }}>
+                        <Text style={{ fontSize: 11, padding: 5, ...currentFont }}>
                             {isFavourite ? "Favourited!" : "Add to Favourites"}
                         </Text>
                     </View>

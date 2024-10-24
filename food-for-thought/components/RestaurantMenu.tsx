@@ -122,6 +122,7 @@ export default function RestaurantMenu({ restaurant }: any) {
 
     const fetchMatchingMeals = async () => {
         try {
+            console.log(activeFilters);
             if (activeFilters.length === 0) {
                 setMatchingMealsList(meals);
                 setOtherMealsList([]);
@@ -138,8 +139,10 @@ export default function RestaurantMenu({ restaurant }: any) {
             });
             const restaurants = response.data;
             const matchingMenuItemIds = restaurants.flatMap((r: any) => r.menuItemMatches || []);
+            console.log(matchingMenuItemIds);
 
             const matchingMealsList = meals.filter((meal: any) => matchingMenuItemIds.includes(meal.mealId));
+            console.log(matchingMealsList);
             const otherMealsList = meals.filter((meal: any) => !matchingMenuItemIds.includes(meal.mealId));
 
             setMatchingMealsList(matchingMealsList);
@@ -154,31 +157,7 @@ export default function RestaurantMenu({ restaurant }: any) {
     }, [activeFilters, meals]);
 
     const renderMatchingMeals = () => {
-        return matchingMealsList.map((meal) => {
-            
-            // Find the active filter for this meal
-            const matchingFilter = activeFilters.find((filter) => {
-                if (filter.type === 'ingredients') {
-                    return meal.ingredients?.includes(filter.value);
-                }
-                if (filter.type === 'allergens') {
-                    return meal.allergens?.includes(filter.value);
-                }
-                if (filter.type === 'diets') {
-                    return meal.diets?.includes(filter.value);
-                }
-                if (filter.type === 'cuisine') {
-                    return meal.cuisines?.includes(filter.value);
-                }
-                if (filter.type === 'meals') {
-                    return meal.mealType === filter.value;
-                }
-                return false; // Return false if no matches found
-            });
-    
-            // If a matching filter is found, get its value
-            const activeFilter = matchingFilter ? matchingFilter.value : null;
-    
+        return matchingMealsList.map((meal) => {    
             return (
                 <Meal key={meal.mealId} meal={meal} state={true} />
             );

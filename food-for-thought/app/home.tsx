@@ -190,15 +190,8 @@ const Home = () => {
           <Text h4 style={{ color: '#2E1C47' }}>Recommendations</Text>
           <Icon name="arrowright" type="antdesign" size={25} onPress={() => console.log("Recommendations arrow clicked")} />
         </View>
-        {/* passing in static restaurants, but can handle any passed in */}
-        {activeFilters.length > 0 ? (
-          <>
-            <RecommendedRestaurant restaurant={fetchedRestaurants[0]} />
-            <RecommendedRestaurant restaurant={fetchedRestaurants[2]} />
-          </>
-        ) : (
-          <Text>No filters available</Text> // This can help with debugging too
-        )}
+          <RecommendedRestaurant restaurant={fetchedRestaurants[0]} />
+          <RecommendedRestaurant restaurant={fetchedRestaurants[2]} />
       </Card>
     </Layout>
   );

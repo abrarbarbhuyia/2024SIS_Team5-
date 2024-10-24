@@ -137,7 +137,7 @@ export default function RecommendedRestaurant({restaurant} : any) {
                 <Image source={ item.foodPhotos && item.foodPhotos.length > 0 ? { uri: item.foodPhotos[0]} : []} style={{width: '30%', height: '100%', borderRadius: 16}} />
                 <View style={{flex: 1, flexDirection: 'column', paddingLeft: 10}}>
                     <Text style={{fontSize: 18, fontWeight: 'bold'}}>{item.name || 'Restaurant Title'}</Text>
-                    <Text numberOfLines={2} style={{fontSize: 12, opacity: 0.7}}>{item.cuisineType?.map((cuisine : any) => cuisine.cuisineType).join('/') || 'Delicious'} food such as {meals.length > 0 ? meals.map((meal : any) => meal.name).slice(0, 3).join(', ') : '<menu item>'}.</Text>
+                    <Text numberOfLines={2} style={{fontSize: 12, opacity: 0.7}}>{item.cuisineType?.map((cuisine : any) => cuisine.cuisineType).join('/') || 'Miscellaneous'} food such as {meals.length > 0 ? meals.map((meal : any) => meal.name).slice(0, 3).join(', ') : '<menu item>'}.</Text>
                     <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row' }}>
                         <Icon
                             name={isFavourite ? "star" : "star-outlined"}

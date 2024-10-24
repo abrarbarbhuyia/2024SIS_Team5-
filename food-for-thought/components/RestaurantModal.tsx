@@ -9,7 +9,7 @@ import MenuItemBadge from "./MenuItemBadge";
 import { getDistance } from "geolib";
 import axios from "axios";
 import Constants from "expo-constants";
-import {NoteModal} from "@/components/NoteModal"
+import { NoteModal } from "@/components/NoteModal"
 
 export type RestaurantModalProps = {
   setShowModal: React.Dispatch<React.SetStateAction<Restaurant | undefined>>,
@@ -35,6 +35,20 @@ export type Note = {
   rating: number,
 }
 
+const getNextOpening = (openingHours: { close: string, day: number, open: string }[], currentDay: number) => {
+  const sortedOpeningHours = openingHours.sort((a, b) => a.day - b.day);
+
+  for (let i = 1; i <= 7; i++) {
+    const nextDay = (currentDay + i) % 7 + 1;
+    const nextOpening = sortedOpeningHours.find(hours => hours.day === nextDay);
+    if (nextOpening) {
+      return { day: nextOpening.day, open: nextOpening.open };
+    }
+  }
+
+  return null;
+};
+
 export function getRestaurantPhoto(restaurantPhotos?: string[], foodPhotos?: string[]) {
   return (foodPhotos && foodPhotos.length > 0) ? foodPhotos[0]
     : (restaurantPhotos && restaurantPhotos.length > 0) ? restaurantPhotos[0] : pic;
@@ -55,6 +69,41 @@ const renderStars = (rating: number) => {
       ))}
     </View>
   );
+};
+
+export const isRestaurantOpen = (openingHours: { close: string, day: number, open: string }[]) => {
+  const now = new Date();
+  const currentDay = now.getDay() === 0 ? 7 : now.getDay(); // 1 for monday, 7 for sunday
+  const currentTime = `${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`; // e.g. convert 10:00AM to '1000'
+  const todaysHours = openingHours.filter(hours => hours.day === currentDay);
+
+  // check if the restaurant is currently open or will open later today
+  for (const period of todaysHours) {
+    const { open, close } = period;
+    if (currentTime >= open && currentTime <= close) {
+      return { isOpen: true, nextOpen: null };
+    }
+    if (currentTime < open) {
+      return { isOpen: false, nextOpen: { day: currentDay, open } };
+    }
+  }
+
+  // restaurant is closed for today, find next available opening
+  return { isOpen: false, nextOpen: getNextOpening(openingHours, currentDay) };
+};
+
+
+const getDayName = (dayNumber: number) => {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  return days[dayNumber % 7];
+};
+
+const formatTime = (time: string) => {
+  const hours = parseInt(time.substring(0, 2), 10);
+  const minutes = time.substring(2);
+  const suffix = hours >= 12 ? 'PM' : 'AM';
+  const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+  return `${formattedHours}:${minutes} ${suffix}`;
 };
 
 export function RestaurantModal({ restaurant, userLocation, username, setShowModal, ...rest }: RestaurantModalProps) {
@@ -79,12 +128,12 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
       console.error('Error fetching favorite status:', error);
     }
   };
-  
-  const fetchNote = async() => {
+
+  const fetchNote = async () => {
     try {
       const response = await axios.get(`http://${HOST_IP}:4000/note/getNotesRestaurant/${username}/${restaurant.restaurantId}`);
       if (response.data.length > 0) {
-        setActiveNote(response.data[0]); 
+        setActiveNote(response.data[0]);
       }
       // else {
       //   // Create a temporary new note (not in DB)
@@ -99,7 +148,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
       // }
     } catch (error) {
       console.error('Error fetching or creating new note:', error);
-    }  
+    }
   }
 
   const fetchMeals = async () => {
@@ -127,7 +176,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
           console.log("Error deleting favourite:", response);
         }
       }
-    } catch (error) {  
+    } catch (error) {
       console.error('Error updating favorite status:', error);
     }
   };
@@ -147,7 +196,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
   React.useEffect(() => {
     fetchFavouriteStatus();
   }, [restaurant]);
-  
+
   // price rating out of 1: cheap, 2: average, 3: expensive, 4: very expensive 
   const priceMap: { [key: number]: string } = {
     1: '$',
@@ -172,151 +221,102 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
     return undefined;
   }
 
-  const isRestaurantOpen = (openingHours: { close: string, day: number, open: string }[]) => {
-    const now = new Date();
-    const currentDay = now.getDay() === 0 ? 7 : now.getDay(); // 1 for monday, 7 for sunday
-    const currentTime = `${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`; // e.g. convert 10:00AM to '1000'
-    const todaysHours = openingHours.filter(hours => hours.day === currentDay);
-
-    // check if the restaurant is currently open or will open later today
-    for (const period of todaysHours) {
-      const { open, close } = period;
-      if (currentTime >= open && currentTime <= close) {
-        return { isOpen: true, nextOpen: null };
-      }
-      if (currentTime < open) {
-        return { isOpen: false, nextOpen: { day: currentDay, open } };
-      }
-    }
-
-    // restaurant is closed for today, find next available opening
-    return { isOpen: false, nextOpen: getNextOpening(openingHours, currentDay) };
-  };
-
-  const getNextOpening = (openingHours: { close: string, day: number, open: string }[], currentDay: number) => {
-    const sortedOpeningHours = openingHours.sort((a, b) => a.day - b.day);
-
-    for (let i = 1; i <= 7; i++) {
-      const nextDay = (currentDay + i) % 7 + 1;
-      const nextOpening = sortedOpeningHours.find(hours => hours.day === nextDay);
-      if (nextOpening) {
-        return { day: nextOpening.day, open: nextOpening.open };
-      }
-    }
-
-    return null;
-  };
-
-  const getDayName = (dayNumber: number) => {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    return days[dayNumber % 7];
-  };
-
-  const formatTime = (time: string) => {
-    const hours = parseInt(time.substring(0, 2), 10);
-    const minutes = time.substring(2);
-    const suffix = hours >= 12 ? 'PM' : 'AM';
-    const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
-    return `${formattedHours}:${minutes} ${suffix}`;
-  };
-
   return (
-  <>
-  {!showNoteModal && 
-  <Overlay overlayStyle={styles.mapModal} isVisible={true} onBackdropPress={() => setShowModal(undefined)}>
-    <View style={styles.restaurantFormHeader}>
-      <View style={styles.flexRowGroup}>
-        <View style={{ ...styles.imageContainer, height: 160, width: '90%', marginRight: 0 }}>
-          <Image
-            source={{ uri: getRestaurantPhoto(restaurant.restaurantPhotos, restaurant.foodPhotos) }}
-            style={{ width: '100%', height: '100%' }} />
-        </View>
-        <View style={styles.iconsContainer}>
-          <Icon
-            name='x'
-            type='feather'
-            iconStyle={styles.modalIcon}
-            size={22}
-            onPress={() => setShowModal(undefined)} />
-          <Icon
-            name={'star'}
-            type='font-awesome'
-            iconStyle={isFavourited ? styles.modalIcon : styles.unfilledStar}
-            size={22} 
-            onPress={handleFavoriteToggle}/>
-          <Icon
-            name='edit'
-            type='feather'
-            iconStyle={styles.modalIcon}
-            size={22}
-            onPress={() => {
-              fetchNote();
-              // setShowModal(undefined);
-              setShowNoteModal(true);
-            }} />
-        </View>
-      </View>
-      {restaurant.name && <View style={styles.formHeaderContainer}>
-        <Text style={styles.formHeaderText}>{restaurant.name}</Text>
-      </View>}
-    </View>
-    <View style={styles.verticalFlexFormGroup}>
-    <View style={styles.flexFormGroup}>
-        <Text style={styles.formDescriptionTextBold}>
-          {calculateCategories(restaurant.cuisineType ? restaurant.cuisineType?.map(c => c.cuisineType) : [],
-            restaurant.restaurantType ? restaurant.restaurantType?.map(c => c.restaurantType) : [])} • {priceMap[restaurant?.price ?? 1]} • {calculateRestaurantDistance(userLocation, restaurant.latitude, restaurant.longitude)} km away
-        </Text>
-      </View>
-      <View style={styles.flexFormGroup}>
-        {restaurant.rating && <View style={{ ...styles.flexFormGroup, gap: 7 }}>
-          {renderStars(restaurant.rating ?? 0)}
-          <Text style={{ ...styles.formDescriptionText, flexDirection: 'row',  marginTop: 2, marginLeft: -4 }}>
-            ({restaurant.total_ratings})
-          </Text>
-        </View>}
-        <View style={{ marginLeft: 'auto' }}>{restaurant.menuItemMatches && <MenuItemBadge matches={restaurant.menuItemMatches} />}</View>
-      </View>
-      {restaurant.menuItemMatches && <View style={styles.flexFormGroup}>
-        <Text style={styles.formDescriptionText}>
-          {restaurant.menuItemMatches} menu items matches your dietary filters!
-        </Text>
-      </View>}
-      <View style={styles.flexFormGroup}>
-        <Icon
-          name='map-pin'
-          type='feather'
-          iconStyle={styles.modalIcon}
-          size={16} />
-        <Text style={styles.formDescriptionText}>{restaurant.address}</Text>
-      </View>
-      <View style={styles.flexFormGroup}>
-        <Icon
-          name='clock'
-          type='feather'
-          iconStyle={styles.modalIcon}
-          size={16} />
-        <View>{isOpen ? <Text style={styles.formDescriptionText}>Open</Text> : 
-          nextOpen ? <Text style={styles.formDescriptionText}>Closed. Next opens at {formatTime(nextOpen.open)} {getDayName(nextOpen.day)}.</Text>
-            : <Text style={styles.formDescriptionText}>Restaurant is closed and no future opening time available.</Text>}
-        </View>
-      </View>
-      <View style={{ paddingBottom: 10 }}>
-        <Text style={styles.formDescriptionTextBold}>Matching menu items </Text>
-        {meals && <View style={{ paddingTop: 4 }}>
-          <Text numberOfLines={2} style={{ fontSize: 14, opacity: 0.8 }}>{meals.length > 0 ? meals.map(meal => meal.name.toLocaleLowerCase()).join(', ') : '<menu item>'}.</Text></View>}
-      </View>
-      <Button buttonStyle={{ ...styles.button, paddingHorizontal: 25, marginTop: 0 }} titleStyle={{ ...styles.buttonTitle, fontSize: 12 }} onPress={() => { router.push('/restaurant'); setShowModal(undefined); }} title={('view more').toUpperCase()} />
-    </View>
-    </Overlay>
-    }
-    {showNoteModal && (<NoteModal
-      setShowNoteModal={setShowNoteModal}
-      restaurant={restaurant}
-      initialNote={activeNote}
-      username={username}
+    <>
+      {!showNoteModal &&
+        <Overlay overlayStyle={styles.mapModal} isVisible={true} onBackdropPress={() => setShowModal(undefined)}>
+          <View style={styles.restaurantFormHeader}>
+            <View style={styles.flexRowGroup}>
+              <View style={{ ...styles.imageContainer, height: 160, width: '90%', marginRight: 0 }}>
+                <Image
+                  source={{ uri: getRestaurantPhoto(restaurant.restaurantPhotos, restaurant.foodPhotos) }}
+                  style={{ width: '100%', height: '100%' }} />
+              </View>
+              <View style={styles.iconsContainer}>
+                <Icon
+                  name='x'
+                  type='feather'
+                  iconStyle={styles.modalIcon}
+                  size={22}
+                  onPress={() => setShowModal(undefined)} />
+                <Icon
+                  name={'star'}
+                  type='font-awesome'
+                  iconStyle={isFavourited ? styles.modalIcon : styles.unfilledStar}
+                  size={22}
+                  onPress={handleFavoriteToggle} />
+                <Icon
+                  name='edit'
+                  type='feather'
+                  iconStyle={styles.modalIcon}
+                  size={22}
+                  onPress={() => {
+                    fetchNote();
+                    // setShowModal(undefined);
+                    setShowNoteModal(true);
+                  }} />
+              </View>
+            </View>
+            {restaurant.name && <View style={styles.formHeaderContainer}>
+              <Text style={styles.formHeaderText}>{restaurant.name}</Text>
+            </View>}
+          </View>
+          <View style={styles.verticalFlexFormGroup}>
+            <View style={styles.flexFormGroup}>
+              <Text style={styles.formDescriptionTextBold}>
+                {calculateCategories(restaurant.cuisineType ? restaurant.cuisineType?.map(c => c.cuisineType) : [],
+                  restaurant.restaurantType ? restaurant.restaurantType?.map(c => c.restaurantType) : [])} • {priceMap[restaurant?.price ?? 1]} • {calculateRestaurantDistance(userLocation, restaurant.latitude, restaurant.longitude)} km away
+              </Text>
+            </View>
+            <View style={styles.flexFormGroup}>
+              {restaurant.rating && <View style={{ ...styles.flexFormGroup, gap: 7 }}>
+                {renderStars(restaurant.rating ?? 0)}
+                <Text style={{ ...styles.formDescriptionText, flexDirection: 'row', marginTop: 2, marginLeft: -4 }}>
+                  ({restaurant.total_ratings})
+                </Text>
+              </View>}
+              <View style={{ marginLeft: 'auto' }}>{restaurant.menuItemMatches && <MenuItemBadge matches={restaurant.menuItemMatches} />}</View>
+            </View>
+            {restaurant.menuItemMatches && <View style={styles.flexFormGroup}>
+              <Text style={styles.formDescriptionText}>
+                {restaurant.menuItemMatches} menu items matches your dietary filters!
+              </Text>
+            </View>}
+            <View style={styles.flexFormGroup}>
+              <Icon
+                name='map-pin'
+                type='feather'
+                iconStyle={styles.modalIcon}
+                size={16} />
+              <Text style={styles.formDescriptionText}>{restaurant.address}</Text>
+            </View>
+            <View style={styles.flexFormGroup}>
+              <Icon
+                name='clock'
+                type='feather'
+                iconStyle={styles.modalIcon}
+                size={16} />
+              <View>{isOpen ? <Text style={styles.formDescriptionText}>Open</Text> :
+                nextOpen ? <Text style={styles.formDescriptionText}>Closed. Next opens at {formatTime(nextOpen.open)} {getDayName(nextOpen.day)}.</Text>
+                  : <Text style={styles.formDescriptionText}>Restaurant is closed and no future opening time available.</Text>}
+              </View>
+            </View>
+            <View style={{ paddingBottom: 10 }}>
+              <Text style={styles.formDescriptionTextBold}>Matching menu items </Text>
+              {meals && <View style={{ paddingTop: 4 }}>
+                <Text numberOfLines={2} style={{ fontSize: 14, opacity: 0.8 }}>{meals.length > 0 ? meals.map(meal => meal.name.toLocaleLowerCase()).join(', ') : '<menu item>'}.</Text></View>}
+            </View>
+            <Button buttonStyle={{ ...styles.button, paddingHorizontal: 25, marginTop: 0 }} titleStyle={{ ...styles.buttonTitle, fontSize: 12 }} onPress={() => { router.push('/restaurant'); setShowModal(undefined); }} title={('view more').toUpperCase()} />
+          </View>
+        </Overlay>
+      }
+      {showNoteModal && (<NoteModal
+        setShowNoteModal={setShowNoteModal}
+        restaurant={restaurant}
+        initialNote={activeNote}
+        username={username}
       />
-    )}
-  
-  </>
+      )}
+    </>
   );
 }

@@ -50,6 +50,7 @@ export function NoteModal({
     } catch (error) {
       console.error('Error fetching favorite status:', error);
     }
+    setShowNoteModal(false);
   };
 
   const handleEditNote = async () => {
@@ -61,6 +62,7 @@ export function NoteModal({
     } catch (error) {
       console.error('Error fetching favorite status:', error);
     }
+    setShowNoteModal(false);
   };
 
   return (
@@ -121,7 +123,7 @@ export function NoteModal({
                     placeholder="Write your note here..."
                     multiline
                     value={newNote.content}
-                    onKeyPress={(e: NativeSyntheticEvent<TextInputKeyPressEventData>)  => {
+                    onKeyPress={(e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
                       if (e.nativeEvent.key === "Enter") {
                         e.target.blur();
                       }

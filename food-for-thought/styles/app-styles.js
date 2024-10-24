@@ -825,4 +825,10 @@ export const styles = StyleSheet.create({
     padding: 7,
     alignSelf: 'center',
   },
+  badgeText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 14,
+    textAlign: 'center',
+},
 });

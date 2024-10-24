@@ -1,5 +1,4 @@
-import Header from "@/components/Header";
-import { View, Image } from "react-native";
+import { View, Image, TouchableOpacity } from "react-native";
 import { Icon, Text, Overlay, Button } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
@@ -7,6 +6,10 @@ import React from "react";
 import { styles } from '../styles/app-styles';
 import axios from 'axios';
 import Constants from 'expo-constants';
+import { NoteModal } from "@/components/NoteModal";
+import { Restaurant } from "./map";
+import Layout from "@/components/Layout";
+
 export type Note = {
     noteId: string,
     date: string,
@@ -24,7 +27,9 @@ export default function Notes() {
     const [username, setUsername] = React.useState<string>();
     const [notes, setNotes] = React.useState<Note[]>([]);
     const [noteToRemove, setNoteToRemove] = React.useState<Note>();
-    const [restaurants, setRestaurants] = React.useState<any>([]);
+    const [restaurants, setRestaurants] = React.useState<Restaurant[]>([]);
+    const [showNoteModal, setShowNoteModal] = React.useState<boolean>(false);
+    const [activeNote, setActiveNote] = React.useState<Note>();
 
     const loadUser = React.useCallback(async () => {
         const token = await AsyncStorage.getItem('token');
@@ -43,7 +48,6 @@ export default function Notes() {
     }, [loadUser]);
 
     const renderStars = (rating: number) => {
-        const stars = Math.round(rating / 2); // get rating between 0 and 5
         return (
             <View style={{ ...styles.starContainer }}>
                 {Array.from({ length: 5 }).map((_, index) => (
@@ -51,7 +55,7 @@ export default function Notes() {
                         key={index}
                         name='star'
                         type='font-awesome'
-                        iconStyle={index < stars ? styles.filledStar : styles.unfilledStar}
+                        iconStyle={index < rating ? styles.filledStar : styles.unfilledStar}
                         size={15}
                     />
                 ))}
@@ -81,10 +85,12 @@ export default function Notes() {
         await axios.get(url)
             .then(response => {
                 const notesArray = response.data;
-                notesArray.forEach(async (n: any) => {
-                    const restaurant = restaurants.find((r: any) => n.restaurantId == r.restaurantId)
-                    n.restaurantName = restaurant.name
-                    n.restaurantImageUrl = restaurant.foodPhotos[0];
+                notesArray.forEach(async (n: Note) => {
+                    const restaurant = restaurants.find((r: Restaurant) => n.restaurantId == r.restaurantId);
+                    if (restaurant) {
+                        n.restaurantName = restaurant.name
+                        n.restaurantImageUrl = restaurant.foodPhotos?.[0] ?? restaurant.restaurantPhotos?.[0] ?? '';
+                    }
                 })
                 setNotes(notesArray);
             })
@@ -95,60 +101,70 @@ export default function Notes() {
         if (username && restaurants.length > 0) {
             fetchNotes();
         }
-    }, [restaurants, username]); // when the restaurant variable is modified, the useEffect is called
+    }, [restaurants, username, showNoteModal]); // when the restaurant variable is modified, the useEffect is called
 
     React.useEffect(() => {
         fetchRestaurants();
     }, [username]);
     return (
-        <View style={{ ...styles.container, justifyContent: 'flex-start' }} >
-            <Header />
-            <View style={{ paddingTop: 70 }}>
-                <Text style={styles.subtitle}>Notes</Text>
-                <Text style={styles.userText}>Your thoughts on your recent visits</Text>
-                {notes && notes.length > 0 ? <View style={{ ...styles.rectangle, shadowOpacity: 0.2, marginTop: 35 }}>
-                    {notes.map(n =>
-                        <View key={`note-${n.restaurantId}`} style={{ flexDirection: 'row', height: 90 }}>
-                            <View style={{ flex: 1, flexDirection: 'column' }}>
-                                <View style={{ paddingHorizontal: 10 }}>
-                                    <Image source={{ uri: n.restaurantImageUrl }} style={{ borderRadius: 16, width: 80, height: 80 }} />
-                                </ View>
+        <Layout>
+            <View style={{ ...styles.pageContainer, justifyContent: 'flex-start' }} >
+                <View style={{ ...styles.detailsContainer }}>
+                    <Text style={styles.subtitle}>Notes</Text>
+                    <Text style={styles.userText}>Your thoughts on your recent visits</Text>
+                    {notes && notes.length > 0 ? <View style={{ ...styles.rectangle, shadowOpacity: 0.2, marginTop: 35, paddingVertical: 15 }}>
+                        {notes.map(n =>
+                            <TouchableOpacity key={`note-${n.restaurantId}`} onPress={() => {
+                                setShowNoteModal(true);
+                                setActiveNote(n);
+                            }} style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#EEE', height: 90, paddingTop: 5 }}>
+                                <View style={{ flex: 1.1, flexDirection: 'column', alignItems: 'center' }}>
+                                    <View style={{ paddingHorizontal: 10 }}>
+                                        <Image source={{ uri: n.restaurantImageUrl }} style={{ borderRadius: 16, width: 80, height: 80 }} />
+                                    </ View>
+                                </View>
+                                <View style={{ flex: 2, flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+                                    <Text style={styles.noteTitle}>{n.restaurantName}</Text>
+                                    <Text style={styles.userText}>{n.date}</Text>
+                                    <View style={{ paddingTop: 6 }}><Text>{renderStars(n.rating)}</Text></View>
+                                    <Text numberOfLines={1} style={{ ...styles.userText, textAlign: 'left', marginTop: -10 }}>{n.content}</Text>
+                                </View >
+                                <View style={{ flex: 0.4, flexDirection: 'column', alignItems: 'flex-start', gap: 2, paddingLeft: 5 }}>
+                                    <Icon
+                                        name='x'
+                                        type='feather'
+                                        iconStyle={styles.modalIcon}
+                                        size={20}
+                                        onPress={() => setNoteToRemove(n)} />
+                                </View>
+                            </TouchableOpacity>)}
+                        {noteToRemove && <Overlay
+                            overlayStyle={styles.modal}
+                            isVisible={noteToRemove !== undefined}
+                            onBackdropPress={() => setNoteToRemove(undefined)}>
+                            <View style={{ padding: 20, flexDirection: 'column', alignItems: 'center' }}>
+                                <Text style={{ ...styles.formHeaderText, paddingBottom: 20 }}>Confirm Removal</Text>
+                                <Text style={styles.userText}>Are you sure want to remove your note on the {noteToRemove.restaurantName}?</Text>
+                                <Button buttonStyle={{ ...styles.button, paddingHorizontal: 25, marginTop: 20 }}
+                                    titleStyle={{ ...styles.buttonTitle, fontSize: 12 }}
+                                    onPress={() => {
+                                        handleDeleteNote(noteToRemove);
+                                        setNoteToRemove(undefined);
+                                    }}
+                                    title={('remove note').toUpperCase()} />
                             </View>
-                            <View style={{ flex: 2, flexDirection: 'column', alignItems: 'flex-start', gap: 2, paddingLeft: 5 }}>
-                                <Text style={styles.noteTitle}>{n.restaurantName}</Text>
-                                <Text style={styles.userText}>{n.date}</Text>
-                                <View style={{ paddingTop: 6 }}><Text>{renderStars(n.rating)}</Text></View>
-                                <Text numberOfLines={1} style={{ ...styles.userText, textAlign: 'left', marginTop: -10 }}>{n.content}</Text>
-                            </View >
-                            <View style={{ flex: 0.4, flexDirection: 'column', alignItems: 'flex-start', gap: 2, paddingLeft: 5 }}>
-                                <Icon
-                                    name='x'
-                                    type='feather'
-                                    iconStyle={styles.modalIcon}
-                                    size={20}
-                                    onPress={() => setNoteToRemove(n)} />
-                            </View>
-                        </View>)}
-                    {noteToRemove && <Overlay
-                        overlayStyle={styles.modal}
-                        isVisible={noteToRemove !== undefined}
-                        onBackdropPress={() => setNoteToRemove(undefined)}>
-                        <View style={{ padding: 20, flexDirection: 'column', alignItems: 'center' }}>
-                            <Text style={{ ...styles.formHeaderText, paddingBottom: 20 }}>Confirm Removal</Text>
-                            <Text style={styles.userText}>Are you sure want to remove your note on the {noteToRemove.restaurantName}?</Text>
-                            <Button buttonStyle={{ ...styles.button, paddingHorizontal: 25, marginTop: 20 }}
-                                titleStyle={{ ...styles.buttonTitle, fontSize: 12 }}
-                                onPress={() => {
-                                    handleDeleteNote(noteToRemove);
-                                    setNoteToRemove(undefined);
-                                }}
-                                title={('remove note').toUpperCase()} />
-                        </View>
-                    </Overlay>}
+                        </Overlay>}
+                        {showNoteModal && username && (<NoteModal
+                            setShowNoteModal={setShowNoteModal}
+                            restaurant={(restaurants.find(r => r.restaurantId === activeNote?.restaurantId) as Restaurant)}
+                            initialNote={activeNote}
+                            username={username}
+                        />)}
+                    </View>
+                        : <View style={{ paddingTop: 20 }}><Text>Please add your notes from the restaurant finder page.</Text></View>
+                    }
                 </View>
-                    : <View style={{ paddingTop: 20 }}><Text>Please add your notes from the restaurant finder page.</Text></View>
-                }
             </View>
-        </View>
+        </Layout>
     )
 }

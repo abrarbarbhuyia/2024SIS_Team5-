@@ -4,6 +4,10 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { styles } from '../styles/app-styles'; 
 
+// Used to hide warnings for demo purposes
+// import { LogBox } from 'react-native';
+// LogBox.ignoreAllLogs();
+
 export default function Index() {
   return (
     <View style={styles.loginContainer}>

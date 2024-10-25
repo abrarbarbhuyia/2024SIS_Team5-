@@ -219,6 +219,11 @@ async function createMealIngredient(body) {
 async function addDiet(body) {
   const mealId = body.mealId;
 
+  if (!mealId) {
+    console.log("Meal ID is missing, skipping...");
+    return;
+  }
+
   let dietTracker = {
     "ALCOHOL": "ALCOHOL_FREE",
     "CELERY": "CELERY_FREE",
@@ -255,59 +260,59 @@ async function addDiet(body) {
     "WHEAT": "WHEAT_FREE"
   };
 
-
   //Do a get call to return all MealIngredients with the given Meal Id
-  let mealIngredients;
+  let mealIngredients = [];
   try {
     const response = await axios.get(
       process.env.BACKEND_URL + `/mealIngredient/getMealIngredient/${mealId}`
     );
-    //If it exists (Response array is longer than 1), do not post and continue to next iteration
-    if (response.data.length > 0) {
+    if (response.data && response.data.length > 0) {
       console.log("Found meal ingredients: ", response.data);
       mealIngredients = response.data;
-    }
-    else {
-      console.log("Ingredient does not exist")
+    } else {
+      console.log("No meal ingredients found for this meal.");
     }
   } catch (error) {
-    console.error(error.message);
+    console.error(`Error fetching meal ingredients: ${error.message}`);
+  }
+
+  if (!mealIngredients || mealIngredients.length === 0) {
+    console.log("No meal ingredients to process.");
+    return;
   }
 
   //For each returned mealIngredient, get the allergens from each associated ingredient, and remove them from the hashmap
   for (let i = 0; i < mealIngredients.length; i++) {
-    // Do a get call to get the allergens from the ingredient
-    let ingredient;
+    let ingredient = null;
     try {
       const response = await axios.get(
         process.env.BACKEND_URL + `/ingredient/getIngredient/${mealIngredients[i].ingredientId}`
       );
-      //If it exists (Response array is longer than 1), do not post and continue to next iteration
-      if (response.data.length > 0) {
+      if (response.data && response.data.length > 0) {
         console.log("Found ingredient: ", response.data);
         ingredient = response.data[0];
-      }
-      else {
-        console.log("Ingredient does not exist")
+      } else {
+        console.log("Ingredient does not exist");
       }
     } catch (error) {
-      console.error(error.message);
+      console.error(`Error fetching ingredient: ${error.message}`);
+      continue; // Skip to the next ingredient in case of error
     }
 
-    // Remove from the tracker
-    for (let j = 0; j < ingredient.allergens.length; j++) {
-      // delete from diet tracker if it exists
-      if (ingredient.allergens[j] in dietTracker) {
-        delete dietTracker[ingredient.allergens[j]];
+    if (ingredient && ingredient.allergens) {
+      // Remove from the tracker
+      for (let j = 0; j < ingredient.allergens.length; j++) {
+        if (ingredient.allergens[j] in dietTracker) {
+          delete dietTracker[ingredient.allergens[j]];
+        }
       }
+      console.log(dietTracker);
     }
-    console.log(dietTracker);
   }
 
   const dietTrackerArray = Object.values(dietTracker);
-  
-  const requestBody = {diet: dietTrackerArray}
-  console.log("tracker array = ", dietTrackerArray);
+  const requestBody = { diet: dietTrackerArray };
+  console.log("Tracker array = ", dietTrackerArray);
 
   // update diet array with new set
   try {
@@ -315,10 +320,10 @@ async function addDiet(body) {
       process.env.BACKEND_URL + `/meal/editMeal/${mealId}`,
       requestBody
     );
-    console.log(response.data)
+    console.log(response.data);
     return response.data;
   } catch (error) {
-    console.error(error.message);
+    console.error(`Error updating meal diet: ${error.message}`);
   }
 }
 

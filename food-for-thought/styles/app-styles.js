@@ -113,6 +113,7 @@ export const styles = StyleSheet.create({
   },
   modalIcon: {
     color: colours.darkPurple,
+    marginRight: 4,
   },
   button: {
     marginTop: 15,
@@ -711,7 +712,7 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 10,
   },
-  modal: {
+  mapModal: {
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FBF8FF',
@@ -762,4 +763,72 @@ export const styles = StyleSheet.create({
     borderRadius: 30,
     width: '80%',
   },
+  pageContainer: {
+    backgroundColor: "#E6D7FA",
+    flex: 1,
+  },
+  detailsContainer: {
+      alignItems: 'center',
+      backgroundColor: '#F5EEFF',
+      paddingTop: 10,
+      width: width,
+      height: height,
+      flex: 1,
+  },
+  tabContainer: {
+      flex: 1,
+      backgroundColor: '#FBF8FF',
+      width: width - 32,
+      padding: 2,
+      paddingTop: 0,
+      borderRadius: 24,
+      marginTop: 5,
+      shadowOffset: {width: 0, height: 2},
+      shadowOpacity: 2,
+      shadowRadius: 4,
+      marginBottom: 15,
+  },
+  noteTitle: {
+    fontSize: 18,
+  },
+  noteFormHeader: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5EAFF',
+    width: '100%',
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  noteImageContainer: {
+    flex: 1,
+    marginRight: 10,
+    backgroundColor: colours.white,
+    borderRadius: 8,
+    overflow: 'hidden',
+    width: 110,
+    height: 80,
+  },
+  noteDetailContainer: {
+    flex: 3, 
+    paddingLeft: 16
+  },
+  saveNoteButton: {
+    marginBottom: 15,
+    minWidth: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colours.secondary,
+    borderColor: colours.primary,
+    borderWidth: 2,
+    borderRadius: 20,
+    padding: 7,
+    alignSelf: 'center',
+  },
+  badgeText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 14,
+    textAlign: 'center',
+},
 });

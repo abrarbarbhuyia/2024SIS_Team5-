@@ -6,6 +6,17 @@ const Restaurant = require('../models/restaurantModel');
 const databaseMaster = require('../databaseMaster');
 const { testFlow } = require('../allergenTest');
 
+router.get('/getRestaurants', async (req, res) => {
+    try {
+        await databaseMaster.dbOp('find', 'RestaurantDetails', {}).then(data => {
+            res.json(data);
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 router.get('/getRestaurant/:restaurantId', async (req, res) => {
     try {
         const restaurantId = req.params.restaurantId;
@@ -29,7 +40,7 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
 
     //perform a search query to return up to 10 restaurants (ids) that a within a specified metre radius from the set location specified by the latitude and longitude coordinates
     //will filter restaurants that are open at the time of search
-    const url = `https://api.foursquare.com/v3/places/search?ll=${latitude}%2C${longitude}&radius=${radius}&categories=13000&fields=fsq_id&open_now=true&limit=5`;
+    const url = `https://api.foursquare.com/v3/places/search?ll=${latitude}%2C${longitude}&radius=${radius}&categories=13000&fields=fsq_id&open_now=true&limit=30`;
     try {
         // fetch the restaurants nearby the specified latitude and longitude location (set to UTS Building 5)
         await axios.get(url, {

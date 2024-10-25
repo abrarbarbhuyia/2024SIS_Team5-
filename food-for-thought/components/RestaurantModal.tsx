@@ -276,6 +276,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
                 </Text>
               </View>}
               <View style={{ marginLeft: 'auto' }}>{restaurant.menuItemMatches && <MenuItemBadge matches={restaurant.menuItemMatches.length} />}</View>
+              <View style={{ marginLeft: 'auto' }}>{restaurant.menuItemMatches && <MenuItemBadge matches={restaurant.menuItemMatches.length} />}</View>
             </View>
             {restaurant.menuItemMatches && <View style={styles.flexFormGroup}>
               <Text style={{...styles.formDescriptionText, fontWeight: '500'}}>
@@ -306,7 +307,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
               {restaurant.menuItemMatches && restaurant.menuItemMatches?.length > 0 && <View style={{ paddingTop: 4 }}>
                 <Text numberOfLines={2} style={{ fontSize: 14, opacity: 0.8, ...currentFont }}>{restaurant.menuItemMatches.map(meal => meals?.find(m => m.mealId === meal)?.name ?? 'No meal'.toLocaleLowerCase()).join(', ')}</Text></View>}
             </View>
-            <Button buttonStyle={{ ...styles.button, paddingHorizontal: 25, marginTop: 0 }} titleStyle={{ ...styles.buttonTitle, fontSize: 12 }} onPress={() => { router.push('/restaurant'); setShowModal(undefined); }} title={('view more').toUpperCase()} />
+            <Button buttonStyle={{ ...styles.button, paddingHorizontal: 25, marginTop: 0 }} titleStyle={{ ...styles.buttonTitle, fontSize: 12 }} onPress={() => { router.push({ pathname: "/restaurant", params: { restaurant: JSON.stringify(restaurant) } }); setShowModal(undefined); }} title={('view more').toUpperCase()} />
           </View>
         </Overlay>
       }

@@ -40,7 +40,7 @@ router.get('/', async (req, res) => {
         }
 
         if (allergensFilter.length > 0) { // only add the allergens filter if it's not empty
-            ingredientQuery.$or = allergensFilter.map(allergen => ({
+            ingredientQuery.$and = allergensFilter.map(allergen => ({
                 allergens: { $not: { $regex: removeTrailingS(allergen), $options: 'i' } }
             }));
         }
@@ -62,9 +62,8 @@ router.get('/', async (req, res) => {
             });
             allergenIngredientIds = antiFilteredIngredients.map(ingredient => ingredient.ingredientId);
         }
-
+        
         const ingredientIds = filteredIngredients.map(ingredient => ingredient.ingredientId); // create an array of ingredientIds
-        console.log(`ingredientIds that match applied filters ${ingredientIds}`);
         
         /* Ingredient Results + Query for Diets and Meals (MealDetails) */
         /* 
@@ -78,7 +77,7 @@ router.get('/', async (req, res) => {
         };
 
         if (dietsFilter.length > 0) { // only add the diets filter if it has values
-            mealQuery.$or = dietsFilter.map(diet => ({
+            mealQuery.$and = dietsFilter.map(diet => ({
                 diet: { $regex: removeDashes(diet), $options: 'i' }
             }));
         }
@@ -112,7 +111,7 @@ router.get('/', async (req, res) => {
                 cuisineType: { $elemMatch: { cuisineType: { $regex: cuisine, $options: 'i' } } }
             }));
         }
-        
+
         const restaurantResults = await databaseMaster.dbOp('find', 'RestaurantDetails', { query: restaurantQuery });
         const updatedRestaurantResults = restaurantResults.filter(r => r.hasMenu).map(r => ({
             ...r, menuItemMatches: menuMealCount.get(r.menuId)

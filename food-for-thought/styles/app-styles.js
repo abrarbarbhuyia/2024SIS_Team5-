@@ -823,6 +823,8 @@ export const styles = StyleSheet.create({
   },
   noteTitle: {
     fontSize: 18,
+    ...currentFont,
+    fontWeight: '600'
   },
   noteFormHeader: {
     justifyContent: 'center',

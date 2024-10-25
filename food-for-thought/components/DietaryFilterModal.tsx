@@ -69,7 +69,7 @@ export function DietaryFilterModal({ filterType, currentFilters, setActiveFilter
               title={a[0].toUpperCase()}
               containerStyle={{ backgroundColor: "purple" }} />
             <ListItem.Content>
-              <ListItem.Title>{capitaliseFirstLetter(a)}</ListItem.Title>
+              <ListItem.Title style={{...currentFont}}>{capitaliseFirstLetter(a)}</ListItem.Title>
             </ListItem.Content>
             <CheckBox
               key={`${a}-${i}-allergens-checkbox`}
@@ -103,7 +103,7 @@ export function DietaryFilterModal({ filterType, currentFilters, setActiveFilter
                 title={d[0].toUpperCase()}
                 containerStyle={{ backgroundColor: "purple" }} />
               <ListItem.Content>
-                <ListItem.Title>{capitaliseFirstLetter(d)}</ListItem.Title>
+                <ListItem.Title style={{...currentFont}}>{capitaliseFirstLetter(d)}</ListItem.Title>
               </ListItem.Content>
               <CheckBox
                 key={`${d}-${i}-diets-checkbox`}
@@ -137,7 +137,7 @@ export function DietaryFilterModal({ filterType, currentFilters, setActiveFilter
                   title={d[0].toUpperCase()}
                   containerStyle={{ backgroundColor: "purple" }} />
                 <ListItem.Content>
-                  <ListItem.Title>{capitaliseFirstLetter(d)}</ListItem.Title>
+                  <ListItem.Title style={{...currentFont}}>{capitaliseFirstLetter(d)}</ListItem.Title>
                 </ListItem.Content>
                 <CheckBox
                   key={`${d}-${i}-cuisine-checkbox`}
@@ -171,7 +171,7 @@ export function DietaryFilterModal({ filterType, currentFilters, setActiveFilter
                     title={f.value[0].toUpperCase()}
                     containerStyle={{ backgroundColor: "purple" }} />
                   <ListItem.Content>
-                    <ListItem.Title>{capitaliseFirstLetter(f.value)}</ListItem.Title>
+                    <ListItem.Title style={{...currentFont}}>{capitaliseFirstLetter(f.value)}</ListItem.Title>
                   </ListItem.Content>
                   <Icon
                     name='x'
@@ -192,7 +192,7 @@ export function DietaryFilterModal({ filterType, currentFilters, setActiveFilter
                     title={f.value[0].toUpperCase()}
                     containerStyle={{ backgroundColor: "purple" }} />
                   <ListItem.Content>
-                    <ListItem.Title>{capitaliseFirstLetter(f.value)}</ListItem.Title>
+                    <ListItem.Title style={{...currentFont}}>{capitaliseFirstLetter(f.value)}</ListItem.Title>
                   </ListItem.Content>
                   <Icon
                     name='x'

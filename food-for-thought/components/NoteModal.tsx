@@ -3,7 +3,7 @@ import { View, Image, Text, TextInput, Keyboard, NativeSyntheticEvent, TextInput
 import * as React from "react";
 import pic from "../assets/images/react-logo.png"; // Placeholder image
 import { Restaurant } from "@/app/map";
-import { styles } from "../styles/app-styles";
+import { currentFont, styles } from "../styles/app-styles";
 import axios from "axios";
 import Constants from "expo-constants";
 import { Note } from "@/components/RestaurantModal";
@@ -94,8 +94,8 @@ export function NoteModal({
           </View>
           <View style={styles.noteDetailContainer}>
             <View style={{ marginBottom: 8 }}>
-              <Text style={{ fontSize: 22 }}>{restaurant.name}</Text>
-              <Text style={{ fontSize: 14, color: "gray" }}>{newNote.date}</Text>
+              <Text style={{ fontSize: 22, ...currentFont }}>{restaurant.name}</Text>
+              <Text style={{ fontSize: 14, color: "gray", ...currentFont }}>{newNote.date}</Text>
               <View style={{ flexDirection: "row", marginBottom: 8 }}>
                 {Array.from({ length: 5 }).map((_, index) => (
                   <Icon
@@ -130,7 +130,7 @@ export function NoteModal({
                     }}
                     onBlur={() => Keyboard.dismiss()}
                     onChangeText={(value) => setNewNote({ ...newNote, content: value })}
-                    style={{ fontSize: 16, height: 50 }} // Adjust height as needed
+                    style={{ fontSize: 16, height: 50, ...currentFont }} // Adjust height as needed
                   />
                 </View>
               </View>

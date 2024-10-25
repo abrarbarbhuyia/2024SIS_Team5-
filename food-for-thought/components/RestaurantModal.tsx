@@ -275,11 +275,11 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
                   ({restaurant.total_ratings})
                 </Text>
               </View>}
-              <View style={{ marginLeft: 'auto' }}>{restaurant.menuItemMatches && <MenuItemBadge matches={restaurant.menuItemMatches} />}</View>
+              <View style={{ marginLeft: 'auto' }}>{restaurant.menuItemMatches && <MenuItemBadge matches={restaurant.menuItemMatches.length} />}</View>
             </View>
             {restaurant.menuItemMatches && <View style={styles.flexFormGroup}>
-              <Text style={styles.formDescriptionText}>
-                {restaurant.menuItemMatches} menu items matches your dietary filters!
+              <Text style={{...styles.formDescriptionText, fontWeight: '500'}}>
+                {restaurant.menuItemMatches.length} menu items matches your dietary filters!
               </Text>
             </View>}
             <View style={styles.flexFormGroup}>
@@ -301,10 +301,10 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
                   : <Text style={styles.formDescriptionText}>Restaurant is closed and no future opening time available.</Text>}
               </View>
             </View>
-            <View style={{ paddingBottom: 10 }}>
+            <View style={{ paddingBottom: 10, width: '100%' }}>
               <Text style={styles.formDescriptionTextBold}>Matching menu items </Text>
-              {meals && <View style={{ paddingTop: 4 }}>
-                <Text numberOfLines={2} style={{ fontSize: 14, opacity: 0.8 }}>{meals.length > 0 ? meals.map(meal => meal.name.toLocaleLowerCase()).join(', ') : '<menu item>'}.</Text></View>}
+              {restaurant.menuItemMatches && restaurant.menuItemMatches?.length > 0 && <View style={{ paddingTop: 4 }}>
+                <Text numberOfLines={2} style={{ fontSize: 14, opacity: 0.8, ...currentFont }}>{restaurant.menuItemMatches.map(meal => meals?.find(m => m.mealId === meal)?.name ?? 'No meal'.toLocaleLowerCase()).join(', ')}</Text></View>}
             </View>
             <Button buttonStyle={{ ...styles.button, paddingHorizontal: 25, marginTop: 0 }} titleStyle={{ ...styles.buttonTitle, fontSize: 12 }} onPress={() => { router.push('/restaurant'); setShowModal(undefined); }} title={('view more').toUpperCase()} />
           </View>

@@ -127,7 +127,7 @@ export default function Favourites() {
                                 <TouchableOpacity style={{ minWidth: '80%', flex: 1, flexDirection: 'row', paddingTop: 5 }} onPress={() => router.push({ pathname: '/restaurant', params: { restaurant: JSON.stringify(restaurants.find(r => r.restaurantId === f.restaurantId)) } })}>
                                     <View style={{ flex: 1.5, flexDirection: 'column' }}>
                                         <View style={{ paddingHorizontal: 10 }}>
-                                            <Image source={{ uri: f.imageUrl }} style={{ borderRadius: 16, width: 70, height: 70 }} />
+                                            <Image source={{ uri: f ? f.imageUrl : '' }} style={{ borderRadius: 16, width: 70, height: 70 }} />
                                         </ View>
                                     </View>
                                     <View style={{ flex: 3, flexDirection: 'column', alignItems: 'flex-start', gap: 2, paddingLeft: 4 }}>
@@ -135,7 +135,7 @@ export default function Favourites() {
                                         <Badge
                                             badgeStyle={{
                                                 backgroundColor: f.isOpen ? '#16D59C' : '#E03F43',
-                                                height: 18,
+                                                height: 15,
                                                 borderStyle: 'solid',
                                                 borderColor: f.isOpen ? '#16D59C' : '#F02929',
                                             }}

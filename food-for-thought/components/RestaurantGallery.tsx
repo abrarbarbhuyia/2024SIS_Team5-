@@ -1,7 +1,7 @@
 import { View, Image, StyleSheet, FlatList, Modal, TouchableOpacity } from "react-native";
 import { Text } from '@rneui/themed';
 import React from "react";
-import { styles } from "@/styles/app-styles";
+import { currentFont, styles } from "@/styles/app-styles";
 
 export default function RestaurantGallery({restaurant} : any) {
 
@@ -30,7 +30,7 @@ export default function RestaurantGallery({restaurant} : any) {
 
     return (
         <View style={{padding: 10,}}>
-            <Text h4>Restaurant Photos</Text>
+            <Text h4 style={{...currentFont}}>Restaurant Photos</Text>
             <FlatList
             data={restaurant?.restaurantPhotos || []}
             renderItem={renderItem}
@@ -39,7 +39,7 @@ export default function RestaurantGallery({restaurant} : any) {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.carousel}
             />
-            <Text h4 style={{paddingTop: 25}}>Food Photos</Text>
+            <Text h4 style={{paddingTop: 25, ...currentFont}}>Food Photos</Text>
             <FlatList
             data={restaurant?.foodPhotos || []}
             renderItem={renderItem}

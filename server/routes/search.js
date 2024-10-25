@@ -40,23 +40,47 @@ router.get('/', async (req, res) => {
         }
 
         if (allergensFilter.length > 0) { // only add the allergens filter if it's not empty
-            ingredientQuery.allergens = { $nin: [allergensFilter] };
+            ingredientQuery.$or = allergensFilter.map(allergen => ({
+                allergens: { $not: { $regex: removeTrailingS(allergen), $options: 'i' } }
+            }));
         }
 
         const filteredIngredients = await databaseMaster.dbOp('find', 'IngredientDetails', {
             query: ingredientQuery
         });
 
+        let allergenIngredientIds = [];
+        if (allergensFilter.length > 0) {
+            let antiIngredientQuery = {};
+            antiIngredientQuery.$or = allergensFilter.map(allergen => {
+                return {
+                    allergens: { $regex: removeTrailingS(allergen), $options: 'i' } 
+                }
+            });
+            const antiFilteredIngredients = await databaseMaster.dbOp('find', 'IngredientDetails', {
+                query: antiIngredientQuery
+            });
+            allergenIngredientIds = antiFilteredIngredients.map(ingredient => ingredient.ingredientId);
+        }
+
         const ingredientIds = filteredIngredients.map(ingredient => ingredient.ingredientId); // create an array of ingredientIds
         console.log(`ingredientIds that match applied filters ${ingredientIds}`);
         
         /* Ingredient Results + Query for Diets and Meals (MealDetails) */
+        /* 
+        Note for Allergen-Based Filtering:
+            new query to return mealIds list that does contain eggs -> but exclude them from above list
+            e.g., query1 returns meals[0, 1, 2...], and query 2 returns meals[1] -> exclude meals[1] from list
+            and finish with meals [0, 2]
+        */
         let mealQuery = {
-            mealId: { $in: await getMealIdsForIngredients(ingredientIds) }
+            mealId: { $in: await getMealIdsForIngredients(ingredientIds, allergenIngredientIds) }
         };
 
         if (dietsFilter.length > 0) { // only add the diets filter if it has values
-            mealQuery.diet = { $in: [dietsFilter] };
+            mealQuery.$or = dietsFilter.map(diet => ({
+                diet: { $regex: removeDashes(diet), $options: 'i' }
+            }));
         }
 
         if (mealFilter.length > 0) {
@@ -101,14 +125,36 @@ router.get('/', async (req, res) => {
     }
 });
 
-async function getMealIdsForIngredients(ingredientIds) {
+async function getMealIdsForIngredients(ingredientIds, allergenIngredientIds) {
+    let mealIngredientQuery = {ingredientId: { $in: ingredientIds }};
+    if (allergenIngredientIds && allergenIngredientIds.length > 0) {
+        // Step 1: Find meals that contain allergenic ingredients
+        const allergenMealMappings = await databaseMaster.dbOp('find', 'MealIngredientDetails', {
+            query: {
+                ingredientId: { $in: allergenIngredientIds }
+            }
+        });
+
+        // Extract mealIds associated with allergenic ingredients
+        const allergenMealIds = allergenMealMappings.map(mapping => mapping.mealId);
+        mealIngredientQuery.mealId = { $nin: allergenMealIds };
+    }
+
+    // Step 2: Find meals associated with the allergen-free ingredients, excluding allergenic meals
     const mealIngredientMappings = await databaseMaster.dbOp('find', 'MealIngredientDetails', {
-        query: {
-            ingredientId: { $in: ingredientIds }
-        }
+        query: mealIngredientQuery // Exclude meals that contain allergenic ingredients
     });
-    
-    return mealIngredientMappings.map(mapping => mapping.mealId);
+
+    const filteredMeals = mealIngredientMappings.map(mapping => mapping.mealId);
+    return filteredMeals;
+}
+
+function removeTrailingS(str) {
+    return String(str).replace(/s$/i, '');
+}
+
+function removeDashes(str) {
+    return String(str).replace(/-/g, '_');
 }
 
 module.exports = router;

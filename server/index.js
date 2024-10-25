@@ -13,6 +13,7 @@ const userRoutes = require('./routes/user');
 const ingredientRoutes = require('./routes/ingredient');
 const mealIngredientRoutes = require('./routes/mealIngredient');
 const restaurantRoutes = require('./routes/restaurant');
+const noteRoutes = require('./routes/note');
 const { runTests } = require('./allergenTest');
 
 const corsOptions = {
@@ -31,6 +32,7 @@ app.use('/menu', menuRoutes);
 app.use('/ingredient', ingredientRoutes);
 app.use('/mealIngredient', mealIngredientRoutes);
 app.use('/restaurant', restaurantRoutes);
+app.use('/note', noteRoutes);
 
 app.get('/api/menu', async (req, res) => {
   try {

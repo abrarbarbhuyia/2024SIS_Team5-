@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge } from '@rneui/themed';
-import { StyleSheet } from 'react-native';
+import { styles } from '@/styles/app-styles';
 
 export const handleMenuItemMatches = (matches: number) => {
   if (matches == 0) { // handle if the match is ever 0
@@ -40,19 +40,11 @@ const MenuItemBadge = ({ matches }: { matches: number }) => {
       }}
       value={matchScore}
       textStyle={[
-        styles.text, 
+        styles.badgeText, 
         { color: matchScore == "NO MATCHES" ? '#CAC4D0' : 'white' }
       ]}
     />
   );
 };
-
-const styles = StyleSheet.create({
-    text: {
-        fontWeight: '600',
-        fontSize: 14,
-        textAlign: 'center',
-    },
-});
 
 export default MenuItemBadge;

@@ -38,12 +38,12 @@ export default function Restaurant() {
                     buttonStyle={{  backgroundColor: '#FBF8FF' }}
                     selectedButtonStyle={{ backgroundColor: '#E8DEF8' }}
                     buttons={[
-                    <Text>Menu</Text>,
-                    <Text>Description</Text>,
-                    <Text>Gallery</Text>
+                   "Menu", "Description", "Gallery"
                     ]}
                     selectedIndex={selectedIndex}
                     onPress={setSelectedIndex}
+                    selectedTextStyle={{color: "#1D1B20", fontSize: 14}}
+                    textStyle={{color: "#1D1B20", fontSize: 14}}
                     containerStyle={{borderTopStartRadius: 16, borderTopEndRadius: 16, borderWidth: 0, height: 50}}
                 />
                 <Card.Divider/>

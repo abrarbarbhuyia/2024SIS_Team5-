@@ -4,7 +4,7 @@ const axios = require('axios');
 const router = express.Router();
 const Restaurant = require('../models/restaurantModel');
 const databaseMaster = require('../databaseMaster');
-const {testFlow} = require('../allergenTest');
+const { testFlow } = require('../allergenTest');
 
 router.get('/getRestaurant/:restaurantId', async (req, res) => {
     try {
@@ -29,31 +29,26 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
 
     //perform a search query to return up to 10 restaurants (ids) that a within a specified metre radius from the set location specified by the latitude and longitude coordinates
     //will filter restaurants that are open at the time of search
-    const url = `https://api.foursquare.com/v3/places/search?ll=${latitude}%2C${longitude}&radius=${radius}&categories=13000&fields=fsq_id&open_now=true&limit=20`;
+    const url = `https://api.foursquare.com/v3/places/search?ll=${latitude}%2C${longitude}&radius=${radius}&categories=13000&fields=fsq_id&open_now=true&limit=5`;
     try {
         // fetch the restaurants nearby the specified latitude and longitude location (set to UTS Building 5)
-    await axios.get(url, {
+        await axios.get(url, {
             headers: {
                 Authorization: `${process.env.FOURSQUARE_API_KEY}`
             }
-        }).then( async (response) => {
+        }).then(async (response) => {
             const restaurants_array = response.data.results
 
-            for(let i = 0; i < restaurants_array.length; i++)
-                {
-                    const restaurant = restaurants_array[i];
-                    const fsq_id = restaurant.fsq_id;
-                    // check if the restaurant matches an existing entry in the restaurantdetails database
-                    const query = { restaurantId: fsq_id };
-                    await databaseMaster.dbOp('find', 'RestaurantDetails', { query }).then(async (response1) => {
-                        console.log("response1", response1);
-                         // if there is no existing entry
-                    if (response1.length == 0)
-                        {
-                            await testFlow(fsq_id).then(async (response2) => 
-                            {
-                                if(response2)
-                                {
+            for (let i = 0; i < restaurants_array.length; i++) {
+                const restaurant = restaurants_array[i];
+                const fsq_id = restaurant.fsq_id;
+
+                await axios.get(
+                    process.env.BACKEND_URL + `/restaurant/getRestaurant/${fsq_id}`).then(async (response1) => {
+                        // if there is no existing entry
+                        if (response1.data.length == 0) {
+                            await testFlow(fsq_id).then(async (response2) => {
+                                if (response2) {
                                     //fetch the place details of the restaurant including location, name, telephone, hours and website
                                     const placeDetailsUrl = `https://api.foursquare.com/v3/places/${fsq_id}?fields=name%2Clocation%2Cgeocodes%2Chours%2Ctel%2Cwebsite%2Ccategories%2Cprice%2Crating%2Cstats`;
                                     const response1 = await axios.get(placeDetailsUrl, {
@@ -73,11 +68,10 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
                                     //iterate through each photo in the array
                                     var place_photo_array = response2.data
                                     var restaurant_photo_array = [];
-                                    for (let i = 0; i < place_photo_array.length; i++) 
-                                    {
-                                            //concatenate the menu_url_string to "prefix" + "widthxheight" + "height"
-                                            const menu_url = place_photo_array[i].prefix + place_photo_array[i].width + "x" + place_photo_array[i].height + place_photo_array[i].suffix;
-                                            restaurant_photo_array.push(menu_url)
+                                    for (let i = 0; i < place_photo_array.length; i++) {
+                                        //concatenate the menu_url_string to "prefix" + "widthxheight" + "height"
+                                        const menu_url = place_photo_array[i].prefix + place_photo_array[i].width + "x" + place_photo_array[i].height + place_photo_array[i].suffix;
+                                        restaurant_photo_array.push(menu_url)
                                     }
 
                                     //fetch 5 most popular food photos of the restaurant
@@ -90,11 +84,10 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
 
                                     place_photo_array = response3.data
                                     var food_photo_array = [];
-                                    for (let i = 0; i < place_photo_array.length; i++) 
-                                    {
-                                            //concatenate the menu_url_string to "prefix" + "widthxheight" + "height"
-                                            const menu_url = place_photo_array[i].prefix + place_photo_array[i].width + "x" + place_photo_array[i].height + place_photo_array[i].suffix;
-                                            food_photo_array.push(menu_url)
+                                    for (let i = 0; i < place_photo_array.length; i++) {
+                                        //concatenate the menu_url_string to "prefix" + "widthxheight" + "height"
+                                        const menu_url = place_photo_array[i].prefix + place_photo_array[i].width + "x" + place_photo_array[i].height + place_photo_array[i].suffix;
+                                        food_photo_array.push(menu_url)
                                     }
 
                                     //retrieve the restaurant's menu from the MenuDetails collection
@@ -106,24 +99,22 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
                                     const cuisineType_array = [];
                                     const restaurantType_array = [];
                                     const cuisineTypes = ["Chinese", "Australian", "Thai", "Asian", "Italian", "Greek", "Mexican", "Japanese", "Vietnamese", "Korean", "American", "French", "Turkish", "Indian", "Malay", "Korean BBQ", "Mediterranean"];
-                                    for (i = 0; i < categories_array.length; i++)
-                                    {
-                                        if(cuisineTypes.includes(categories_array[i].short_name))
-                                        {
+                                    for (i = 0; i < categories_array.length; i++) {
+                                        if (cuisineTypes.includes(categories_array[i].short_name)) {
                                             //retrieve the cuisine name and associated icon png at size 64 pixels
                                             const cuisine_icon_url = categories_array[i].icon.prefix + "64.png"
-                                            cuisineType_array.push({"cuisineType": categories_array[i].short_name, "icon" : cuisine_icon_url});
-                                        }  
+                                            cuisineType_array.push({ "cuisineType": categories_array[i].short_name, "icon": cuisine_icon_url });
+                                        }
 
-                                        else
-                                        {
+                                        else {
                                             //retrieve the restaurant Type and associated icon png at size 64 pixels
                                             const restaurantType_icon_url = categories_array[i].icon.prefix + "64.png"
-                                            restaurantType_array.push({"restaurantType": categories_array[i].short_name, "icon" : restaurantType_icon_url});
-                                        }  
+                                            restaurantType_array.push({ "restaurantType": categories_array[i].short_name, "icon": restaurantType_icon_url });
+                                        }
                                     }
+
                                     //create a restaurant entry using model schema and add new entry to the RestaurantDetails collection
-                                    const restaurant = new Restaurant({
+                                    const requestBody = {
                                         restaurantId: fsq_id,
                                         name: placeDetails.name,
                                         address: placeDetails.location.formatted_address,
@@ -141,38 +132,55 @@ router.get('/searchRestaurants/:latitude/:longitude/:radius', async (req, res) =
                                         foodPhotos: food_photo_array,
                                         menuId: menu_find_result[0].menuId,
                                         hasMenu: true
-                                    }) 
-                                
-                                    await databaseMaster.dbOp('insert', 'RestaurantDetails', { docs: [restaurant] });
-                                    restaurant_ids.push(fsq_id);
+                                    };
+
+                                    try {
+                                        await axios.post(
+                                            process.env.BACKEND_URL + `/restaurant/createRestaurant/`,
+                                            requestBody
+                                        );
+                                        console.log("Created Restaurant");
+                                    } catch (error) {
+                                        console.error("Error creating the restaurant", error)
+                                    }
+
                                 }
-                                else
-                                {
+                                else {
                                     //for restaurants without a valid menu, create any entry in the restaurant details collections but set the hasMenuFlag to false
-                                    const restaurant = new Restaurant({
+                                    const requestBody = {
                                         restaurantId: fsq_id,
                                         hasMenu: false
-                                    })
-                                    await databaseMaster.dbOp('insert', 'RestaurantDetails', { docs: [restaurant] });
+                                    };
+
+                                    try {
+                                        await axios.post(
+                                            process.env.BACKEND_URL + `/restaurant/createRestaurant/`,
+                                            requestBody
+                                        );
+                                        console.log("Created a Restaurant with no menu");
+                                    } catch (error) {
+                                        console.error("Error creating the restaurant", error)
+                                    }
 
                                 }
-                        });
+                            });
 
-                    }
-                    else {
-                            
-                        if(response1[0].hasMenu)
-                        {
+                        }
+                        else {
+
+                            if (response1.data[0].hasMenu) {
                                 restaurant_ids.push(fsq_id);
-                        } 
-                    } 
-                });
+                            }
+                        }
+                    }).catch(error => {
+                        console.error("Error retrieving restaurant entry from database", error)
+                    });
             }
         });
-            //a wierd bug where the restaurant_ids array were returning duplicates, quick fix for now
-            res.json(Array.from(new Set(restaurant_ids)));
-          
-    } catch(error) {
+        //a wierd bug where the restaurant_ids array were returning duplicates, quick fix for now
+        res.json(Array.from(new Set(restaurant_ids)));
+
+    } catch (error) {
         console.error(error);
         throw new Error('Failed to get restaurant!');
     }
@@ -190,13 +198,19 @@ router.post('/createRestaurant', async (req, res) => {
             openingHours: req.body.openingHours,
             phoneNumber: req.body.phoneNumber,
             website: req.body.website,
-            cuisine: req.body.cuisine,
+            cuisineType: req.body.cuisineType,
+            restaurantType: req.body.restaurantType,
             price: req.body.price,
             rating: req.body.rating,
             total_ratings: req.body.total_ratings,
-            menuId: req.body.menuId
+            menuId: req.body.menuId,
+            restaurantPhotos: req.body.restaurantPhotos,
+            foodPhotos: req.body.foodPhotos,
+            hasMenu: req.body.hasMenu
+
         });
         await databaseMaster.dbOp('insert', 'RestaurantDetails', { docs: [restaurant] });
+        res.status(201).json(restaurant);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -207,7 +221,7 @@ router.post('/createRestaurant', async (req, res) => {
 router.put('/editRestaurant/:restaurantId', async (req, res) => {
     try {
         const { updateField } = req.body;
-        const query = { restaurantId : req.params.restaurantId }
+        const query = { restaurantId: req.params.restaurantId }
         const docs = { $set: { updateField: updateField } };
         await databaseMaster.dbOp('update', 'RestaurantDetails', { query, docs });
     } catch (error) {
@@ -220,7 +234,7 @@ router.put('/editRestaurant/:restaurantId', async (req, res) => {
 router.delete('/deleteRestaurant/:restaurantId', async (req, res) => {
     try {
         const restaurantId = req.params.restaurantId;
-        await databaseMaster.dbOp('delete', 'RestaurantDetails', { query: { restaurantId: restaurantId } } );
+        await databaseMaster.dbOp('delete', 'RestaurantDetails', { query: { restaurantId: restaurantId } });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });

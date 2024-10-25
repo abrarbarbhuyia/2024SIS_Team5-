@@ -2,33 +2,18 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Card, Icon } from '@rneui/themed';
 import { router } from 'expo-router';
-import Header from "@/components/Header";     
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { jwtDecode } from 'jwt-decode';
 import { styles } from '../styles/app-styles';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import Layout from '@/components/Layout';
+import useLoadUser from '@/hooks/useLoadUser';
 
 const UserProfile = () => {
-  const [username, setUsername] = useState('');
-  const [isGuest, setIsGuest] = useState(true);
+  const { username, isGuest, loadUser } = useLoadUser();
   const [userNotes, setUserNotes] = useState(0);
   const [userFavourites, setUserFavourites] = useState(0);
   const [userPreferences, setUserPreferences] = useState(0);
-
-  const loadUser = useCallback(async () => {
-    const token = await AsyncStorage.getItem('token');
-    if (token) {
-      try {
-        const decodedToken: any = jwtDecode(token);
-        setUsername(decodedToken.username);
-        setIsGuest(false);
-      } catch (error) {
-        console.error("Invalid token");
-      }
-    }
-  }, []);
 
   useEffect(() => {
     loadUser();
@@ -37,9 +22,8 @@ const UserProfile = () => {
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
-    setUsername('');
-    setIsGuest(true);
     router.push('/');
+    loadUser();
   };
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;

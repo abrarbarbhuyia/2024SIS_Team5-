@@ -48,7 +48,7 @@ export function NoteModal({
       const response = await axios.post(`http://${HOST_IP}:4000/note/createNote`, newNote);
       setNewNote(response.data);
     } catch (error) {
-      console.error('Error fetching favorite status:', error);
+      console.error('Error fetching favourite status:', error);
     }
     setShowNoteModal(false);
   };
@@ -60,7 +60,7 @@ export function NoteModal({
         await axios.put(`http://${HOST_IP}:4000/note/editNote/${newNote.noteId}`, requestBody);
       }
     } catch (error) {
-      console.error('Error fetching favorite status:', error);
+      console.error('Error fetching favourite status:', error);
     }
     setShowNoteModal(false);
   };

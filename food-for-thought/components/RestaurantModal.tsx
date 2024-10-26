@@ -114,10 +114,10 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
     try {
       const response = await axios.get(`http://${HOST_IP}:4000/user/getFavourites/${username}`);
       if (response.data.includes(restaurant.restaurantId)) {
-        setIsFavourited(true);  // If the restaurant is favorited, set the state to true
+        setIsFavourited(true);
       }
     } catch (error) {
-      console.error('Error fetching favorite status:', error);
+      console.error('Error fetching favourite status:', error);
     }
   };
 
@@ -153,7 +153,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
     }
   };
 
-  const handleFavoriteToggle = async () => {
+  const handleFavouriteToggle = async () => {
     setIsFavourited(!isFavourited);
 
     try {
@@ -169,7 +169,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
         }
       }
     } catch (error) {
-      console.error('Error updating favorite status:', error);
+      console.error('Error updating favourite status:', error);
     }
   };
 
@@ -236,7 +236,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
                   type='font-awesome'
                   iconStyle={isFavourited ? styles.modalIcon : styles.unfilledStar}
                   size={22}
-                  onPress={handleFavoriteToggle} />
+                  onPress={handleFavouriteToggle} />
                 <Icon
                   name='edit'
                   type='feather'

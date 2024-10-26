@@ -10,7 +10,7 @@ import { getDistance } from 'geolib';
 import { router } from "expo-router";
 import { isRestaurantOpen } from "@/components/RestaurantModal";
 import Layout from "@/components/Layout";
-import { Restaurant, Favourite, cuisineType } from "@/constants/interfaces";
+import { Restaurant, Favourite, cuisineType, JwtPayload } from "@/constants/interfaces";
 
 const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
@@ -39,7 +39,7 @@ export default function Favourites() {
         const token = await AsyncStorage.getItem('token');
         if (token) {
             try {
-                const decodedToken: any = jwtDecode(token);
+                const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
                 setUsername(decodedToken.username);
             } catch (error) {
                 console.error("Invalid token");

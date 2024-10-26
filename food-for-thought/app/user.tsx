@@ -8,6 +8,7 @@ import { styles } from '../styles/app-styles';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import Layout from '@/components/Layout';
+import { JwtPayload } from '@/constants/interfaces';
 
 const UserProfile = () => {
   const [username, setUsername] = useState<string>();
@@ -20,7 +21,7 @@ const UserProfile = () => {
     const token = await AsyncStorage.getItem('token');
     if (token) {
       try {
-        const decodedToken: any = jwtDecode(token);
+        const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
         setUsername(decodedToken.username);
         setIsGuest(false);
       } catch (error) {

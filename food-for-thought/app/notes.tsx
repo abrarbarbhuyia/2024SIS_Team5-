@@ -8,7 +8,7 @@ import axios from 'axios';
 import Constants from 'expo-constants';
 import { NoteModal } from "@/components/NoteModal";
 import Layout from "@/components/Layout";
-import { Restaurant, Note } from "@/constants/interfaces";
+import { Restaurant, Note, JwtPayload } from "@/constants/interfaces";
 
 const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
@@ -24,7 +24,7 @@ export default function Notes() {
         const token = await AsyncStorage.getItem('token');
         if (token) {
             try {
-                const decodedToken: any = jwtDecode(token);
+                const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
                 setUsername(decodedToken.username);
             } catch (error) {
                 console.error("Invalid token");

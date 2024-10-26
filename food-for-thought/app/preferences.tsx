@@ -8,7 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Layout from "@/components/Layout";
 import { jwtDecode } from "jwt-decode";
 import Constants from "expo-constants";
-import { UserPreferences } from "@/constants/interfaces";
+import { JwtPayload, UserPreferences } from "@/constants/interfaces";
 
 // Function to get color based on type
 const getTypeColor = (type: string) => {
@@ -109,7 +109,7 @@ const Preferences: React.FC = () => {
     try {
       const token = await AsyncStorage.getItem("token");
       if (token) {
-        const decodedToken: any = jwtDecode(token);
+        const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
         if (decodedToken?.username) {
           setUsername(decodedToken.username);
         } else {
@@ -147,7 +147,7 @@ const Preferences: React.FC = () => {
       const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
       const token = await AsyncStorage.getItem("token");
       if (token) {
-        const decodedToken: any = jwtDecode(token);
+        const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
         const username = decodedToken.username;
 
         const response = await axios.delete(

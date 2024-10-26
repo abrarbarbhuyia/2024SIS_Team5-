@@ -15,6 +15,7 @@ import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
 import Layout from "@/components/Layout";
+import { JwtPayload } from "@/constants/interfaces";
 
 const ChangePassword = () => {
   const [username, setUsername] = useState<string>("");
@@ -29,7 +30,7 @@ const ChangePassword = () => {
     const token = await AsyncStorage.getItem("token");
     if (token) {
       try {
-        const decodedToken: any = jwtDecode(token);
+        const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
         setUsername(decodedToken.username);
       } catch (error) {
         setErrorMessage("Invalid token");

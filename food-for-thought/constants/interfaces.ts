@@ -1,3 +1,9 @@
+export interface JwtPayload {
+  iat: number;
+  userId: string;
+  username: string;
+}
+
 export interface Ingredient {
   ingredientId: string;
   name: string;

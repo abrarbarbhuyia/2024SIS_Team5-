@@ -34,7 +34,7 @@ import { getDistance } from "geolib";
 import Layout from "@/components/Layout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
-import { cuisineType, Restaurant, UserPreferences } from '@/constants/interfaces';
+import { cuisineType, JwtPayload, Restaurant, UserPreferences } from '@/constants/interfaces';
 
 const RestaurantMap = () => {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -83,7 +83,7 @@ const RestaurantMap = () => {
     const token = await AsyncStorage.getItem("token");
     if (token) {
       try {
-        const decodedToken: any = jwtDecode(token);
+        const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
         setUsername(decodedToken.username);
       } catch (error) {
         console.error("Invalid token");

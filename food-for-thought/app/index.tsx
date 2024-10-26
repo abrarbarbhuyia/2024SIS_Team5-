@@ -1,30 +1,26 @@
 import { Card } from '@rneui/themed';
 import { router } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { styles } from '../styles/app-styles'; 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import useLoadUser from '@/hooks/useLoadUser';
 
 // Used to hide warnings for demo purposes
 // import { LogBox } from 'react-native';
 // LogBox.ignoreAllLogs();
 
 export default function Index() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
-  const loadUser = useCallback(async () => {
-    const token = await AsyncStorage.getItem('token');
-    if (token) {
-      setIsLoggedIn(true);
-      router.push('/home');
-    }
-  }, []);
+  const { username, loadUser } = useLoadUser();
 
   useEffect(() => {
     loadUser();
+
+    if (username) {
+      router.push('/home');
+    }
   }, [loadUser]);
 
-  if (isLoggedIn) {
+  if (username) {
     return null;
   }
 
@@ -44,7 +40,7 @@ export default function Index() {
           <Text style={styles.signUpButtonText}>SIGN UP</Text>
         </TouchableOpacity>
 
-        <Text style={styles.guestText} onPress={() => router.push('/home')}>Continue as a guest.</Text>
+        <Text style={styles.guestText} onPress={() => router.push('/home')}>Continue as a guest</Text>
         <Text style={styles.supportingTextHome}>Your preferences won't be saved!</Text>
       </Card>
     </View>

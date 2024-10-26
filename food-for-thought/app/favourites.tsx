@@ -8,7 +8,7 @@ import { getDistance } from 'geolib';
 import { router } from "expo-router";
 import { isRestaurantOpen } from "@/components/RestaurantModal";
 import Layout from "@/components/Layout";
-import { Restaurant, Favourite, cuisineType, JwtPayload } from "@/constants/interfaces";
+import { Restaurant, Favourite, cuisineType } from "@/constants/interfaces";
 import useLoadUser from '@/hooks/useLoadUser';
 
 const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;

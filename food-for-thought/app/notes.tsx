@@ -12,7 +12,7 @@ import useLoadUser from '@/hooks/useLoadUser';
 const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
 export default function Notes() {
-    const { username, isGuest, loadUser } = useLoadUser();
+    const { username, loadUser } = useLoadUser();
     const [notes, setNotes] = React.useState<Note[]>([]);
     const [noteToRemove, setNoteToRemove] = React.useState<Note>();
     const [restaurants, setRestaurants] = React.useState<Restaurant[]>([]);

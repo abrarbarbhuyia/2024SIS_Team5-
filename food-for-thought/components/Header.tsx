@@ -1,14 +1,21 @@
 import { Card, Icon } from '@rneui/themed';
-import { View, StyleSheet, Dimensions, Image } from "react-native";
-import React from 'react';
-import { router, usePathname } from 'expo-router';
+import { View, StyleSheet, Dimensions } from "react-native";
+import React, { useCallback, useState } from 'react';
+import { router, useFocusEffect, usePathname } from 'expo-router';
 import logo from '../assets/images/logo.png';        
 
 export default function Header() {
-    const isHomePage = usePathname() === '/home';
-    
+    const isNotHomepage = usePathname() !== '/home';
+    const [showBackButton, setShowBackButton] = useState<boolean>(false);
+
+    useFocusEffect(
+        useCallback(() => {
+            setShowBackButton(isNotHomepage);
+        }, [isNotHomepage])
+    );
+
     const handleHomeRoute = () => {
-        if (!isHomePage) {
+        if (isNotHomepage) {
             router.push('/home');
         }
     }
@@ -18,7 +25,7 @@ export default function Header() {
             <Card containerStyle={styles.headerCard}>
                 <View style={styles.headerContent}>
                     <View style={styles.leftIcons}>
-                        {!isHomePage && (
+                        {showBackButton && (
                             <Icon style={{ color: '#000000' }} name='arrow-back' type='material' size={35} onPress={() => router.back()}/>
                         )}
                     </View>

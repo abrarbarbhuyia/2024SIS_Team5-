@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Pressable } from 'react-native';
 import { Card, Icon } from '@rneui/themed';
 import { router } from 'expo-router';  
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -60,7 +60,11 @@ const UserProfile = () => {
 
         {isGuest ? (
           <Text style={styles.supportingText}>
-            Currently browsing as a guest. Please log in to add user preferences, favourites, and personal notes.
+            Currently browsing as a guest. Please{' '}
+            <Pressable onPress={() => router.push('/login')}>
+                <Text style={[styles.supportingText, {color: '#720BC4', marginBottom: -11}]}>log in</Text>
+            </Pressable>{' '}
+            to add user preferences, favourites, and personal notes.
           </Text>
         ) : (
           <Text style={styles.subtitle}>{username}</Text>

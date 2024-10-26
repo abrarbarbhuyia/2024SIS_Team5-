@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { View, Text, Switch, TextInput, TouchableOpacity } from 'react-native';
 import { styles } from '../styles/app-styles';
 import Icon from 'react-native-vector-icons/FontAwesome';
-// slider support error
 import { Card, Slider } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';

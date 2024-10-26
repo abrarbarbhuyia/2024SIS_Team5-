@@ -33,8 +33,7 @@ import Constants from "expo-constants";
 import { getDistance } from "geolib";
 import Layout from "@/components/Layout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { jwtDecode } from "jwt-decode";
-import { cuisineType, JwtPayload, Restaurant, UserPreferences } from '@/constants/interfaces';
+import { cuisineType, Restaurant, UserPreferences } from '@/constants/interfaces';
 import useLoadUser from '@/hooks/useLoadUser';
 
 const RestaurantMap = () => {

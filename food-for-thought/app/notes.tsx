@@ -7,19 +7,8 @@ import { styles } from '../styles/app-styles';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import { NoteModal } from "@/components/NoteModal";
-import { Restaurant } from "./map";
 import Layout from "@/components/Layout";
-
-export type Note = {
-    noteId: string,
-    date: string,
-    content: string,
-    restaurantId: string,
-    restaurantName: string,
-    username: string,
-    rating: number,
-    restaurantImageUrl: string
-}
+import { Restaurant, Note } from "@/constants/interfaces";
 
 const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 

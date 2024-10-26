@@ -56,8 +56,8 @@ export interface Restaurant {
   restaurantPhotos?: string[];
   foodPhotos?: string[];
   hasMenu: boolean;
-  // number of matching menu items to the current dietary filters
-  menuItemMatches?: number;
+  // array of mealIds of matching menu items to the current dietary filters
+  menuItemMatches?: string[];
 }
 
 export interface UserPreferences {
@@ -70,4 +70,25 @@ export interface User {
   password: string;
   favourites: string[];
   preferences: UserPreferences[];
+}
+
+export interface Note {
+  noteId: string,
+  date: string,
+  content: string,
+  restaurantId: string,
+  restaurantName: string,
+  username: string,
+  rating: number,
+  restaurantImageUrl: string
+}
+
+export interface Favourite {
+  restaurantId: string
+  name: string,
+  longitude: string,
+  latitude: string,
+  imageUrl: string,
+  cuisines: string[],
+  isOpen: boolean
 }

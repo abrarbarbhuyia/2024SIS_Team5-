@@ -8,21 +8,11 @@ import axios from 'axios';
 import Constants from 'expo-constants';
 import { getDistance } from 'geolib';
 import { router } from "expo-router";
-import { Restaurant } from "./map";
 import { isRestaurantOpen } from "@/components/RestaurantModal";
 import Layout from "@/components/Layout";
+import { Restaurant, Favourite, cuisineType } from "@/constants/interfaces";
 
 const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
-
-export type Favourite = {
-    restaurantId: string
-    name: string,
-    longitude: string,
-    latitude: string,
-    imageUrl: string,
-    cuisines: string[],
-    isOpen: boolean
-}
 
 export default function Favourites() {
     const [username, setUsername] = React.useState<string>();
@@ -66,9 +56,9 @@ export default function Favourites() {
         await axios.get(url)
             .then(response => {
                 const userDetails = response.data;
-                const favouritesArray = userDetails[0].favourites ?? [];
-                setFavourites(favouritesArray.map((f: Favourite) => {
-                    const restaurant = restaurants?.find((r: any) => f == r.restaurantId);
+                const favouritesArray: string[] = userDetails[0].favourites ?? [];
+                setFavourites(favouritesArray.map((f: string) => {
+                    const restaurant = restaurants?.find((r: Restaurant) => f == r.restaurantId);
                     return restaurant && {
                         restaurantId: restaurant.restaurantId,
                         latitude: restaurant.latitude,
@@ -76,9 +66,9 @@ export default function Favourites() {
                         imageUrl: restaurant.foodPhotos?.[0] ?? "https://reactjs.org/logo-og.png",
                         name: restaurant.name,
                         isOpen: restaurant.openingHours ? isRestaurantOpen(restaurant.openingHours).isOpen : false,
-                        cuisines: restaurant.cuisineType?.map((c: any) => c.cuisineType) ?? []
+                        cuisines: restaurant.cuisineType?.map((c: cuisineType) => c.cuisineType) ?? []
                     }
-                }))
+                }) as Favourite[])
             })
             .catch(error => console.error("Error fetching the favourites", error));
     }

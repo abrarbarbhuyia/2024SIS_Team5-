@@ -1,6 +1,7 @@
 import { useCallback, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
+import { JwtPayload } from '@/constants/interfaces';
 
 const useLoadUser = () => {
   const [username, setUsername] = useState<string>('');
@@ -10,7 +11,7 @@ const useLoadUser = () => {
     const token = await AsyncStorage.getItem('token');
     if (token) {
       try {
-        const decodedToken : any = jwtDecode(token);
+        const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
         setUsername(decodedToken.username);
         setIsGuest(false);
       } catch (error) {

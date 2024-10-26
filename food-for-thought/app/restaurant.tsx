@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import { View, StyleSheet, Dimensions } from "react-native";
 import { Card, Text } from '@rneui/themed';
 import React from "react";
@@ -12,7 +11,7 @@ import Layout from "@/components/Layout";
 export default function Restaurant() {
     const [selectedIndex, setSelectedIndex] = React.useState(0);
     //need to get the restaurant data from path route - object was stringified
-    const {restaurant} = useLocalSearchParams();
+    const {restaurant}: {restaurant: string} = useLocalSearchParams();
     const restaurantData = JSON.parse(restaurant);
 
     // Components to load based on selected index, passes restaurant data
@@ -38,12 +37,12 @@ export default function Restaurant() {
                     buttonStyle={{  backgroundColor: '#FBF8FF' }}
                     selectedButtonStyle={{ backgroundColor: '#E8DEF8' }}
                     buttons={[
-                    <Text>Menu</Text>,
-                    <Text>Description</Text>,
-                    <Text>Gallery</Text>
+                   "Menu", "Description", "Gallery"
                     ]}
                     selectedIndex={selectedIndex}
                     onPress={setSelectedIndex}
+                    selectedTextStyle={{color: "#1D1B20", fontSize: 14}}
+                    textStyle={{color: "#1D1B20", fontSize: 14}}
                     containerStyle={{borderTopStartRadius: 16, borderTopEndRadius: 16, borderWidth: 0, height: 50}}
                 />
                 <Card.Divider/>

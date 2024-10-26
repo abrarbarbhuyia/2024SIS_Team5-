@@ -26,7 +26,6 @@ import { Badge, Card, Icon, Text } from "@rneui/themed";
 import axios from "axios";
 import MapView, { Marker } from "react-native-maps";
 import { DietaryFilterModal } from "@/components/DietaryFilterModal";
-import Header from "@/components/Header";
 import { capitaliseFirstLetter, formatTextValue } from "@/utils";
 import { RestaurantModal } from "@/components/RestaurantModal";
 import { styles } from "../styles/app-styles";
@@ -35,48 +34,7 @@ import { getDistance } from "geolib";
 import Layout from "@/components/Layout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
-
-interface UserPreferences {
-  name: string;
-  type: string;
-}
-
-export type Restaurant = {
-  _id: string;
-  restaurantId: string;
-  name: string;
-  address: string;
-  latitude: string;
-  longitude: string;
-  openingHours?: [
-    {
-      close: string;
-      day: number;
-      open: string;
-    }
-  ];
-  phoneNumber: string;
-  website: string;
-  cuisineType?: {
-    cuisineType: string;
-    icon: string;
-  }[];
-  restaurantType?: {
-    restaurantType: string;
-    icon: string;
-  }[];
-  // price rating out of 1: cheap, 2: average, 3: expensive, 4: very expensive
-  price: number;
-  // rating out of 10
-  rating: number;
-  total_ratings: number;
-  menuId: string;
-  restaurantPhotos?: string[];
-  foodPhotos?: string[];
-  hasMenu: boolean;
-  // number of matching menu items to the current dietary filters
-  menuItemMatches?: number;
-};
+import { cuisineType, JwtPayload, Restaurant, UserPreferences } from '@/constants/interfaces';
 
 const RestaurantMap = () => {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -125,7 +83,7 @@ const RestaurantMap = () => {
     const token = await AsyncStorage.getItem("token");
     if (token) {
       try {
-        const decodedToken: any = jwtDecode(token);
+        const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
         setUsername(decodedToken.username);
       } catch (error) {
         console.error("Invalid token");
@@ -195,7 +153,7 @@ const RestaurantMap = () => {
           radius: 2000, // hard-coded to 2000m right now, this can change in user settings
         },
       });
-      setRestaurants(response.data);
+      sortRestaurants(response.data);
       bottomSheetModalRef.current?.present();
     } catch (error: any) {
       console.error(
@@ -203,6 +161,19 @@ const RestaurantMap = () => {
       );
     }
   };
+
+  const sortRestaurants = (restaurants: Restaurant[]) => {
+    const sortedList = [...restaurants].sort((a, b) => {
+      if (activeFilters.length > 0 && a.menuItemMatches && b.menuItemMatches) { // if a filter has been applied, sort by match quality
+        return b.menuItemMatches.length - a.menuItemMatches.length;
+      } else {
+        const distanceA = calculateRestaurantDistance(userLocation, a.latitude, a.longitude); // sort by distance by default (closest to furthest)
+        const distanceB = calculateRestaurantDistance(userLocation, b.latitude, b.longitude);
+        return parseFloat(distanceA) - parseFloat(distanceB);
+      }
+    });
+    setRestaurants(sortedList);
+  }
 
   useEffect(() => {
     if (username && filterByDietary) {
@@ -276,15 +247,16 @@ const RestaurantMap = () => {
             {item.name || "Restaurant Title"}
           </Text>
           <View style={styles.restaurantDetailsContainer}>
-            <MenuItemBadge
-              matches={item.menuItemMatches ? item.menuItemMatches : 15}
-            />
+            {item.menuItemMatches && <MenuItemBadge matches={item.menuItemMatches.length} />}
             {renderStars(item.rating)}
+            <Text style={{ ...styles.formDescriptionText, marginLeft: -7 }}>
+              ({item.total_ratings})
+            </Text>
           </View>
           <Text style={styles.formDescriptionText}>
             {item.cuisineType && item.cuisineType.length > 0
               ? item.cuisineType
-                  .map((cuisineObj: any) =>
+                  .map((cuisineObj: cuisineType) =>
                     capitaliseFirstLetter(cuisineObj.cuisineType)
                   )
                   .join(", ")
@@ -434,7 +406,7 @@ const RestaurantMap = () => {
                         color={
                           r.menuItemMatches
                             ? markerColor[
-                                handleMenuItemMatches(r.menuItemMatches)
+                                handleMenuItemMatches(r.menuItemMatches.length)
                               ]
                             : "#EA4335"
                         }
@@ -445,7 +417,7 @@ const RestaurantMap = () => {
                           ...styles.innerCircle,
                           backgroundColor: r.menuItemMatches
                             ? markerColor[
-                                handleMenuItemMatches(r.menuItemMatches)
+                                handleMenuItemMatches(r.menuItemMatches.length)
                               ]
                             : "#EA4335",
                         }}
@@ -508,11 +480,12 @@ const RestaurantMap = () => {
             setActiveFilters={setActiveFilters}
           />
         )}
-        {activeRestaurant && (
+        {activeRestaurant && username && (
           <RestaurantModal
             setShowModal={setActiveRestaurant}
             userLocation={userLocation}
             restaurant={activeRestaurant}
+            username={username}
           />
         )}
       </BottomSheetModalProvider>

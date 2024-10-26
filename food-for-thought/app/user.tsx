@@ -21,7 +21,7 @@ const UserProfile = () => {
       handleUserDetails();
       fetchNotes();
     }
-  }, [loadUser]);
+  }, [loadUser, username]);
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');

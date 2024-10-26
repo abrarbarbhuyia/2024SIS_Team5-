@@ -156,7 +156,7 @@ const Preferences: React.FC = () => {
 
   useEffect(() => {
     loadUser();
-  }, [loadUser]);
+  }, [loadUser, username]);
 
   useEffect(() => {
     if (username) {

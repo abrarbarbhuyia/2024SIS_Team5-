@@ -82,7 +82,7 @@ const RestaurantMap = () => {
   React.useEffect(() => {
     loadUser();
     loadSettings();
-  }, [loadUser]);
+  }, [loadUser, username]);
 
   const fetchUserPreferences = async (username: string) => {
     // if a user is logged in AND has filter by dietary preferences toggleOn - we can fetch their filters - otherwise we use state

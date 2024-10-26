@@ -21,7 +21,7 @@ export default function Notes() {
 
     React.useEffect(() => {
         loadUser();
-    }, [loadUser]);
+    }, [loadUser, username]);
 
     const renderStars = (rating: number) => {
         return (

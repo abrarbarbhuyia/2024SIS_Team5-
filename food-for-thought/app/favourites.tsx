@@ -36,7 +36,7 @@ export default function Favourites() {
 
     React.useEffect(() => {
         loadUser();
-    }, [loadUser]);
+    }, [loadUser, username]);
 
     const fetchFavourites = async () => {
         const url = `http://${HOST_IP}:4000/user/getUser/${username}`;

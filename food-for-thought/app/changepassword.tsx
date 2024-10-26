@@ -26,7 +26,7 @@ const ChangePassword = () => {
 
   useEffect(() => {
     loadUser();
-  }, [loadUser]);
+  }, [loadUser, username]);
 
   const handleChangePassword = useCallback(async () => {
     if (newPassword !== confirmPassword) {

@@ -9,7 +9,7 @@ import { styles } from '../styles/app-styles';
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Constants from 'expo-constants';
-import { Restaurant } from "@/app/map";
+import { cuisineType, Restaurant } from "@/constants/interfaces";
 import Layout from "@/components/Layout";
 import SafetyWarning from "@/components/SafetyWarning";
 
@@ -60,7 +60,7 @@ const Home = () => {
       <TouchableOpacity onPress={() => router.push({pathname: '/restaurant', params: {restaurant: JSON.stringify(item)}})}>
       <Image source={ item.foodPhotos && item.foodPhotos.length > 0 ? { uri: item.foodPhotos[0]} : pic} style={styles.homeImage} />        
         <Text numberOfLines={1} style={styles.recentLabel}>{item.name || 'Restaurant Title'}</Text>
-        <Text numberOfLines={1} style={styles.recentComment}>{item.cuisineType && item.cuisineType.length > 0 ? item.cuisineType.map((cuisineObj: any) => cuisineObj.cuisineType).join(', ') : 'Other'}</Text>
+        <Text numberOfLines={1} style={styles.recentComment}>{item.cuisineType && item.cuisineType.length > 0 ? item.cuisineType.map((cuisineObj: cuisineType) => cuisineObj.cuisineType).join(', ') : 'Other'}</Text>
       </TouchableOpacity>
     </View>
   );

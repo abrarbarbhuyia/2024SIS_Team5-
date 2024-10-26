@@ -26,7 +26,6 @@ import { Badge, Card, Icon, Text } from "@rneui/themed";
 import axios from "axios";
 import MapView, { Marker } from "react-native-maps";
 import { DietaryFilterModal } from "@/components/DietaryFilterModal";
-import Header from "@/components/Header";
 import { capitaliseFirstLetter, formatTextValue } from "@/utils";
 import { RestaurantModal } from "@/components/RestaurantModal";
 import { styles } from "../styles/app-styles";
@@ -35,48 +34,7 @@ import { getDistance } from "geolib";
 import Layout from "@/components/Layout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
-
-interface UserPreferences {
-  name: string;
-  type: string;
-}
-
-export type Restaurant = {
-  _id: string;
-  restaurantId: string;
-  name: string;
-  address: string;
-  latitude: string;
-  longitude: string;
-  openingHours?: [
-    {
-      close: string;
-      day: number;
-      open: string;
-    }
-  ];
-  phoneNumber: string;
-  website: string;
-  cuisineType?: {
-    cuisineType: string;
-    icon: string;
-  }[];
-  restaurantType?: {
-    restaurantType: string;
-    icon: string;
-  }[];
-  // price rating out of 1: cheap, 2: average, 3: expensive, 4: very expensive
-  price: number;
-  // rating out of 10
-  rating: number;
-  total_ratings: number;
-  menuId: string;
-  restaurantPhotos?: string[];
-  foodPhotos?: string[];
-  hasMenu: boolean;
-  // number of matching menu items to the current dietary filters
-  menuItemMatches?: string[];
-};
+import { cuisineType, JwtPayload, Restaurant, UserPreferences } from '@/constants/interfaces';
 
 const RestaurantMap = () => {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -125,7 +83,7 @@ const RestaurantMap = () => {
     const token = await AsyncStorage.getItem("token");
     if (token) {
       try {
-        const decodedToken: any = jwtDecode(token);
+        const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
         setUsername(decodedToken.username);
       } catch (error) {
         console.error("Invalid token");
@@ -298,7 +256,7 @@ const RestaurantMap = () => {
           <Text style={styles.formDescriptionText}>
             {item.cuisineType && item.cuisineType.length > 0
               ? item.cuisineType
-                  .map((cuisineObj: any) =>
+                  .map((cuisineObj: cuisineType) =>
                     capitaliseFirstLetter(cuisineObj.cuisineType)
                   )
                   .join(", ")

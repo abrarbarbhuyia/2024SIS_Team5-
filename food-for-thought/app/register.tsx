@@ -4,13 +4,13 @@ import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import { Card } from '@rneui/themed';
-import { styles } from '../styles/app-styles'; 
+import { styles } from '../styles/app-styles';
 import Constants from 'expo-constants';
 
 const Register = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>();
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;

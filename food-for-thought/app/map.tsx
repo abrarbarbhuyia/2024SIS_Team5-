@@ -35,6 +35,7 @@ import Layout from "@/components/Layout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
 import { cuisineType, JwtPayload, Restaurant, UserPreferences } from '@/constants/interfaces';
+import useLoadUser from '@/hooks/useLoadUser';
 
 const RestaurantMap = () => {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -47,7 +48,7 @@ const RestaurantMap = () => {
   >();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [username, setUsername] = useState<string>();
+  const { username, loadUser } = useLoadUser();
   const [filterByDietary, setFilterByDietary] = useState<boolean>(false);
   // initial region is hardcoded to UTS Tower
   const [userLocation, setUserLocation] = useState<{
@@ -78,18 +79,6 @@ const RestaurantMap = () => {
       console.error("Error loading settings", error);
     }
   };
-
-  const loadUser = React.useCallback(async () => {
-    const token = await AsyncStorage.getItem("token");
-    if (token) {
-      try {
-        const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
-        setUsername(decodedToken.username);
-      } catch (error) {
-        console.error("Invalid token");
-      }
-    }
-  }, []);
 
   React.useEffect(() => {
     loadUser();

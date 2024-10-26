@@ -11,13 +11,14 @@ import axios from "axios";
 import Constants from 'expo-constants';
 import { cuisineType, Restaurant } from "@/constants/interfaces";
 import Layout from "@/components/Layout";
+import SafetyWarning from "@/components/SafetyWarning";
 
 // Component
 const Home = () => {
   const [fetchedRestaurants, setFetchedRestaurants] = useState<Restaurant[]>([]);
+  const [showModal, setShowModal] = useState<boolean>(true);
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
-
   const pic = require('../assets/images/react-logo.png'); // placeholder restaurant image
 
   // Fetch specific restaurants by ID
@@ -44,6 +45,10 @@ const Home = () => {
     fetchRestaurants();
   }, []);
 
+  const handleNotedPress = () => {
+    setShowModal(false);
+  };
+
   const handleSearch = (search: string) => {
     // Temp fix for onSearch error. Potentially route to map.tsx and parse searchFilter.
     return '';
@@ -62,6 +67,7 @@ const Home = () => {
 
   return (
     <Layout>
+      {showModal && <SafetyWarning handleNotedPress={ handleNotedPress } />} 
       {/* Card for the Restaurant finder */}
       <TouchableOpacity onPress={() => router.push('/map')}>
         <Card containerStyle={styles.finderCard}>

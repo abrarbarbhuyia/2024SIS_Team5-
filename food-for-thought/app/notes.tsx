@@ -7,19 +7,8 @@ import { styles } from '../styles/app-styles';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import { NoteModal } from "@/components/NoteModal";
-import { Restaurant } from "./map";
 import Layout from "@/components/Layout";
-
-export type Note = {
-    noteId: string,
-    date: string,
-    content: string,
-    restaurantId: string,
-    restaurantName: string,
-    username: string,
-    rating: number,
-    restaurantImageUrl: string
-}
+import { Restaurant, Note, JwtPayload } from "@/constants/interfaces";
 
 const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
@@ -35,7 +24,7 @@ export default function Notes() {
         const token = await AsyncStorage.getItem('token');
         if (token) {
             try {
-                const decodedToken: any = jwtDecode(token);
+                const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
                 setUsername(decodedToken.username);
             } catch (error) {
                 console.error("Invalid token");
@@ -112,24 +101,24 @@ export default function Notes() {
                 <View style={{ ...styles.detailsContainer }}>
                     <Text style={styles.subtitle}>Notes</Text>
                     <Text style={styles.userText}>Your thoughts on your recent visits</Text>
-                    {notes && notes.length > 0 ? <View style={{ ...styles.rectangle, shadowOpacity: 0.2, marginTop: 35, paddingVertical: 15 }}>
-                        {notes.map(n =>
+                    {notes && notes.length > 0 ? <View style={{ ...styles.rectangle, shadowOpacity: 0.2, marginTop: 35, paddingVertical: 15, gap: 10 }}>
+                        {notes.map((n, i) =>
                             <TouchableOpacity key={`note-${n.restaurantId}`} onPress={() => {
                                 setShowNoteModal(true);
                                 setActiveNote(n);
-                            }} style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#EEE', height: 90, paddingTop: 5 }}>
+                            }} style={{ flexDirection: 'row', ...(notes.length - 1 !== i && {borderBottomWidth: 1, borderBottomColor: '#EEE'}), height: 90 }}>
                                 <View style={{ flex: 1.1, flexDirection: 'column', alignItems: 'center' }}>
                                     <View style={{ paddingHorizontal: 10 }}>
                                         <Image source={{ uri: n.restaurantImageUrl }} style={{ borderRadius: 16, width: 80, height: 80 }} />
                                     </ View>
                                 </View>
-                                <View style={{ flex: 2, flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+                                <View style={{ flex: 2, flexDirection: 'column', alignItems: 'flex-start' }}>
                                     <Text style={styles.noteTitle}>{n.restaurantName}</Text>
                                     <Text style={styles.userText}>{n.date}</Text>
                                     <View style={{ paddingTop: 6 }}><Text>{renderStars(n.rating)}</Text></View>
-                                    <Text numberOfLines={1} style={{ ...styles.userText, textAlign: 'left', marginTop: -10 }}>{n.content}</Text>
+                                    <Text numberOfLines={1} style={{ ...styles.userText, textAlign: 'left', marginTop: -10, fontSize: 12 }}>{n.content}</Text>
                                 </View >
-                                <View style={{ flex: 0.4, flexDirection: 'column', alignItems: 'flex-start', gap: 2, paddingLeft: 5 }}>
+                                <View style={{ flex: 0.4, flexDirection: 'column', alignItems: 'flex-start', paddingLeft: 5 }}>
                                     <Icon
                                         name='x'
                                         type='feather'

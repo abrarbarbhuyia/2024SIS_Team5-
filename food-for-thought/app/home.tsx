@@ -9,7 +9,7 @@ import { currentFont, styles } from '../styles/app-styles';
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Constants from 'expo-constants';
-import { Restaurant } from "@/app/map";
+import { cuisineType, Restaurant } from "@/constants/interfaces";
 import Layout from "@/components/Layout";
 import SafetyWarning from "@/components/SafetyWarning";
 
@@ -60,7 +60,7 @@ const Home = () => {
       <TouchableOpacity onPress={() => router.push({pathname: '/restaurant', params: {restaurant: JSON.stringify(item)}})}>
       <Image source={ item.foodPhotos && item.foodPhotos.length > 0 ? { uri: item.foodPhotos[0]} : pic} style={styles.homeImage} />        
         <Text numberOfLines={1} style={styles.recentLabel}>{item.name || 'Restaurant Title'}</Text>
-        <Text numberOfLines={1} style={styles.recentComment}>{item.cuisineType && item.cuisineType.length > 0 ? item.cuisineType.map((cuisineObj: any) => cuisineObj.cuisineType).join(', ') : 'Other'}</Text>
+        <Text numberOfLines={1} style={styles.recentComment}>{item.cuisineType && item.cuisineType.length > 0 ? item.cuisineType.map((cuisineObj: cuisineType) => cuisineObj.cuisineType).join(', ') : 'Other'}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -94,7 +94,7 @@ const Home = () => {
       {/* Card for recently visited Restaurants */}
       <Card containerStyle={styles.recentCard}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text h4 style={{ color: '#2E1C47', ...currentFont, fontWeight: 600 }}>Last Visited</Text>
+          <Text style={{ color: '#2E1C47', ...currentFont, fontWeight: 600, fontSize: 22 }}>Last Visited</Text>
           <Icon name="arrowright" type="antdesign" size={25} onPress={() => console.log("Recent arrow clicked")} />
         </View>
         {/* Rendering the fetched restaurant data in carousel */}
@@ -110,7 +110,7 @@ const Home = () => {
       {/* Card for restaurant recommendations */}
       <Card containerStyle={styles.recommendationsCard}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text h4 style={{ color: '#2E1C47', ...currentFont, fontWeight: 500 }}>Recommendations</Text>
+          <Text style={{ color: '#2E1C47', ...currentFont, fontWeight: 500, fontSize: 22 }}>Recommendations</Text>
           <Icon name="arrowright" type="antdesign" size={25} onPress={() => console.log("Recommendations arrow clicked")} />
         </View>
         {/* passing in static restaurants, but can handle any passed in */}

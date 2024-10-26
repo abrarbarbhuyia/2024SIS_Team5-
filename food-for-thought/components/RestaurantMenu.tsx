@@ -1,21 +1,22 @@
-import { View, StyleSheet, Linking } from "react-native";
-import { Card, Text } from '@rneui/themed';
+import { View, Linking } from "react-native";
+import { Text } from '@rneui/themed';
 import React, { useState, useEffect } from "react";
 import { Icon } from "react-native-elements";
 import { ScrollView } from "react-native-gesture-handler";
-import Meal from "./Meal";
 import Constants from "expo-constants";
 import axios from "axios";
-import { styles } from "@/styles/app-styles";
+import { currentFont, styles } from "@/styles/app-styles";
+import { Meal as MealType, Menu, Restaurant } from "@/constants/interfaces";
+import Meal from "./Meal";
 
-export default function RestaurantMenu({restaurant} : any) {
+export default function RestaurantMenu({ restaurant }: { restaurant: Restaurant }) {
     const menuURL = 'https://irp.cdn-website.com/1efc617b/files/uploaded/takeawaymenu_2021_Aug.pdf';
     
     //const [isMatchingMeal, setIsMatchingMeal] = React.useState(false);
-    const [menu, setMenu] = useState(null);
-    const [meals, setMeals] = useState([]);
+    const [menu, setMenu] = useState<Menu>();
+    const [meals, setMeals] = useState<MealType[]>([]);
     //const [setFilter, setSetFilter] = useState(null);
-    const [cachedMenu, setCachedMenu] = useState<any>(null); // For caching menu data
+    const [cachedMenu, setCachedMenu] = useState<Menu>(); // For caching menu data
     const item = restaurant || {};
     const restaurantId = item.restaurantId;
 
@@ -28,7 +29,7 @@ export default function RestaurantMenu({restaurant} : any) {
     }, [restaurantId, cachedMenu]);
 
     //fetch menu using restaurantId
-    const fetchMenu = async (restaurantId : any) => {
+    const fetchMenu = async (restaurantId: string) => {
         try {
             const response = await axios.get(`http://${HOST_IP}:4000/menu/getMenu/${restaurantId}`);
             const menuData = response.data;
@@ -44,7 +45,7 @@ export default function RestaurantMenu({restaurant} : any) {
     };
 
     //returns all meals associated with a menu id
-    const fetchMeals = async (menuId : any) => {
+    const fetchMeals = async (menuId: string) => {
         try {
             const response = await axios.get(`http://${HOST_IP}:4000/meal/getMealByMenuId/${menuId}`);
             setMeals(response.data);
@@ -64,13 +65,13 @@ export default function RestaurantMenu({restaurant} : any) {
     return (
         <View style={{}}>
             <View style={styles.appliedFilters}>
-                <Text>Filtering by: </Text>
+                <Text style={{...currentFont}}>Filtering by: </Text>
             </View>
             {/* insert a link here but not sure what for */}
             <View style={styles.clipboardLink}>
                 <Icon name='clipboard-list' type='font-awesome-5' size={22}/>
                 <Text 
-                    style={{fontSize: 12, paddingLeft: 15, textDecorationLine: 'underline', }} 
+                    style={{fontSize: 12, paddingLeft: 15, textDecorationLine: 'underline', ...currentFont }} 
                     numberOfLines={1}
                     ellipsizeMode="tail" 
                     onPress={() => Linking.openURL(menuURL)}>{menuURL}
@@ -79,7 +80,7 @@ export default function RestaurantMenu({restaurant} : any) {
             <ScrollView style={{ height: '73%'}}>
                 <View style={styles.matchingMealsList}>
                     <View style={styles.menuListHeader}>
-                        <Text style={{paddingRight: 15, fontWeight: 'bold'}}>Matching Meals</Text>
+                        <Text style={{paddingRight: 15, fontWeight: 'bold', ...currentFont }}>Matching Meals</Text>
                         <Icon name='check-circle' type='feather' size={20} color={'#16D59C'}/>
                     </View>
                     {/* {meals.filter(isMealMatching).map((meal) => (

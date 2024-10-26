@@ -1,26 +1,27 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Card, Icon } from '@rneui/themed';
-import { router } from 'expo-router';
+import { router } from 'expo-router';  
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 import { styles } from '../styles/app-styles';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import Layout from '@/components/Layout';
+import { JwtPayload } from '@/constants/interfaces';
 
 const UserProfile = () => {
   const [username, setUsername] = useState<string>();
-  const [isGuest, setIsGuest] = useState(true);
-  const [userNotes, setUserNotes] = useState();
-  const [userFavourites, setUserFavourites] = useState();
-  const [userPreferences, setUserPreferences] = useState();
+  const [isGuest, setIsGuest] = useState<boolean>(true);
+  const [userNotes, setUserNotes] = useState<number>();
+  const [userFavourites, setUserFavourites] = useState<number>();
+  const [userPreferences, setUserPreferences] = useState<number>();
 
   const loadUser = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
     if (token) {
       try {
-        const decodedToken: any = jwtDecode(token);
+        const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
         setUsername(decodedToken.username);
         setIsGuest(false);
       } catch (error) {

@@ -17,9 +17,9 @@ const SafetyWarning: React.FC<SafetyWarningProps> = ({ handleNotedPress }) => {
     >
       <Text style={styles.subtitle}>WARNING</Text>
       <Text style={styles.supportingText}>
-        Food for Thought uses AI to provide dietary and allergy-related recommendations.
-        We cannot guarantee 100% accuracy. 
-        Please consult a healthcare professional before relying on any dietary information provided by the app.
+        Food for Thought uses AI to provide dietary and allergy-related recommendations. {"\n"}
+        We cannot guarantee 100% accuracy. {"\n"}{"\n"}
+        Please consult a healthcare professional before relying on any dietary information given by the app.{"\n"}
         Always check with restaurant staff before dining.
       </Text>
       <TouchableOpacity style={[styles.button, { marginTop: -10 }]} onPress={ handleNotedPress }>

@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import { View, StyleSheet, Dimensions } from "react-native";
 import { Card, Text } from '@rneui/themed';
 import React from "react";
@@ -13,7 +12,7 @@ import { currentFont } from "@/styles/app-styles";
 export default function Restaurant() {
     const [selectedIndex, setSelectedIndex] = React.useState(0);
     //need to get the restaurant data from path route - object was stringified
-    const {restaurant} = useLocalSearchParams();
+    const {restaurant}: {restaurant: string} = useLocalSearchParams();
     const restaurantData = JSON.parse(restaurant);
 
     // Components to load based on selected index, passes restaurant data
@@ -34,18 +33,18 @@ export default function Restaurant() {
         <Layout>
             <View style={styles.detailsContainer}>
                 <Text h4 style={{padding: 15, ...currentFont, fontWeight: '500'}}>{restaurantData.name}</Text>
-                <Card containerStyle={styles.tabContainer}>
+                <Card containerStyle={{...styles.tabContainer}}>
                 <ButtonGroup
                     buttonStyle={{  backgroundColor: '#FBF8FF' }}
                     selectedButtonStyle={{ backgroundColor: '#E8DEF8' }}
                     buttons={[
-                    <Text style={{...currentFont}}>Menu</Text>,
-                    <Text style={{...currentFont}}>Description</Text>,
-                    <Text style={{...currentFont}}>Gallery</Text>
+                   "Menu", "Description", "Gallery"
                     ]}
                     selectedIndex={selectedIndex}
                     onPress={setSelectedIndex}
-                    containerStyle={{borderTopStartRadius: 16, borderTopEndRadius: 16, borderWidth: 0, height: 50}}
+                    selectedTextStyle={{color: "#1D1B20", fontSize: 14, ...currentFont}}
+                    textStyle={{color: "#1D1B20", fontSize: 14, ...currentFont}}
+                    containerStyle={{borderTopStartRadius: 16, borderTopEndRadius: 16, borderWidth: 0, height: 50, marginHorizontal: -2, marginVertical: 0}}
                 />
                 <Card.Divider/>
                 {/* load in page component or sumn based on selected button? */}

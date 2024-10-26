@@ -1,14 +1,13 @@
-import { Button, Icon, Overlay, Divider, Badge } from "@rneui/themed";
+import { Button, Icon, Overlay } from "@rneui/themed";
 import { View, Image, Text } from 'react-native';
 import * as React from "react";
-import pic from '../assets/images/react-logo.png'; // Placeholder image
-import { Restaurant } from "@/app/map";
-import { currentFont, styles } from '../styles/app-styles';
+import { styles, currentFont } from '../styles/app-styles';
 import { router } from "expo-router";
 import MenuItemBadge from "./MenuItemBadge";
 import { getDistance } from "geolib";
 import axios from "axios";
 import Constants from "expo-constants";
+import { Restaurant, Meal } from "@/constants/interfaces"
 import { NoteModal } from "@/components/NoteModal"
 
 export type RestaurantModalProps = {
@@ -17,14 +16,6 @@ export type RestaurantModalProps = {
   userLocation: { latitude: number, longitude: number },
   username: string
 };
-
-export type Meal = {
-  _id: string,
-  mealId: string,
-  name: string,
-  diet: string[],
-  menuId: string
-}
 
 export type Note = {
   noteId?: string,
@@ -50,6 +41,7 @@ const getNextOpening = (openingHours: { close: string, day: number, open: string
 };
 
 export function getRestaurantPhoto(restaurantPhotos?: string[], foodPhotos?: string[]) {
+  const pic = require('../assets/images/react-logo.png'); // placeholder restaurant image
   return (foodPhotos && foodPhotos.length > 0) ? foodPhotos[0]
     : (restaurantPhotos && restaurantPhotos.length > 0) ? restaurantPhotos[0] : pic;
 }
@@ -109,7 +101,7 @@ const formatTime = (time: string) => {
 export function RestaurantModal({ restaurant, userLocation, username, setShowModal, ...rest }: RestaurantModalProps) {
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
   const [meals, setMeals] = React.useState<Meal[]>();
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const [nextOpen, setNextOpen] = React.useState<{ day: number, open: string } | null>(null);
   const [isFavourited, setIsFavourited] = React.useState(false);
   // const [noteModalVisible, setNoteModalVisible] = React.useState<boolean>(false);
@@ -258,7 +250,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
               </View>
             </View>
             {restaurant.name && <View style={styles.formHeaderContainer}>
-              <Text style={styles.formHeaderText}>{restaurant.name}</Text>
+              <Text numberOfLines={1} style={styles.formHeaderText}>{restaurant.name}</Text>
             </View>}
           </View>
           <View style={styles.verticalFlexFormGroup}>
@@ -289,7 +281,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
                 type='feather'
                 iconStyle={styles.modalIcon}
                 size={16} />
-              <Text style={styles.formDescriptionText}>{restaurant.address}</Text>
+              <Text numberOfLines={1} style={{...styles.formDescriptionText, width: '90%'}}>{restaurant.address}</Text>
             </View>
             <View style={styles.flexFormGroup}>
               <Icon

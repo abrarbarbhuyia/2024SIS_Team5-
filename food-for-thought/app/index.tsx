@@ -18,7 +18,7 @@ export default function Index() {
     if (username) {
       router.push('/home');
     }
-  }, [loadUser]);
+  }, [loadUser, username]);
 
   if (username) {
     return null;

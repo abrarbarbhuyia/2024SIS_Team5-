@@ -96,5 +96,6 @@ export interface Favourite {
   latitude: string,
   imageUrl: string,
   cuisines: string[],
+  restaurantTypes: string[],
   isOpen: boolean
 }

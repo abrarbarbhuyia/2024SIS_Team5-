@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { View, FlatList } from "react-native";
 import { Button, Card, Text } from "@rneui/themed";
 import axios from "axios";
-import { styles } from "../styles/app-styles";
+import { currentFont, styles } from "../styles/app-styles";
 import { DietaryChoiceModal } from "@/components/DietaryChoiceModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Layout from "@/components/Layout";
@@ -51,7 +51,7 @@ const renderRow = ({
         alignItems: "center",
       }}
     >
-      <Text style={{ textAlign: "center" }}>{item.name}</Text>
+      <Text style={{ textAlign: "center", ...currentFont }}>{item.name}</Text>
     </View>
 
     <View
@@ -82,7 +82,7 @@ const renderRow = ({
           alignItems: "center",
         }}
       >
-        <Text style={{ textAlign: "center" }}>{item.type}</Text>
+        <Text style={{ textAlign: "center", ...currentFont }}>{item.type}</Text>
       </View>
 
       <Button
@@ -167,7 +167,7 @@ const Preferences: React.FC = () => {
   return (
       <Layout>
       <View style={{ alignItems: "center", marginBottom: 16 }}>
-        <Text h3 style={{ color: "#1D1B20", fontWeight: "600" }}>
+        <Text h3 style={{ color: "#1D1B20", fontWeight: "600", ...currentFont }}>
           Dietary Preferences
         </Text>
         <Button
@@ -186,7 +186,7 @@ const Preferences: React.FC = () => {
               padding: 10,
             }}
           >
-            <Text style={{ flex: 1, fontWeight: "bold", textAlign: "center" }}>
+            <Text style={{ flex: 1, fontWeight: "bold", textAlign: "center", ...currentFont }}>
               Name
             </Text>
             <View
@@ -197,7 +197,7 @@ const Preferences: React.FC = () => {
                 marginHorizontal: 10,
               }}
             />
-            <Text style={{ flex: 1, fontWeight: "bold", textAlign: "center" }}>
+            <Text style={{ flex: 1, fontWeight: "bold", textAlign: "center", ...currentFont }}>
               Type
             </Text>
           </View>

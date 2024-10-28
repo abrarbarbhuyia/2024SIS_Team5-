@@ -12,6 +12,7 @@ import { SelectList } from "react-native-dropdown-select-list";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Constants from "expo-constants";
+import { currentFont } from "@/styles/app-styles";
 
 export type DietaryChoiceProps = {
   setShowModal: React.Dispatch<React.SetStateAction<boolean | undefined>>;
@@ -161,6 +162,8 @@ export function DietaryChoiceModal({
             data={data}
             save="key"
             boxStyles={styles.selectBox}
+            inputStyles={{ ...currentFont }}
+            dropdownTextStyles={{...currentFont}}
           />
         </View>
         {selectedDietaryFilter !== "" && (
@@ -212,7 +215,7 @@ export function DietaryChoiceModal({
                         containerStyle={{ backgroundColor: "purple" }}
                       />
                       <ListItem.Content>
-                        <ListItem.Title>{option || "?"}</ListItem.Title>
+                        <ListItem.Title style={{...currentFont}}>{option || "?"}</ListItem.Title>
                       </ListItem.Content>
                       <CheckBox
                         checked={currentFilters.some(
@@ -261,6 +264,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 10,
     fontSize: 18,
+    ...currentFont
   },
   dropdownContainer: {
     marginTop: 20,
@@ -270,6 +274,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingTop: 14,
     paddingBottom: 9,
+    ...currentFont
   },
   flexFormGroup: {
     marginBottom: 10,
@@ -288,10 +293,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "white",
     paddingHorizontal: 10,
-    fontFamily: "Roboto",
     fontSize: 15,
     color: "#808080",
     height: 38,
+    ...currentFont
   },
   icon: {
     color: "white",
@@ -304,6 +309,7 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "inherit",
     paddingVertical: 10,
+    ...currentFont
   },
   scrollView: {
     maxHeight: 270,

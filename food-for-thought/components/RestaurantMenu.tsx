@@ -5,7 +5,7 @@ import { Icon } from "react-native-elements";
 import { ScrollView } from "react-native-gesture-handler";
 import Constants from "expo-constants";
 import axios from "axios";
-import { styles } from "@/styles/app-styles";
+import { currentFont, styles } from "@/styles/app-styles";
 import { Meal as MealType, Menu, Restaurant } from "@/constants/interfaces";
 import Meal from "./Meal";
 
@@ -65,13 +65,13 @@ export default function RestaurantMenu({ restaurant }: { restaurant: Restaurant 
     return (
         <View style={{}}>
             <View style={styles.appliedFilters}>
-                <Text>Filtering by: </Text>
+                <Text style={{...currentFont}}>Filtering by: </Text>
             </View>
             {/* insert a link here but not sure what for */}
             <View style={styles.clipboardLink}>
                 <Icon name='clipboard-list' type='font-awesome-5' size={22}/>
                 <Text 
-                    style={{fontSize: 12, paddingLeft: 15, textDecorationLine: 'underline', }} 
+                    style={{fontSize: 12, paddingLeft: 15, textDecorationLine: 'underline', ...currentFont }} 
                     numberOfLines={1}
                     ellipsizeMode="tail" 
                     onPress={() => Linking.openURL(menuURL)}>{menuURL}
@@ -80,7 +80,7 @@ export default function RestaurantMenu({ restaurant }: { restaurant: Restaurant 
             <ScrollView style={{ height: '73%'}}>
                 <View style={styles.matchingMealsList}>
                     <View style={styles.menuListHeader}>
-                        <Text style={{paddingRight: 15, fontWeight: 'bold'}}>Matching Meals</Text>
+                        <Text style={{paddingRight: 15, fontWeight: 'bold', ...currentFont }}>Matching Meals</Text>
                         <Icon name='check-circle' type='feather' size={20} color={'#16D59C'}/>
                     </View>
                     {/* {meals.filter(isMealMatching).map((meal) => (

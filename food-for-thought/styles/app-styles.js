@@ -2,6 +2,8 @@ import { Dimensions, StyleSheet } from "react-native";
 
 const {width, height} = Dimensions.get('window');
 
+export const currentFont = { fontFamily: 'Avenir' }
+
 const colours = {
   textPrimary: '#1D1B20',
   white: '#FFFFFF',
@@ -68,6 +70,7 @@ export const styles = StyleSheet.create({
     color: colours.textPrimary,
     marginBottom: 15,
     textAlign: 'center',
+    ...currentFont,
   },
   supportingText: {
     paddingBottom: 8,
@@ -78,6 +81,7 @@ export const styles = StyleSheet.create({
     color: colours.textSecondary,
     marginBottom: 30,
     alignSelf: 'center',
+    ...currentFont,
   },
   supportingTextHome: {
     paddingBottom: 8,
@@ -87,6 +91,7 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     color: colours.textSecondary,
     alignSelf: 'center',
+    ...currentFont,
   },
   inputContainer: {
     width: '100%',
@@ -103,6 +108,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 40,
     fontSize: 16,
     color: colours.grey,
+    ...currentFont,
   },
   icon: {
     position: 'absolute',
@@ -148,19 +154,23 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     color: colours.labelColor,
     fontWeight: '600',
+    ...currentFont,
   },
   buttonText: {
     color: colours.white,
     fontSize: 16,
     fontWeight: 'bold',
+    ...currentFont,
   },
   buttonTitle: {
     fontWeight: '600',
     fontSize: 14,
+    ...currentFont,
   },
   registerText: {
     textDecorationLine: 'underline',
     color: colours.primary,
+    ...currentFont,
   },
   signUpButton: {
     marginBottom: 15,
@@ -189,11 +199,13 @@ export const styles = StyleSheet.create({
     color: colours.primary,
     fontSize: 16,
     fontWeight: 'bold',
+    ...currentFont,
   },
   guestText: {
     paddingTop: 6,
     color: colours.purple,
     textAlign: 'center',
+    ...currentFont,
   },
   finderCard: {
     width: width - 32,
@@ -214,6 +226,7 @@ export const styles = StyleSheet.create({
     height: 605,
     backgroundColor: colours.secondary,
     padding: 12,
+    paddingHorizontal: 14,
     borderRadius: 24,
     marginTop: 5,
     elevation: 4,
@@ -228,6 +241,7 @@ export const styles = StyleSheet.create({
     height: 220,
     backgroundColor: colours.secondary,
     padding: 12,
+    paddingHorizontal: 14,
     borderRadius: 24,
     marginTop: 5,
     elevation: 4,
@@ -242,6 +256,7 @@ export const styles = StyleSheet.create({
     height: 265,
     backgroundColor: colours.secondary,
     padding: 12,
+    paddingHorizontal: 14,
     borderRadius: 24,
     marginTop: 5,
     elevation: 4,
@@ -271,11 +286,14 @@ export const styles = StyleSheet.create({
   recentLabel: {
     marginLeft: 5,
     marginTop: 5,
+    fontWeight: '500',
+    ...currentFont,
   },
   recentComment: {
     marginLeft: 5,
     fontSize: 12,
     opacity: 0.5,
+    ...currentFont,
   },
   filledCircle: {
     position: 'absolute',
@@ -347,18 +365,21 @@ export const styles = StyleSheet.create({
     fontSize: 20,
     color: '#281554',
     justifyContent: 'flex-start',
+    ...currentFont,
   },
   formDescriptionText: {
     fontWeight: '400',
     fontSize: 15,
     color: '#281554',
     justifyContent: 'flex-start',
+    ...currentFont,
   },
   formDescriptionTextBold: {
     fontWeight: '500',
     fontSize: 16,
     color: '#281554',
     justifyContent: 'flex-start',
+    ...currentFont,
   },
   restaurantDetailsContainer: {
     flexDirection: 'row',
@@ -398,6 +419,7 @@ export const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 11,
     letterSpacing: -0.4,
+    ...currentFont,
   },
   filterCheck: {
     color: colours.midPurple,
@@ -415,6 +437,7 @@ export const styles = StyleSheet.create({
     fontWeight: '400',
     fontSize: 11,
     textAlign: 'center',
+    ...currentFont,
   },
   badgesCross: {
     color: colours.lightIconGrey,
@@ -473,7 +496,8 @@ export const styles = StyleSheet.create({
   noResultsText: { 
     textAlign: 'center', 
     color: colours.mutedGrey, 
-    marginTop: 20 
+    marginTop: 20,
+    ...currentFont
   },
   restaurantItem: { 
     padding: 10, 
@@ -481,7 +505,8 @@ export const styles = StyleSheet.create({
     borderBottomColor: colours.borderGrey,
   },
   restaurantName: { 
-    fontSize: 18 
+    fontSize: 18,
+    ...currentFont
   },
   pageContainer: {
     padding: 15,
@@ -544,9 +569,11 @@ export const styles = StyleSheet.create({
     paddingRight: 20,
     alignItems: 'center',
     paddingTop: 5,
+    ...currentFont,
   },
   mealTitle: {
       fontSize: 18,
+      ...currentFont,
   },
   mealFilterList: {
       flexDirection: 'row',
@@ -564,9 +591,11 @@ export const styles = StyleSheet.create({
     flex: 1,
     paddingRight: 10,
     paddingLeft: 5,
+    ...currentFont,
   },
   viewIngredientsText: {
       color: '#A394B8',
+      ...currentFont,
   },
   appliedFilters: {
     flexDirection: 'row',
@@ -584,6 +613,7 @@ export const styles = StyleSheet.create({
       paddingLeft: 15,
       paddingTop: 5,
       paddingBottom: 5,
+      ...currentFont,
   },
   matchingMealsList: {
       backgroundColor: '#CFFFF150',
@@ -598,12 +628,12 @@ export const styles = StyleSheet.create({
     marginBottom: 15,
   },
   user: {
-    width: 95,
+    width: 100,
     height: 120,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5EEFF',
-    borderRadius: 4,
+    borderRadius: 6,
     shadowColor: 'rgba(0, 0, 0, 0.15)',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8,
@@ -622,15 +652,17 @@ export const styles = StyleSheet.create({
     textAlign: 'center', 
   },
   userText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '600',
     color: '#2E1C49',
-    textAlign: 'center', 
+    textAlign: 'center',
+    ...currentFont,
   },
   switchLabel: {
     fontSize: 16,
     color: colours.textSecondary,
-    right: 10
+    right: 10,
+    ...currentFont,
   },
   inputWithIcon: {
     flexDirection: 'row',
@@ -660,7 +692,8 @@ export const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'left',
     width: '100%',
-    left: 20
+    left: 20,
+    ...currentFont,
   },
   listItem: {
     flexDirection: 'row',
@@ -678,6 +711,7 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     color: colours.textPrimary,
     left: 10,
+    ...currentFont,
   },
   switchRow: {
     flexDirection: 'row',
@@ -701,6 +735,7 @@ export const styles = StyleSheet.create({
     color: colours.textSecondary,
     marginBottom: 10,
     left: 15,
+    ...currentFont,
   },
   slider: {
     width: '95%',
@@ -711,6 +746,7 @@ export const styles = StyleSheet.create({
     color: 'red',
     textAlign: 'center',
     marginBottom: 10,
+    ...currentFont,
   },
   mapModal: {
     justifyContent: 'center',
@@ -726,6 +762,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#F5EAFF',
     width: '100%',
     padding: 20,
+    paddingBottom: 10,
     gap: 15,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -790,6 +827,8 @@ export const styles = StyleSheet.create({
   },
   noteTitle: {
     fontSize: 18,
+    ...currentFont,
+    fontWeight: '600'
   },
   noteFormHeader: {
     justifyContent: 'center',

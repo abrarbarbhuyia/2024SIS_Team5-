@@ -7,6 +7,7 @@ import RestaurantDescription from "@/components/RestaurantDescription";
 import RestaurantMenu from "@/components/RestaurantMenu";
 import { useLocalSearchParams } from "expo-router";
 import Layout from "@/components/Layout";
+import { currentFont } from "@/styles/app-styles";
 
 export default function Restaurant() {
     const [selectedIndex, setSelectedIndex] = React.useState(0);
@@ -31,8 +32,8 @@ export default function Restaurant() {
     return (
         <Layout>
             <View style={styles.detailsContainer}>
-                <Text h4 style={{padding: 15,}}>{restaurantData.name}</Text>
-                <Card containerStyle={styles.tabContainer}>
+                <Text h4 style={{padding: 15, ...currentFont, fontWeight: '500'}}>{restaurantData.name}</Text>
+                <Card containerStyle={{...styles.tabContainer}}>
                 <ButtonGroup
                     buttonStyle={{  backgroundColor: '#FBF8FF' }}
                     selectedButtonStyle={{ backgroundColor: '#E8DEF8' }}
@@ -41,9 +42,9 @@ export default function Restaurant() {
                     ]}
                     selectedIndex={selectedIndex}
                     onPress={setSelectedIndex}
-                    selectedTextStyle={{color: "#1D1B20", fontSize: 14}}
-                    textStyle={{color: "#1D1B20", fontSize: 14}}
-                    containerStyle={{borderTopStartRadius: 16, borderTopEndRadius: 16, borderWidth: 0, height: 50}}
+                    selectedTextStyle={{color: "#1D1B20", fontSize: 14, ...currentFont}}
+                    textStyle={{color: "#1D1B20", fontSize: 14, ...currentFont}}
+                    containerStyle={{borderTopStartRadius: 16, borderTopEndRadius: 16, borderWidth: 0, height: 50, marginHorizontal: -2, marginVertical: 0}}
                 />
                 <Card.Divider/>
                 {/* load in page component or sumn based on selected button? */}

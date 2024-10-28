@@ -1,7 +1,7 @@
 import { View, Image, TouchableOpacity } from "react-native";
-import { Icon, Text, Overlay, Button } from '@rneui/themed';
+import { Icon, Text, Overlay, Button, Card } from '@rneui/themed';
 import React from "react";
-import { styles } from '../styles/app-styles';
+import { currentFont, styles } from '../styles/app-styles';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import { NoteModal } from "@/components/NoteModal";
@@ -86,26 +86,26 @@ export default function Notes() {
         <Layout>
             <View style={{ ...styles.pageContainer, justifyContent: 'flex-start' }} >
                 <View style={{ ...styles.detailsContainer }}>
-                    <Text style={styles.subtitle}>Notes</Text>
+                    <Text h3 style={{ color: "#1D1B20", fontWeight: "600", ...currentFont }}>Notes</Text>
                     <Text style={styles.userText}>Your thoughts on your recent visits</Text>
-                    {notes && notes.length > 0 ? <View style={{ ...styles.rectangle, shadowOpacity: 0.2, marginTop: 35, paddingVertical: 15 }}>
-                        {notes.map(n =>
+                    {notes && notes.length > 0 ? <Card containerStyle={{ ...styles.rectangle, marginTop: 20, paddingVertical: 10, paddingHorizontal: 0, alignItems: 'stretch' }}>
+                        {notes.map((n, i) =>
                             <TouchableOpacity key={`note-${n.restaurantId}`} onPress={() => {
                                 setShowNoteModal(true);
                                 setActiveNote(n);
-                            }} style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#EEE', height: 90, paddingTop: 5 }}>
+                            }} style={{ flexDirection: 'row', ...(notes.length - 1 !== i && {borderBottomWidth: 1, borderBottomColor: '#EEE'}), height: 90, marginTop: 10 }}>
                                 <View style={{ flex: 1.1, flexDirection: 'column', alignItems: 'center' }}>
                                     <View style={{ paddingHorizontal: 10 }}>
                                         <Image source={{ uri: n.restaurantImageUrl }} style={{ borderRadius: 16, width: 80, height: 80 }} />
                                     </ View>
                                 </View>
-                                <View style={{ flex: 2, flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+                                <View style={{ flex: 2, flexDirection: 'column', alignItems: 'flex-start' }}>
                                     <Text style={styles.noteTitle}>{n.restaurantName}</Text>
                                     <Text style={styles.userText}>{n.date}</Text>
                                     <View style={{ paddingTop: 6 }}><Text>{renderStars(n.rating)}</Text></View>
-                                    <Text numberOfLines={1} style={{ ...styles.userText, textAlign: 'left', marginTop: -10 }}>{n.content}</Text>
+                                    <Text numberOfLines={1} style={{ ...styles.userText, textAlign: 'left', marginTop: -10, fontSize: 12 }}>{n.content}</Text>
                                 </View >
-                                <View style={{ flex: 0.4, flexDirection: 'column', alignItems: 'flex-start', gap: 2, paddingLeft: 5 }}>
+                                <View style={{ flex: 0.4, flexDirection: 'column', alignItems: 'flex-start', paddingLeft: 5 }}>
                                     <Icon
                                         name='x'
                                         type='feather'
@@ -136,7 +136,7 @@ export default function Notes() {
                             initialNote={activeNote}
                             username={username}
                         />)}
-                    </View>
+                    </Card>
                         : <View style={{ paddingTop: 20 }}><Text>Please add your notes from the restaurant finder page.</Text></View>
                     }
                 </View>

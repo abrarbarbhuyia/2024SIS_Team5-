@@ -1,7 +1,7 @@
 import { Button, Icon, Overlay } from "@rneui/themed";
 import { View, Image, Text } from 'react-native';
 import * as React from "react";
-import { styles } from '../styles/app-styles';
+import { styles, currentFont } from '../styles/app-styles';
 import { router } from "expo-router";
 import MenuItemBadge from "./MenuItemBadge";
 import { getDistance } from "geolib";
@@ -98,6 +98,16 @@ const formatTime = (time: string) => {
   return `${formattedHours}:${minutes} ${suffix}`;
 };
 
+export const calculateCategories = (cuisineType?: string[], restaurantType?: string[]) => {
+  if (cuisineType && cuisineType.length > 0) {
+    return cuisineType.join(', ');
+  }
+  if (restaurantType && restaurantType.length > 0) {
+    return restaurantType[0].toLowerCase().includes('caf') ? 'Cafe' : restaurantType[0];
+  }
+  return undefined;
+}
+
 export function RestaurantModal({ restaurant, userLocation, username, setShowModal, ...rest }: RestaurantModalProps) {
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
   const [meals, setMeals] = React.useState<Meal[]>();
@@ -114,10 +124,10 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
     try {
       const response = await axios.get(`http://${HOST_IP}:4000/user/getFavourites/${username}`);
       if (response.data.includes(restaurant.restaurantId)) {
-        setIsFavourited(true);  // If the restaurant is favorited, set the state to true
+        setIsFavourited(true);
       }
     } catch (error) {
-      console.error('Error fetching favorite status:', error);
+      console.error('Error fetching favourite status:', error);
     }
   };
 
@@ -153,7 +163,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
     }
   };
 
-  const handleFavoriteToggle = async () => {
+  const handleFavouriteToggle = async () => {
     setIsFavourited(!isFavourited);
 
     try {
@@ -169,7 +179,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
         }
       }
     } catch (error) {
-      console.error('Error updating favorite status:', error);
+      console.error('Error updating favourite status:', error);
     }
   };
 
@@ -203,16 +213,6 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
     return (distanceInMeters / 1000).toFixed(2);
   }
 
-  const calculateCategories = (cuisineType?: string[], restaurantType?: string[]) => {
-    if (cuisineType && cuisineType.length > 0) {
-      return cuisineType.join(', ');
-    }
-    if (restaurantType && restaurantType.length > 0) {
-      return restaurantType[0].toLowerCase().includes('caf') ? 'Cafe' : restaurantType[0];
-    }
-    return undefined;
-  }
-
   return (
     <>
       {!showNoteModal &&
@@ -236,7 +236,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
                   type='font-awesome'
                   iconStyle={isFavourited ? styles.modalIcon : styles.unfilledStar}
                   size={22}
-                  onPress={handleFavoriteToggle} />
+                  onPress={handleFavouriteToggle} />
                 <Icon
                   name='edit'
                   type='feather'
@@ -250,10 +250,10 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
               </View>
             </View>
             {restaurant.name && <View style={styles.formHeaderContainer}>
-              <Text style={styles.formHeaderText}>{restaurant.name}</Text>
+              <Text numberOfLines={1} style={{...styles.formHeaderText, fontSize: 22}}>{restaurant.name}</Text>
             </View>}
           </View>
-          <View style={styles.verticalFlexFormGroup}>
+          <View style={{...styles.verticalFlexFormGroup, paddingTop: 15}}>
             <View style={styles.flexFormGroup}>
               <Text style={styles.formDescriptionTextBold}>
                 {calculateCategories(restaurant.cuisineType ? restaurant.cuisineType?.map(c => c.cuisineType) : [],
@@ -268,9 +268,10 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
                 </Text>
               </View>}
               <View style={{ marginLeft: 'auto' }}>{restaurant.menuItemMatches && <MenuItemBadge matches={restaurant.menuItemMatches.length} />}</View>
+              <View style={{ marginLeft: 'auto' }}>{restaurant.menuItemMatches && <MenuItemBadge matches={restaurant.menuItemMatches.length} />}</View>
             </View>
             {restaurant.menuItemMatches && <View style={styles.flexFormGroup}>
-              <Text style={styles.formDescriptionText}>
+              <Text style={{...styles.formDescriptionText, fontWeight: '500'}}>
                 {restaurant.menuItemMatches.length} menu items matches your dietary filters!
               </Text>
             </View>}
@@ -280,7 +281,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
                 type='feather'
                 iconStyle={styles.modalIcon}
                 size={16} />
-              <Text style={styles.formDescriptionText}>{restaurant.address}</Text>
+              <Text numberOfLines={1} style={{...styles.formDescriptionText, width: '90%'}}>{restaurant.address}</Text>
             </View>
             <View style={styles.flexFormGroup}>
               <Icon
@@ -288,15 +289,15 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
                 type='feather'
                 iconStyle={styles.modalIcon}
                 size={16} />
-              <View>{isOpen ? <Text style={styles.formDescriptionText}>Open</Text> :
+              <View>{isOpen ? <Text style={styles.formDescriptionText}>Open Now</Text> :
                 nextOpen ? <Text style={styles.formDescriptionText}>Closed. Next opens at {formatTime(nextOpen.open)} {getDayName(nextOpen.day)}.</Text>
                   : <Text style={styles.formDescriptionText}>Restaurant is closed and no future opening time available.</Text>}
               </View>
             </View>
-            <View style={{ paddingBottom: 10 }}>
+            <View style={{ paddingBottom: 10, width: '100%' }}>
               <Text style={styles.formDescriptionTextBold}>Matching menu items </Text>
-              {meals && <View style={{ paddingTop: 4 }}>
-                <Text numberOfLines={2} style={{ fontSize: 14, opacity: 0.8 }}>{meals.length > 0 ? meals.map(meal => meal.name.toLocaleLowerCase()).join(', ') : '<menu item>'}.</Text></View>}
+              {restaurant.menuItemMatches && restaurant.menuItemMatches?.length > 0 && <View style={{ paddingTop: 4 }}>
+                <Text numberOfLines={2} style={{ fontSize: 14, opacity: 0.8, ...currentFont }}>{restaurant.menuItemMatches.map(meal => meals?.find(m => m.mealId === meal)?.name ?? 'No meal'.toLocaleLowerCase()).join(', ')}</Text></View>}
             </View>
             <Button buttonStyle={{ ...styles.button, paddingHorizontal: 25, marginTop: 0 }} titleStyle={{ ...styles.buttonTitle, fontSize: 12 }} onPress={() => { router.push({ pathname: "/restaurant", params: { restaurant: JSON.stringify(restaurant) } }); setShowModal(undefined); }} title={('view more').toUpperCase()} />
           </View>

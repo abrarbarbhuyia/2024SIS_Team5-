@@ -95,7 +95,6 @@ const Home = () => {
       <Card containerStyle={styles.recentCard}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Text h4 style={{ color: '#2E1C47' }}>Last Visited</Text>
-          <Icon name="arrowright" type="antdesign" size={25} onPress={() => console.log("Recent arrow clicked")} />
         </View>
         {/* Rendering the fetched restaurant data in carousel */}
         <FlatList
@@ -111,7 +110,6 @@ const Home = () => {
       <Card containerStyle={styles.recommendationsCard}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Text h4 style={{ color: '#2E1C47' }}>Recommendations</Text>
-          <Icon name="arrowright" type="antdesign" size={25} onPress={() => console.log("Recommendations arrow clicked")} />
         </View>
         {/* passing in static restaurants, but can handle any passed in */}
         <RecommendedRestaurant restaurant={fetchedRestaurants[2]}/>

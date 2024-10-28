@@ -1,7 +1,5 @@
 import { View, Image, TouchableOpacity } from "react-native";
 import { Icon, Text, Overlay, Button, Badge } from '@rneui/themed';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { jwtDecode } from 'jwt-decode';
 import React from "react";
 import { styles } from '../styles/app-styles';
 import axios from 'axios';
@@ -10,12 +8,13 @@ import { getDistance } from 'geolib';
 import { router } from "expo-router";
 import { isRestaurantOpen } from "@/components/RestaurantModal";
 import Layout from "@/components/Layout";
-import { Restaurant, Favourite, cuisineType, JwtPayload } from "@/constants/interfaces";
+import { Restaurant, Favourite, cuisineType } from "@/constants/interfaces";
+import useLoadUser from '@/hooks/useLoadUser';
 
 const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
 export default function Favourites() {
-    const [username, setUsername] = React.useState<string>();
+    const { username, loadUser } = useLoadUser();
     const [favourites, setFavourites] = React.useState<Favourite[]>([]);
     const [restaurants, setRestaurants] = React.useState<Restaurant[]>([]);
     const [favouriteToRemove, setFavouriteToRemove] = React.useState<Favourite>();
@@ -35,21 +34,9 @@ export default function Favourites() {
             );
     }
 
-    const loadUser = React.useCallback(async () => {
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
-            try {
-                const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
-                setUsername(decodedToken.username);
-            } catch (error) {
-                console.error("Invalid token");
-            }
-        }
-    }, []);
-
     React.useEffect(() => {
         loadUser();
-    }, [loadUser]);
+    }, [loadUser, username]);
 
     const fetchFavourites = async () => {
         const url = `http://${HOST_IP}:4000/user/getUser/${username}`;

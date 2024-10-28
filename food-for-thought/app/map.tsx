@@ -473,6 +473,7 @@ const RestaurantMap = () => {
             userLocation={userLocation}
             restaurant={activeRestaurant}
             username={username}
+            currentFilters={activeFilters}
           />
         )}
       </BottomSheetModalProvider>

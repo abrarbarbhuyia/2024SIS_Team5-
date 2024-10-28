@@ -1,20 +1,15 @@
 import { View, Image, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import { Text, Icon } from '@rneui/themed';
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Constants from 'expo-constants';
-import { cuisineType, JwtPayload, Meal, Menu, Restaurant } from '@/constants/interfaces';
+import { cuisineType, Meal, Menu, Restaurant, UserPreferences } from '@/constants/interfaces';
 import { currentFont, styles } from "@/styles/app-styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
 import { jwtDecode } from "jwt-decode";
 import { formatTextValue } from "@/utils";
-
-interface UserPreferences {
-    name: string;
-    type: string;
-  }
 
 export default function RecommendedRestaurant({ restaurant }: { restaurant: Restaurant }) {
     const [menu, setMenu] = useState<Menu>();

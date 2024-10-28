@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import { View, StyleSheet, Dimensions } from "react-native";
 import { Card, Text } from '@rneui/themed';
 import React from "react";
@@ -7,13 +6,15 @@ import RestaurantGallery from "@/components/RestaurantGallery";
 import RestaurantDescription from "@/components/RestaurantDescription";
 import RestaurantMenu from "@/components/RestaurantMenu";
 import { useLocalSearchParams } from "expo-router";
+import Layout from "@/components/Layout";
+import { currentFont } from "@/styles/app-styles";
 
 export default function Restaurant() {
     const [selectedIndex, setSelectedIndex] = React.useState(0);
     //need to get the restaurant data from path route - object was stringified
     const {restaurant, activeFilters} = useLocalSearchParams();
     const filters: {type: String, value: String}[] = activeFilters ? JSON.parse(activeFilters.toString()) : [];
-    const restaurantData = JSON.parse(restaurant);
+    const restaurantData = JSON.parse(restaurant.toString());
 
     // Components to load based on selected index, passes restaurant data
     const renderContent = () => {
@@ -30,22 +31,22 @@ export default function Restaurant() {
     };
 
     return (
+        <Layout>
         <View style={styles.pageContainer} >
-            <Header />
             <View style={styles.detailsContainer}>
-                <Text h4 style={{padding: 15,}}>{restaurantData.name}</Text>
-                <Card containerStyle={styles.tabContainer}>
+                <Text h3 style={{padding: 15, ...currentFont, fontWeight: '500'}}>{restaurantData.name}</Text>
+                <Card containerStyle={{...styles.tabContainer}}>
                 <ButtonGroup
                     buttonStyle={{  backgroundColor: '#FBF8FF' }}
                     selectedButtonStyle={{ backgroundColor: '#E8DEF8' }}
                     buttons={[
-                    <Text>Menu</Text>,
-                    <Text>Description</Text>,
-                    <Text>Gallery</Text>
+                   "Menu", "Description", "Gallery"
                     ]}
                     selectedIndex={selectedIndex}
                     onPress={setSelectedIndex}
-                    containerStyle={{borderTopStartRadius: 16, borderTopEndRadius: 16, borderWidth: 0, height: 50}}
+                    selectedTextStyle={{color: "#1D1B20", fontSize: 14, ...currentFont}}
+                    textStyle={{color: "#1D1B20", fontSize: 14, ...currentFont}}
+                    containerStyle={{borderTopStartRadius: 16, borderTopEndRadius: 16, borderWidth: 0, height: 50, marginHorizontal: -2, marginVertical: 0}}
                 />
                 <Card.Divider/>
                 {/* load in page component or sumn based on selected button? */}
@@ -53,6 +54,7 @@ export default function Restaurant() {
                 </Card>
             </View>
         </View>
+    </Layout>
     )
 }
 

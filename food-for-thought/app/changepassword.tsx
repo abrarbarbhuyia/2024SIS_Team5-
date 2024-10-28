@@ -5,42 +5,28 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Image,
-  Alert,
+  Image
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import axios from "axios";
 import { Card } from "@rneui/themed";
 import { styles } from "../styles/app-styles";
 import Constants from "expo-constants";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { jwtDecode } from "jwt-decode";
 import Layout from "@/components/Layout";
+import useLoadUser from '@/hooks/useLoadUser';
 
 const ChangePassword = () => {
-  const [username, setUsername] = useState("");
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const { username, loadUser } = useLoadUser();
+  const [oldPassword, setOldPassword] = useState<string>("");
+  const [newPassword, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>();
 
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
-  const loadUser = useCallback(async () => {
-    const token = await AsyncStorage.getItem("token");
-    if (token) {
-      try {
-        const decodedToken: any = jwtDecode(token);
-        setUsername(decodedToken.username);
-      } catch (error) {
-        setErrorMessage("Invalid token");
-      }
-    }
-  }, []);
-
   useEffect(() => {
     loadUser();
-  }, [loadUser]);
+  }, [loadUser, username]);
 
   const handleChangePassword = useCallback(async () => {
     if (newPassword !== confirmPassword) {

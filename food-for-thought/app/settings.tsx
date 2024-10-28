@@ -5,7 +5,6 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Card, Slider } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import Header from "@/components/Header";
 import Layout from '@/components/Layout';
 
 const Settings = () => {

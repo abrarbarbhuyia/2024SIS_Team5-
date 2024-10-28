@@ -26,7 +26,6 @@ import { Badge, Card, Icon, Text } from "@rneui/themed";
 import axios from "axios";
 import MapView, { Marker } from "react-native-maps";
 import { DietaryFilterModal } from "@/components/DietaryFilterModal";
-import Header from "@/components/Header";
 import { capitaliseFirstLetter, formatTextValue } from "@/utils";
 import { RestaurantModal } from "@/components/RestaurantModal";
 import { styles } from "../styles/app-styles";
@@ -34,49 +33,8 @@ import Constants from "expo-constants";
 import { getDistance } from "geolib";
 import Layout from "@/components/Layout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { jwtDecode } from "jwt-decode";
-
-interface UserPreferences {
-  name: string;
-  type: string;
-}
-
-export type Restaurant = {
-  _id: string;
-  restaurantId: string;
-  name: string;
-  address: string;
-  latitude: string;
-  longitude: string;
-  openingHours?: [
-    {
-      close: string;
-      day: number;
-      open: string;
-    }
-  ];
-  phoneNumber: string;
-  website: string;
-  cuisineType?: {
-    cuisineType: string;
-    icon: string;
-  }[];
-  restaurantType?: {
-    restaurantType: string;
-    icon: string;
-  }[];
-  // price rating out of 1: cheap, 2: average, 3: expensive, 4: very expensive
-  price: number;
-  // rating out of 10
-  rating: number;
-  total_ratings: number;
-  menuId: string;
-  restaurantPhotos?: string[];
-  foodPhotos?: string[];
-  hasMenu: boolean;
-  // number of matching menu items to the current dietary filters
-  menuItemMatches?: string[];
-};
+import { cuisineType, Restaurant, UserPreferences } from '@/constants/interfaces';
+import useLoadUser from '@/hooks/useLoadUser';
 
 const RestaurantMap = () => {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -89,7 +47,7 @@ const RestaurantMap = () => {
   >();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [username, setUsername] = useState<string>();
+  const { username, loadUser } = useLoadUser();
   const [filterByDietary, setFilterByDietary] = useState<boolean>(false);
   // initial region is hardcoded to UTS Tower
   const [userLocation, setUserLocation] = useState<{
@@ -121,22 +79,10 @@ const RestaurantMap = () => {
     }
   };
 
-  const loadUser = React.useCallback(async () => {
-    const token = await AsyncStorage.getItem("token");
-    if (token) {
-      try {
-        const decodedToken: any = jwtDecode(token);
-        setUsername(decodedToken.username);
-      } catch (error) {
-        console.error("Invalid token");
-      }
-    }
-  }, []);
-
   React.useEffect(() => {
     loadUser();
     loadSettings();
-  }, [loadUser]);
+  }, [loadUser, username]);
 
   const fetchUserPreferences = async (username: string) => {
     // if a user is logged in AND has filter by dietary preferences toggleOn - we can fetch their filters - otherwise we use state
@@ -298,7 +244,7 @@ const RestaurantMap = () => {
           <Text style={styles.formDescriptionText}>
             {item.cuisineType && item.cuisineType.length > 0
               ? item.cuisineType
-                  .map((cuisineObj: any) =>
+                  .map((cuisineObj: cuisineType) =>
                     capitaliseFirstLetter(cuisineObj.cuisineType)
                   )
                   .join(", ")
@@ -352,9 +298,8 @@ const RestaurantMap = () => {
                       key={`${f.type}-${f.value}`}
                       value={
                         <Text style={styles.filterText}>
-                          {`${
-                            f.type === "allergens" ? "No" : ""
-                          } ${capitaliseFirstLetter(f.value)}`}
+                          {`${f.type === "allergens" ? "No" : ""
+                            } ${capitaliseFirstLetter(f.value)}`}
                           <Icon
                             name="x"
                             type="feather"
@@ -363,10 +308,10 @@ const RestaurantMap = () => {
                             onPress={() =>
                               activeFilters.length > 0
                                 ? setActiveFilters(
-                                    activeFilters.filter(
-                                      (filter) => !(filter === f)
-                                    )
+                                  activeFilters.filter(
+                                    (filter) => !(filter === f)
                                   )
+                                )
                                 : null
                             }
                           />
@@ -410,7 +355,7 @@ const RestaurantMap = () => {
                           size={13}
                         />
                       )}
-                      <Text style={styles.typesText}>
+                      <Text style={{ ...styles.typesText, fontFamily: 'Roboto' }}>
                         {capitaliseFirstLetter(f)}
                       </Text>
                     </View>
@@ -522,11 +467,12 @@ const RestaurantMap = () => {
             setActiveFilters={setActiveFilters}
           />
         )}
-        {activeRestaurant && (
+        {activeRestaurant && username && (
           <RestaurantModal
             setShowModal={setActiveRestaurant}
             userLocation={userLocation}
             restaurant={activeRestaurant}
+            username={username}
           />
         )}
       </BottomSheetModalProvider>

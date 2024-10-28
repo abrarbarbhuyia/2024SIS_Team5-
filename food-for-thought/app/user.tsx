@@ -1,62 +1,61 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, TouchableOpacity, Pressable } from 'react-native';
 import { Card, Icon } from '@rneui/themed';
 import { router } from 'expo-router';
-import Header from "@/components/Header";     
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { jwtDecode } from 'jwt-decode';
 import { styles } from '../styles/app-styles';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import Layout from '@/components/Layout';
+import useLoadUser from '@/hooks/useLoadUser';
+import { useFocusEffect } from '@react-navigation/native';
 
 const UserProfile = () => {
-  const [username, setUsername] = useState('');
-  const [isGuest, setIsGuest] = useState(true);
-  const [userNotes, setUserNotes] = useState(0);
-  const [userFavourites, setUserFavourites] = useState(0);
-  const [userPreferences, setUserPreferences] = useState(0);
+  const { username, isGuest, loadUser } = useLoadUser();
+  const [userNotes, setUserNotes] = useState<number>(0);
+  const [userFavourites, setUserFavourites] = useState<number>(0);
+  const [userPreferences, setUserPreferences] = useState<number>(0);
+  const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
-  const loadUser = useCallback(async () => {
-    const token = await AsyncStorage.getItem('token');
-    if (token) {
-      try {
-        const decodedToken: any = jwtDecode(token);
-        setUsername(decodedToken.username);
-        setIsGuest(false);
-      } catch (error) {
-        console.error("Invalid token");
+  useFocusEffect(
+    useCallback(() => {
+      loadUser();
+      if (username) {
+        fetchNotes();
+        handleUserDetails();
       }
-    }
-  }, []);
-
-  useEffect(() => {
-    loadUser();
-    handleUserDetails();
-  }, [loadUser]);
+    }, [username])
+  );
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
-    setUsername('');
-    setIsGuest(true);
     router.push('/');
+    loadUser();
   };
 
-  const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
-
-  const handleUserDetails = useCallback(async () => {
-    try {
-      if (!isGuest) {
-        const response = await axios.get(`http://${HOST_IP}:4000/user/getUser/${username}`);
-        setUserFavourites(response.data?.favourites?.length ?? 0);
-        // To do: update user notes count
-        // setUserNotes(response.data?.notes?.length ?? 0);
-        setUserPreferences(response.data?.preferences?.length ?? 0);
+  const fetchNotes = async () => {
+    if (username) {
+      const url = `http://${HOST_IP}:4000/note/getNotes/${username}`;
+      try {
+        const response = await axios.get(url);
+        setUserNotes(response?.data?.length || 0);
+      } catch (error) {
+        console.error("Error fetching notes", error);
       }
-    } catch (error: any) {
-      console.error(error);
     }
-  }, [userNotes, userFavourites, userPreferences]);
+  };
+
+  const handleUserDetails = async () => {
+    try {
+      if (username) {
+        const response = await axios.get(`http://${HOST_IP}:4000/user/getUser/${username}`);
+        setUserFavourites(response.data[0]?.favourites?.length || 0);
+        setUserPreferences(response.data[0]?.preferences?.length || 0);
+      }
+    } catch (error) {
+      console.error('Unable to get user details', error);
+    }
+  };
 
   return (
     <Layout>
@@ -65,7 +64,11 @@ const UserProfile = () => {
 
         {isGuest ? (
           <Text style={styles.supportingText}>
-            Currently browsing as a guest. Please log in to add user preferences, favourites, and personal notes.
+            Currently browsing as a guest. Please{' '}
+            <Pressable onPress={() => router.push('/login')}>
+                <Text style={[styles.supportingText, {color: '#720BC4', marginBottom: -11}]}>log in</Text>
+            </Pressable>{' '}
+            to add user preferences, favourites, and personal notes.
           </Text>
         ) : (
           <Text style={styles.subtitle}>{username}</Text>
@@ -77,15 +80,15 @@ const UserProfile = () => {
 
         {!isGuest && (
           <View style={styles.userContainer}>
-            <TouchableOpacity onPress={() => router.push('/home')}>
+            <TouchableOpacity onPress={() => router.push('/notes')}>
               <Card containerStyle={styles.user}>
                 <Icon style={styles.userIcon} name='note' type='material' size={40} />
                 <Text style={styles.userCount}>{userNotes}</Text>
                 <Text style={styles.userText}>Notes</Text>
               </Card>
-           </TouchableOpacity>
+            </TouchableOpacity>
 
-           <TouchableOpacity onPress={() => router.push('/home')}>
+            <TouchableOpacity onPress={() => router.push('/favourites')}>
               <Card containerStyle={styles.user}>
                 <Icon style={styles.userIcon} name='favorite' type='material' size={40} />
                 <Text style={styles.userCount}>{userFavourites}</Text>

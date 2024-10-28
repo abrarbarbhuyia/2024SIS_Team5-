@@ -1,10 +1,12 @@
-import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Image, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
-import { Text, Icon } from '@rneui/themed';      
-import { useEffect, useState } from "react";
+import { Text, Icon } from '@rneui/themed';
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from 'expo-constants';
+import { cuisineType, JwtPayload, Meal, Menu, Restaurant } from '@/constants/interfaces';
+import { currentFont, styles } from "@/styles/app-styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
 import { jwtDecode } from "jwt-decode";
 import { formatTextValue } from "@/utils";
@@ -14,11 +16,10 @@ interface UserPreferences {
     type: string;
   }
 
-export default function RecommendedRestaurant({restaurant} : any) {
-
-    const [isFavourite, setIsFavourite] = useState(false);
-    const [menu, setMenu] = useState(null);
-    const [meals, setMeals] = useState([]);
+export default function RecommendedRestaurant({ restaurant }: { restaurant: Restaurant }) {
+    const [menu, setMenu] = useState<Menu>();
+    const [meals, setMeals] = useState<Meal[]>([]);
+    const [favourites, setFavourites] = useState<string[]>([]);
     const item = restaurant || {};
     const restaurantId = item.restaurantId;
     const [username, setUsername] = useState<string>();
@@ -100,7 +101,7 @@ export default function RecommendedRestaurant({restaurant} : any) {
     }, [restaurantId]);
 
     //fetch menu using restaurantId
-    const fetchMenu = async (restaurantId : any) => {
+    const fetchMenu = async (restaurantId: string) => {
         try {
             const response = await axios.get(`http://${HOST_IP}:4000/menu/getMenu/${restaurantId}`);
             const menuData = response.data;
@@ -114,7 +115,7 @@ export default function RecommendedRestaurant({restaurant} : any) {
         }
     };
 
-    const fetchMeals = async (menuId : any) => {
+    const fetchMeals = async (menuId: string) => {
         try {
             const response = await axios.get(`http://${HOST_IP}:4000/meal/getMealByMenuId/${menuId}`);
             setMeals(response.data);
@@ -123,31 +124,62 @@ export default function RecommendedRestaurant({restaurant} : any) {
         }
     };
 
-    const toggleFavourite = () => {
-        setIsFavourite((prev) => !prev);
-        isFavourite ? console.log("Unfavourited " + item.name) : console.log("Favourited " + item.name);
-        //store favourited restaurant
+    const fetchFavourites = async () => {
+        const url = `http://${HOST_IP}:4000/user/getUser/${username}`;
+        await axios.get(url)
+            .then(response => {
+                const userDetails = response.data;
+                const favouritesArray: string[] = userDetails[0].favourites ?? [];
+                setFavourites(favouritesArray);
+            })
+            .catch(error => console.error("Error fetching the favourites", error));
+    }
+
+    useEffect(() => {
+        if (username) {
+            fetchFavourites();
+        }
+    }, [username]);
+
+    const toggleFavourite = async () => {
+        try {
+            if (!favourites.find(f => restaurantId === f)) {
+                const response = await axios.put(`http://${HOST_IP}:4000/user/addFavourite/${username}/${restaurantId}`);
+                setFavourites(favourites.concat([restaurantId]));
+                if (response.status !== 200) {
+                    console.log("Error adding favourite:", response);
+                }
+            } else {
+                const response = await axios.delete(`http://${HOST_IP}:4000/user/deleteFavourite/${username}/${restaurantId}`);
+                setFavourites(favourites.filter(f => f !== restaurantId));
+                if (response.status !== 200) {
+                    console.log("Error deleting favourite:", response);
+                }
+            }
+        } catch (error) {
+            console.error('Error updating favourite status:', error);
+        }
     };
 
     return (
-        <TouchableOpacity 
-            style={{height: '42%', padding: 3, backgroundColor: 'white', marginBottom: 5, borderRadius: 16}} 
-            onPress={() => router.push({pathname: '/restaurant', params: {restaurant: JSON.stringify(item), activeFilters: JSON.stringify(activeFilters)}})}>
-            <View style={{borderRadius: 16, flex: 1, flexDirection: 'row'}}>
-                <Image source={ item.foodPhotos && item.foodPhotos.length > 0 ? { uri: item.foodPhotos[0]} : []} style={{width: '30%', height: '100%', borderRadius: 16}} />
-                <View style={{flex: 1, flexDirection: 'column', paddingLeft: 10}}>
-                    <Text style={{fontSize: 18, fontWeight: 'bold'}}>{item.name || 'Restaurant Title'}</Text>
-                    <Text numberOfLines={2} style={{fontSize: 12, opacity: 0.7}}>{item.cuisineType?.map((cuisine : any) => cuisine.cuisineType).join('/') || 'Miscellaneous'} food such as {meals.length > 0 ? meals.map((meal : any) => meal.name).slice(0, 3).join(', ') : '<menu item>'}.</Text>
+        <TouchableOpacity
+            style={{ height: '42%', padding: 3, backgroundColor: 'white', marginBottom: 5, borderRadius: 16 }}
+            onPress={() => router.push({ pathname: '/restaurant', params: { restaurant: JSON.stringify(item), activeFilters: JSON.stringify(activeFilters)}})}>
+            <View style={{ borderRadius: 16, flex: 1, flexDirection: 'row' }}>
+                <Image source={item.foodPhotos && item.foodPhotos.length > 0 ? { uri: item.foodPhotos[0] } : []} style={{ width: '30%', height: '100%', borderRadius: 16 }} />
+                <View style={{ flex: 1, flexDirection: 'column', paddingLeft: 10 }}>
+                    <Text style={{ fontSize: 17, fontWeight: 'bold', ...currentFont }}>{item.name || 'Restaurant Title'}</Text>
+                    <Text numberOfLines={2} style={{ fontSize: 12, opacity: 0.7, ...currentFont }}>{item.cuisineType?.map((cuisine: cuisineType) => cuisine.cuisineType).join('/') || 'Miscellaneous'} food such as {meals.length > 0 ? meals.map((meal: Meal) => meal.name).slice(0, 3).join(', ') : '<menu item>'}.</Text>
                     <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row' }}>
                         <Icon
-                            name={isFavourite ? "star" : "star-outlined"}
-                            type="entypo"
-                            size={25}
+                            name='star'
+                            type='font-awesome'
+                            iconStyle={favourites.find(f => f === restaurantId) ? styles.filledStar : styles.unfilledStar}
                             onPress={toggleFavourite}
-                            color={isFavourite ? '#FCBE09' : 'black'}
+                            size={22}
                         />
-                        <Text style={{ fontSize: 11, padding: 5 }}>
-                            {isFavourite ? "Favourited!" : "Add to Favourites"}
+                        <Text style={{ fontSize: 11, padding: 5, ...currentFont }}>
+                            {favourites.find(f => f === restaurantId)  ? "Favourited!" : "Add to Favourites"}
                         </Text>
                     </View>
                 </View>

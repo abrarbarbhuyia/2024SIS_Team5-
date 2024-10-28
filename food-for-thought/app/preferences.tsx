@@ -1,21 +1,15 @@
-import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { View, FlatList } from "react-native";
 import { Button, Card, Text } from "@rneui/themed";
 import axios from "axios";
-import { styles } from "../styles/app-styles";
-import Header from "@/components/Header";
+import { currentFont, styles } from "../styles/app-styles";
 import { DietaryChoiceModal } from "@/components/DietaryChoiceModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Layout from "@/components/Layout";
 import { jwtDecode } from "jwt-decode";
 import Constants from "expo-constants";
-
-// Define the type for your table data
-interface TableData {
-  name: string;
-  type: string;
-}
+import { JwtPayload, UserPreferences } from "@/constants/interfaces";
+import useLoadUser from '@/hooks/useLoadUser';
 
 // Function to get color based on type
 const getTypeColor = (type: string) => {
@@ -38,7 +32,7 @@ const renderRow = ({
   item,
   handleDelete,
 }: {
-  item: TableData;
+  item: UserPreferences;
   handleDelete: (name: string) => void;
 }) => (
   <View
@@ -57,7 +51,7 @@ const renderRow = ({
         alignItems: "center",
       }}
     >
-      <Text style={{ textAlign: "center" }}>{item.name}</Text>
+      <Text style={{ textAlign: "center", ...currentFont }}>{item.name}</Text>
     </View>
 
     <View
@@ -88,7 +82,7 @@ const renderRow = ({
           alignItems: "center",
         }}
       >
-        <Text style={{ textAlign: "center" }}>{item.type}</Text>
+        <Text style={{ textAlign: "center", ...currentFont }}>{item.type}</Text>
       </View>
 
       <Button
@@ -108,27 +102,8 @@ const Preferences: React.FC = () => {
   const [dietaryChoiceModal, setDietaryChoiceModal] = useState<
     boolean | undefined
   >(false);
-  const [username, setUsername] = useState<string>("");
-  const [tableData, setTableData] = useState<TableData[]>([]);
-
-  // Get current logged-in user ID
-  const loadUser = useCallback(async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (token) {
-        const decodedToken: any = jwtDecode(token);
-        if (decodedToken?.username) {
-          setUsername(decodedToken.username);
-        } else {
-          console.error("Decoded token does not have username");
-        }
-      } else {
-        console.error("No token found");
-      }
-    } catch (error) {
-      console.error("Invalid token or unable to decode", error);
-    }
-  }, []);
+  const [tableData, setTableData] = useState<UserPreferences[]>([]);
+  const { username, loadUser } = useLoadUser();
 
   // Get dietary preference table data (user.preferences)
   const loadPreferences = useCallback(async (username: string) => {
@@ -137,7 +112,6 @@ const Preferences: React.FC = () => {
       return;
     }
     const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
-    console.log("HOST IP", HOST_IP);
     try {
       const response = await axios.get(
         `http://${HOST_IP}:4000/user/getUserPreference/${username}`
@@ -155,7 +129,7 @@ const Preferences: React.FC = () => {
       const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
       const token = await AsyncStorage.getItem("token");
       if (token) {
-        const decodedToken: any = jwtDecode(token);
+        const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
         const username = decodedToken.username;
 
         const response = await axios.delete(
@@ -182,7 +156,7 @@ const Preferences: React.FC = () => {
 
   useEffect(() => {
     loadUser();
-  }, [loadUser]);
+  }, [loadUser, username]);
 
   useEffect(() => {
     if (username) {
@@ -193,7 +167,7 @@ const Preferences: React.FC = () => {
   return (
       <Layout>
       <View style={{ alignItems: "center", marginBottom: 16 }}>
-        <Text h3 style={{ color: "#1D1B20", fontWeight: "600" }}>
+        <Text h3 style={{ color: "#1D1B20", fontWeight: "600", ...currentFont }}>
           Dietary Preferences
         </Text>
         <Button
@@ -212,7 +186,7 @@ const Preferences: React.FC = () => {
               padding: 10,
             }}
           >
-            <Text style={{ flex: 1, fontWeight: "bold", textAlign: "center" }}>
+            <Text style={{ flex: 1, fontWeight: "bold", textAlign: "center", ...currentFont }}>
               Name
             </Text>
             <View
@@ -223,7 +197,7 @@ const Preferences: React.FC = () => {
                 marginHorizontal: 10,
               }}
             />
-            <Text style={{ flex: 1, fontWeight: "bold", textAlign: "center" }}>
+            <Text style={{ flex: 1, fontWeight: "bold", textAlign: "center", ...currentFont }}>
               Type
             </Text>
           </View>

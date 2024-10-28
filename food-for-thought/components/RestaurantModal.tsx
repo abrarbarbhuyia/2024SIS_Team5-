@@ -98,6 +98,16 @@ const formatTime = (time: string) => {
   return `${formattedHours}:${minutes} ${suffix}`;
 };
 
+export const calculateCategories = (cuisineType?: string[], restaurantType?: string[]) => {
+  if (cuisineType && cuisineType.length > 0) {
+    return cuisineType.join(', ');
+  }
+  if (restaurantType && restaurantType.length > 0) {
+    return restaurantType[0].toLowerCase().includes('caf') ? 'Cafe' : restaurantType[0];
+  }
+  return undefined;
+}
+
 export function RestaurantModal({ restaurant, userLocation, username, setShowModal, ...rest }: RestaurantModalProps) {
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
   const [meals, setMeals] = React.useState<Meal[]>();
@@ -201,16 +211,6 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
     const restaurantLocation = { latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
     const distanceInMeters = getDistance(userLocation, restaurantLocation);
     return (distanceInMeters / 1000).toFixed(2);
-  }
-
-  const calculateCategories = (cuisineType?: string[], restaurantType?: string[]) => {
-    if (cuisineType && cuisineType.length > 0) {
-      return cuisineType.join(', ');
-    }
-    if (restaurantType && restaurantType.length > 0) {
-      return restaurantType[0].toLowerCase().includes('caf') ? 'Cafe' : restaurantType[0];
-    }
-    return undefined;
   }
 
   return (

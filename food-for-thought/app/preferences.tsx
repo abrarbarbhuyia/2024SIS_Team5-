@@ -51,7 +51,7 @@ const renderRow = ({
         alignItems: "center",
       }}
     >
-      <Text style={{ textAlign: "center" }}>{item.name}</Text>
+      <Text style={{ textAlign: "center", ...currentFont }}>{item.name}</Text>
     </View>
 
     <View
@@ -82,7 +82,7 @@ const renderRow = ({
           alignItems: "center",
         }}
       >
-        <Text style={{ textAlign: "center" }}>{item.type}</Text>
+        <Text style={{ textAlign: "center", ...currentFont }}>{item.type}</Text>
       </View>
 
       <Button
@@ -167,7 +167,7 @@ const Preferences: React.FC = () => {
   return (
       <Layout>
       <View style={{ alignItems: "center", marginBottom: 16 }}>
-        <Text h3 style={{ color: "#1D1B20", fontWeight: "600",...currentFont }}>
+        <Text h3 style={{ color: "#1D1B20", fontWeight: "600", ...currentFont }}>
           Dietary Preferences
         </Text>
         <Button

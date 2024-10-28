@@ -1,12 +1,12 @@
 import { View, Image, TouchableOpacity } from "react-native";
-import { Icon, Text, Overlay, Button, Badge } from '@rneui/themed';
+import { Icon, Text, Overlay, Button, Badge, Card } from '@rneui/themed';
 import React from "react";
 import { currentFont, styles } from '../styles/app-styles';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import { getDistance } from 'geolib';
 import { router } from "expo-router";
-import { isRestaurantOpen } from "@/components/RestaurantModal";
+import { calculateCategories, isRestaurantOpen } from "@/components/RestaurantModal";
 import Layout from "@/components/Layout";
 import { Restaurant, Favourite, cuisineType } from "@/constants/interfaces";
 import useLoadUser from '@/hooks/useLoadUser';
@@ -53,7 +53,8 @@ export default function Favourites() {
                         imageUrl: restaurant.foodPhotos?.[0] ?? "https://reactjs.org/logo-og.png",
                         name: restaurant.name,
                         isOpen: restaurant.openingHours ? isRestaurantOpen(restaurant.openingHours).isOpen : false,
-                        cuisines: restaurant.cuisineType?.map((c: cuisineType) => c.cuisineType) ?? []
+                        cuisines: restaurant.cuisineType?.map((c: cuisineType) => c.cuisineType) ?? [],
+                        restaurantTypes: restaurant.restaurantType?.map(r => r.restaurantType) ?? []
                     }
                 }) as Favourite[])
             })
@@ -86,9 +87,9 @@ export default function Favourites() {
         <Layout>
             <View style={{ ...styles.pageContainer, justifyContent: 'flex-start' }} >
                 <View style={{ ...styles.detailsContainer }}>
-                    <Text style={styles.subtitle}>Favourites</Text>
+                    <Text h3 style={{ color: "#1D1B20", fontWeight: "600", ...currentFont }}>Favourites</Text>
                     <Text style={styles.userText}>A list of your favourite restaurants</Text>
-                    {favourites && favourites.length > 0 ? <View style={{ ...styles.rectangle, shadowOpacity: 0.2, marginTop: 35, paddingVertical: 2 }}>
+                    {favourites && favourites.length > 0 ? <Card containerStyle={{ ...styles.rectangle, marginTop: 20, paddingVertical: 5, paddingHorizontal: 0, alignItems: 'stretch'}}>
                         {favourites.map((f, i) =>
                             <View key={f.restaurantId} style={{ flexDirection: 'row', paddingVertical: 10, ...(favourites.length - 1 !== i && {borderBottomWidth: 1, borderBottomColor: '#EEE'})}}>
                                 <View style={{ flex: 2, flexDirection: 'column', alignItems: 'center' }}>
@@ -119,7 +120,7 @@ export default function Favourites() {
                                             value={f.isOpen ? 'Open' : 'Closed'}
                                             textStyle={{ ...styles.badgeText, fontSize: 10, fontWeight: '600', ...currentFont }}
                                         />
-                                        <Text style={styles.userText}>{f.cuisines && f.cuisines.length > 0 ? f.cuisines.join(', ') : 'Other'}</Text>
+                                        <Text style={{...styles.userText, paddingTop: 1, marginBottom: -2}}>{calculateCategories(f.cuisines, f.restaurantTypes) ?? 'Other'}</Text>
                                         <Text style={styles.userText}>{userLocation && calculateRestaurantDistance(userLocation, f.latitude, f.longitude)} km away</Text>
                                     </View>
                                     <View style={{ flex: 0.8, flexDirection: 'column', alignItems: 'flex-start', paddingLeft: 5 }}>
@@ -149,7 +150,7 @@ export default function Favourites() {
                                     title={('unfavourite').toUpperCase()} />
                             </View>
                         </Overlay>}
-                    </View>
+                    </Card>
                         : <View style={{ paddingTop: 20 }}><Text>Please add favourites from the restaurant finder page.</Text></View>
                     }
                 </View>

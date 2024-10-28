@@ -13,14 +13,14 @@ export default function Restaurant() {
     const [selectedIndex, setSelectedIndex] = React.useState(0);
     //need to get the restaurant data from path route - object was stringified
     const {restaurant, activeFilters} = useLocalSearchParams();
-    const filters: {type: String, value: String}[] = activeFilters ? JSON.parse(activeFilters.toString()) : [];
+    const filters: {type: string, value: string}[] = activeFilters ? JSON.parse(activeFilters.toString()) : [];
     const restaurantData = JSON.parse(restaurant.toString());
 
     // Components to load based on selected index, passes restaurant data
     const renderContent = () => {
         switch (selectedIndex) {
             case 0:
-                return <RestaurantMenu restaurant={restaurantData}/>;
+                return <RestaurantMenu restaurant={restaurantData} filters={filters}/>;
             case 1:
                 return <RestaurantDescription restaurant={restaurantData}/>;
             case 2:

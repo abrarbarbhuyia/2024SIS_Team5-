@@ -86,11 +86,8 @@ export default function RestaurantDescription({ restaurant }: { restaurant: Rest
                 <Text style={styles.body}>{calculateRestaurantDistance(userLocation, restaurant.latitude, restaurant.longitude)} kms</Text>
             </View>
             <View style={styles.textDetail}>
-                <Text style={styles.body}>Mixed Asian vegetarian meals like san chow pow, in a basic space with simple seating and comfy vibe.</Text>
+                <Text style={styles.body}>{restaurant.menuItemMatches ? restaurant.menuItemMatches.length : 0} menu items that match your dietary requirements!</Text>
             </View>
-            {/* <View style={styles.textDetail}>
-                <Text style={styles.body}>{restaurant.menuItemMatches ? restaurant.menuItemMatches : 0} menu items that match your dietary requirements!</Text>
-            </View> */}
             <View style={styles.ratingsView}>
                 <Text style={styles.body}>{rating.toFixed(2)}</Text>
                 <View style={{ flexDirection: 'row', paddingRight: 10, paddingLeft: 5 }}>

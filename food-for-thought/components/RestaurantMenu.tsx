@@ -6,31 +6,24 @@ import { ScrollView } from "react-native-gesture-handler";
 import Constants from "expo-constants";
 import axios from "axios";
 import { currentFont, styles } from "@/styles/app-styles";
-import { Meal as MealType, Menu, Restaurant } from "@/constants/interfaces";
+import { JwtPayload, Meal as MealType, Menu, Restaurant, UserPreferences } from "@/constants/interfaces";
 import Meal from "./Meal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
 import { formatTextValue, capitaliseFirstLetter } from "@/utils";
 
-interface UserPreferences {
-    name: string;
-    type: string;
-}
-
-export default function RestaurantMenu({ restaurant }: { restaurant: Restaurant }) {
-    const menuURL = 'https://irp.cdn-website.com/1efc617b/files/uploaded/takeawaymenu_2021_Aug.pdf';
+export default function RestaurantMenu({ restaurant, filters }: { restaurant: Restaurant, filters: { type: string; value: string }[] }) {
     
-    //const [isMatchingMeal, setIsMatchingMeal] = React.useState(false);
     const [menu, setMenu] = useState<Menu>();
     const [meals, setMeals] = useState<MealType[]>([]);
-    //const [setFilter, setSetFilter] = useState(null);
     const [matchingMealsList, setMatchingMealsList] = useState<MealType[]>([]);
     const [otherMealsList, setOtherMealsList] = useState<MealType[]>([]);
     const [cachedMenu, setCachedMenu] = useState<Menu>(); // For caching menu data
     const item = restaurant || {};
+    const menuURL = item.website || 'https://irp.cdn-website.com/1efc617b/files/uploaded/takeawaymenu_2021_Aug.pdf';
     const restaurantId = item.restaurantId;
     const [username, setUsername] = useState<string>();
-    const [activeFilters, setActiveFilters] = useState<{ type: string; value: string }[]>([]);
+    const [activeFilters, setActiveFilters] = useState<{ type: string; value: string }[]>(filters ?? []);
     const [filterByDietary, setFilterByDietary] = useState<boolean>(false);
 
     const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
@@ -39,7 +32,7 @@ export default function RestaurantMenu({ restaurant }: { restaurant: Restaurant 
         const token = await AsyncStorage.getItem("token");
         if (token) {
             try {
-                const decodedToken: any = jwtDecode(token);
+                const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
                 setUsername(decodedToken.username);
             } catch (error) {
                 console.error("Invalid token");
@@ -69,7 +62,7 @@ export default function RestaurantMenu({ restaurant }: { restaurant: Restaurant 
                 await axios
                     .get(`http://${HOST_IP}:4000/user/getUserPreference/${username}`)
                     .then((response) => {
-                        if (response.data.length > 0) {
+                        if (response.data.length > 0 && !filters) {
                             setActiveFilters(
                                 response.data.map((p: UserPreferences) => ({
                                     type:
@@ -88,7 +81,7 @@ export default function RestaurantMenu({ restaurant }: { restaurant: Restaurant 
     };
 
     useEffect(() => {
-        if (username && filterByDietary) {
+        if (username && filterByDietary && !filters) {
             fetchUserPreferences(username);
         }
     }, [filterByDietary]);
@@ -127,7 +120,6 @@ export default function RestaurantMenu({ restaurant }: { restaurant: Restaurant 
 
     const fetchMatchingMeals = async () => {
         try {
-            console.log(activeFilters);
             if (activeFilters.length === 0) {
                 setMatchingMealsList(meals);
                 setOtherMealsList([]);
@@ -143,12 +135,9 @@ export default function RestaurantMenu({ restaurant }: { restaurant: Restaurant 
                 },
             });
             const restaurants = response.data;
-            const matchingMenuItemIds = restaurants.flatMap((r: any) => r.menuItemMatches || []);
-            console.log(matchingMenuItemIds);
-
-            const matchingMealsList = meals.filter((meal: any) => matchingMenuItemIds.includes(meal.mealId));
-            console.log(matchingMealsList);
-            const otherMealsList = meals.filter((meal: any) => !matchingMenuItemIds.includes(meal.mealId));
+            const matchingMenuItemIds = restaurants.flatMap((r: Restaurant) => r.menuItemMatches || []);
+            const matchingMealsList = meals.filter((meal: MealType) => matchingMenuItemIds.includes(meal.mealId));
+            const otherMealsList = meals.filter((meal: MealType) => !matchingMenuItemIds.includes(meal.mealId));
 
             setMatchingMealsList(matchingMealsList);
             setOtherMealsList(otherMealsList);
@@ -174,39 +163,45 @@ export default function RestaurantMenu({ restaurant }: { restaurant: Restaurant 
         <View style={{}}>
             <View style={styles.appliedFilters}>
                 <Text style={{...currentFont}}>Filtering by: </Text>
-                {activeFilters.length > 0 ? (
-                    activeFilters.map((f) => (
-                        <Badge
-                            badgeStyle={{
-                                ...styles.filterBackground,
-                                backgroundColor: filterColours[f.type]?.fill ?? "white",
-                                borderColor: filterColours[f.type]?.border ?? "white",
-                            }}
-                            textStyle={styles.filterText}
-                            key={`${f.type}-${f.value}`}
-                            value={
-                                <Text style={styles.filterText}>
-                                    {`${f.type === "allergens" ? "No" : ""} ${capitaliseFirstLetter(f.value)}`}
-                                    <Icon
-                                        name="x"
-                                        type="feather"
-                                        iconStyle={styles.badgesCross}
-                                        size={15}
-                                        onPress={() =>
-                                            activeFilters.length > 0
-                                                ? setActiveFilters(activeFilters.filter((filter) => !(filter === f)))
-                                                : null
-                                        }
-                                    />
-                                </Text>
-                            }
-                        />
-                    ))
-                ) : (
-                    <Text style={{ color: "grey", fontSize: 14, paddingLeft: 5 }}>
-                        No filters set
-                    </Text>
-                )}
+                <ScrollView 
+                    horizontal={true}
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.badgeScrollView}
+                >
+                    {activeFilters.length > 0 ? (
+                        activeFilters.map((f) => (
+                            <Badge
+                                badgeStyle={{
+                                    ...styles.filterBackground,
+                                    backgroundColor: filterColours[f.type]?.fill ?? "white",
+                                    borderColor: filterColours[f.type]?.border ?? "white",
+                                }}
+                                textStyle={styles.filterText}
+                                key={`${f.type}-${f.value}`}
+                                value={
+                                    <Text style={styles.filterText}>
+                                        {`${f.type === "allergens" ? "No" : ""} ${capitaliseFirstLetter(f.value)}`}
+                                        <Icon
+                                            name="x"
+                                            type="feather"
+                                            iconStyle={styles.badgesCross}
+                                            size={15}
+                                            onPress={() =>
+                                                activeFilters.length > 0
+                                                    ? setActiveFilters(activeFilters.filter((filter) => !(filter === f)))
+                                                    : null
+                                            }
+                                        />
+                                    </Text>
+                                }
+                            />
+                        ))
+                    ) : (
+                        <Text style={{ color: "grey", fontSize: 14, paddingLeft: 5 }}>
+                            No filters set
+                        </Text>
+                    )}
+                </ScrollView>
             </View>
             <View style={styles.clipboardLink}>
                 <Icon name='clipboard-list' type='font-awesome-5' size={22} color={"#A394B8"}/>

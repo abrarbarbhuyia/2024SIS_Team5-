@@ -601,7 +601,8 @@ export const styles = StyleSheet.create({
   appliedFilters: {
     flexDirection: 'row',
     paddingLeft: 20,
-    overflow: 'hidden',
+    overflow: 'scroll',
+    width: '100%',
     gap: 5
   },
   clipboardLink: {

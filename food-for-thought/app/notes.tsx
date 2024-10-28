@@ -1,40 +1,27 @@
 import { View, Image, TouchableOpacity } from "react-native";
 import { Icon, Text, Overlay, Button } from '@rneui/themed';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { jwtDecode } from 'jwt-decode';
 import React from "react";
 import { styles } from '../styles/app-styles';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import { NoteModal } from "@/components/NoteModal";
 import Layout from "@/components/Layout";
-import { Restaurant, Note, JwtPayload } from "@/constants/interfaces";
+import { Restaurant, Note } from "@/constants/interfaces";
+import useLoadUser from '@/hooks/useLoadUser';
 
 const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
 export default function Notes() {
-    const [username, setUsername] = React.useState<string>();
+    const { username, loadUser } = useLoadUser();
     const [notes, setNotes] = React.useState<Note[]>([]);
     const [noteToRemove, setNoteToRemove] = React.useState<Note>();
     const [restaurants, setRestaurants] = React.useState<Restaurant[]>([]);
     const [showNoteModal, setShowNoteModal] = React.useState<boolean>(false);
     const [activeNote, setActiveNote] = React.useState<Note>();
 
-    const loadUser = React.useCallback(async () => {
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
-            try {
-                const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
-                setUsername(decodedToken.username);
-            } catch (error) {
-                console.error("Invalid token");
-            }
-        }
-    }, []);
-
     React.useEffect(() => {
         loadUser();
-    }, [loadUser]);
+    }, [loadUser, username]);
 
     const renderStars = (rating: number) => {
         return (

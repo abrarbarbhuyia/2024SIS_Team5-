@@ -1,14 +1,29 @@
 import { Card } from '@rneui/themed';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { styles } from '../styles/app-styles'; 
+import useLoadUser from '@/hooks/useLoadUser';
 
 // Used to hide warnings for demo purposes
 // import { LogBox } from 'react-native';
 // LogBox.ignoreAllLogs();
 
 export default function Index() {
+  const { username, loadUser } = useLoadUser();
+
+  useEffect(() => {
+    loadUser();
+
+    if (username) {
+      router.push('/home');
+    }
+  }, [loadUser, username]);
+
+  if (username) {
+    return null;
+  }
+
   return (
     <View style={styles.loginContainer}>
       <Card containerStyle={styles.rectangle}>

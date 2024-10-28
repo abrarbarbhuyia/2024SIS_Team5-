@@ -9,6 +9,7 @@ import Layout from "@/components/Layout";
 import { jwtDecode } from "jwt-decode";
 import Constants from "expo-constants";
 import { JwtPayload, UserPreferences } from "@/constants/interfaces";
+import useLoadUser from '@/hooks/useLoadUser';
 
 // Function to get color based on type
 const getTypeColor = (type: string) => {
@@ -101,27 +102,8 @@ const Preferences: React.FC = () => {
   const [dietaryChoiceModal, setDietaryChoiceModal] = useState<
     boolean | undefined
   >(false);
-  const [username, setUsername] = useState<string>("");
   const [tableData, setTableData] = useState<UserPreferences[]>([]);
-
-  // Get current logged-in user ID
-  const loadUser = useCallback(async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (token) {
-        const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
-        if (decodedToken?.username) {
-          setUsername(decodedToken.username);
-        } else {
-          console.error("Decoded token does not have username");
-        }
-      } else {
-        console.error("No token found");
-      }
-    } catch (error) {
-      console.error("Invalid token or unable to decode", error);
-    }
-  }, []);
+  const { username, loadUser } = useLoadUser();
 
   // Get dietary preference table data (user.preferences)
   const loadPreferences = useCallback(async (username: string) => {
@@ -174,7 +156,7 @@ const Preferences: React.FC = () => {
 
   useEffect(() => {
     loadUser();
-  }, [loadUser]);
+  }, [loadUser, username]);
 
   useEffect(() => {
     if (username) {

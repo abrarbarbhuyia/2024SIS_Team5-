@@ -1,27 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, Pressable } from 'react-native';
 import { Card, Icon } from '@rneui/themed';
-import { router } from 'expo-router';  
+import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { styles } from '../styles/app-styles';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import Layout from '@/components/Layout';
 import useLoadUser from '@/hooks/useLoadUser';
+import { useFocusEffect } from '@react-navigation/native';
 
 const UserProfile = () => {
   const { username, isGuest, loadUser } = useLoadUser();
-  const [userNotes, setUserNotes] = useState<number>();
-  const [userFavourites, setUserFavourites] = useState<number>();
-  const [userPreferences, setUserPreferences] = useState<number>();
+  const [userNotes, setUserNotes] = useState<number>(0);
+  const [userFavourites, setUserFavourites] = useState<number>(0);
+  const [userPreferences, setUserPreferences] = useState<number>(0);
+  const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
-  useEffect(() => {
-    loadUser();
-    if (username) {
-      handleUserDetails();
-      fetchNotes();
-    }
-  }, [loadUser, username]);
+  useFocusEffect(
+    useCallback(() => {
+      loadUser();
+      if (username) {
+        fetchNotes();
+        handleUserDetails();
+      }
+    }, [username])
+  );
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
@@ -32,23 +36,23 @@ const UserProfile = () => {
   const fetchNotes = async () => {
     if (username) {
       const url = `http://${HOST_IP}:4000/note/getNotes/${username}`;
-      await axios.get(url)
-        .then(response => {
-          setUserNotes(response?.data?.length);
-        })
-        .catch(error => console.error("Error fetching all restaurants", error));
+      try {
+        const response = await axios.get(url);
+        setUserNotes(response?.data?.length || 0);
+      } catch (error) {
+        console.error("Error fetching notes", error);
+      }
     }
   };
-  const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
   const handleUserDetails = async () => {
     try {
       if (username) {
         const response = await axios.get(`http://${HOST_IP}:4000/user/getUser/${username}`);
-        setUserFavourites(response.data[0]?.favourites?.length ?? 0);
-        setUserPreferences(response.data[0]?.preferences?.length ?? 0);
+        setUserFavourites(response.data[0]?.favourites?.length || 0);
+        setUserPreferences(response.data[0]?.preferences?.length || 0);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Unable to get user details', error);
     }
   };

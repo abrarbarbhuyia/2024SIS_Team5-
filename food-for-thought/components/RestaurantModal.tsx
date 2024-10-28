@@ -250,10 +250,10 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
               </View>
             </View>
             {restaurant.name && <View style={styles.formHeaderContainer}>
-              <Text numberOfLines={1} style={styles.formHeaderText}>{restaurant.name}</Text>
+              <Text numberOfLines={1} style={{...styles.formHeaderText, fontSize: 22}}>{restaurant.name}</Text>
             </View>}
           </View>
-          <View style={styles.verticalFlexFormGroup}>
+          <View style={{...styles.verticalFlexFormGroup, paddingTop: 15}}>
             <View style={styles.flexFormGroup}>
               <Text style={styles.formDescriptionTextBold}>
                 {calculateCategories(restaurant.cuisineType ? restaurant.cuisineType?.map(c => c.cuisineType) : [],

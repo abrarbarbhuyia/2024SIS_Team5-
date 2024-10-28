@@ -1,60 +1,50 @@
-import { View, Image, StyleSheet, FlatList, Modal, TouchableOpacity } from "react-native";
+import { View, Image, FlatList, Modal, TouchableOpacity } from "react-native";
 import { Text } from '@rneui/themed';
 import React from "react";
-import pic from '../assets/images/react-logo.png';
+import { currentFont, styles } from "@/styles/app-styles";
+import { Restaurant } from "@/constants/interfaces";
 
-//mock images for gallery tab
-const carouselData = [
-    { id: '1', image: pic },
-    { id: '2', image: pic },
-    { id: '3', image: pic },
-    { id: '4', image: pic },
-    { id: '5', image: pic },
-    { id: '6', image: pic },
-    { id: '7', image: pic },
-];
+export default function RestaurantGallery({ restaurant }: { restaurant: Restaurant }) {
 
-export default function RestaurantGallery() {
-
-    const [modalVisible, setModalVisible] = React.useState(false);
-    const [selectedImage, setSelectedImage] = React.useState(null);
+    const [modalVisible, setModalVisible] = React.useState<boolean>(false);
+    const [selectedImage, setSelectedImage] = React.useState<string>("");
 
     //open and close modal
-    const openModal = (image) => {
+    const openModal = (image: string) => {
         setSelectedImage(image);
         setModalVisible(true);
     }
 
     const closeModal = () => {
-        setSelectedImage(null);
+        setSelectedImage("");
         setModalVisible(false);
     }
 
     //carousel view + styling
-    const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => openModal(item.image)}>
-        <View style={styles.imageContainer}>
-            <Image source={item.image} style={styles.image} />
+    const renderItem = ({ item } : { item: string }) => (
+    <TouchableOpacity onPress={() => openModal(item)}>
+        <View style={styles.galleryImageContainer}>
+            <Image source={{uri: item}} style={styles.image} />
         </View>
     </TouchableOpacity>
     )
 
     return (
         <View style={{padding: 10,}}>
-            <Text h4>Menu</Text>
+            <Text style={{...currentFont, fontWeight: 500, fontSize: 22 }}>Restaurant Photos</Text>
             <FlatList
-            data={carouselData}
+            data={restaurant?.restaurantPhotos || []}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={(item, index) => index.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.carousel}
             />
-            <Text h4 style={{paddingTop: 25}}>Other</Text>
+            <Text style={{paddingTop: 25, fontWeight: 500, ...currentFont, fontSize: 22 }}>Food Photos</Text>
             <FlatList
-            data={carouselData}
+            data={restaurant?.foodPhotos || []}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={(item, index) => index.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.carousel}
@@ -65,7 +55,7 @@ export default function RestaurantGallery() {
                 <View style={styles.modalContainer}>
                     <TouchableOpacity style={styles.modalBackground} onPress={closeModal}>
                         {selectedImage && (
-                            <Image source={selectedImage} style={styles.fullImage}/>
+                            <Image source={{uri: selectedImage}} style={styles.fullImage}/>
                         )}
                     </TouchableOpacity>
                 </View>
@@ -73,40 +63,3 @@ export default function RestaurantGallery() {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    carousel: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 10,
-    },
-    imageContainer: {
-        marginRight: 10,
-        backgroundColor: 'white',
-        borderRadius: 8,
-        overflow: 'hidden',
-        width: 180,
-        height: 180,
-    },
-    image: {
-        width: '100%',
-        height: '100%'
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    },
-    modalBackground: {
-        width: '100%',
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    fullImage: {
-        width: '90%',
-        height: '70%',
-        resizeMode: 'contain',
-    },
-})

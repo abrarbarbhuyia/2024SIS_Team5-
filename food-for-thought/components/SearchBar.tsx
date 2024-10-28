@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SearchBar } from '@rneui/themed';
 import { View, StyleSheet } from 'react-native';
 import { useRoute } from '@react-navigation/native';
+import { currentFont } from '@/styles/app-styles';
 
 type SearchBarComponentProps = {
   onSearch: (searchTerm: string) => void;
@@ -19,7 +20,7 @@ const SearchBarComponent: React.FunctionComponent<SearchBarComponentProps> = ({ 
         setPlaceholder('Search by dietary requirement...');
         break;
       default:
-        setPlaceholder('');
+        setPlaceholder('Search nearby restaurants...');
         break;
     }
   }, [route.name]);
@@ -62,8 +63,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   input: {
-    fontFamily: 'Roboto',
     fontSize: 18,
+    ...currentFont,
   },
 });
 

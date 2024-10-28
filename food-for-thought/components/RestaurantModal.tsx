@@ -1,202 +1,307 @@
-import { Button, Icon, Overlay, Divider, Badge } from "@rneui/themed";
-import { View, StyleSheet, Image, Text } from 'react-native';
+import { Button, Icon, Overlay } from "@rneui/themed";
+import { View, Image, Text } from 'react-native';
 import * as React from "react";
-import { capitaliseFirstLetter, formatTextValue } from "@/utils";
-import { Restaurant } from "@/app/map";
+import { styles, currentFont } from '../styles/app-styles';
+import { router } from "expo-router";
+import MenuItemBadge from "./MenuItemBadge";
+import { getDistance } from "geolib";
+import axios from "axios";
+import Constants from "expo-constants";
+import { Restaurant, Meal, Note } from "@/constants/interfaces"
+import { NoteModal } from "@/components/NoteModal"
 
-export type DietaryFilterProps = {
+export type RestaurantModalProps = {
   setShowModal: React.Dispatch<React.SetStateAction<Restaurant | undefined>>,
   restaurant: Restaurant,
+  userLocation: { latitude: number, longitude: number },
+  username: string,
+  currentFilters: {type: string, value: string}[],
 };
 
-export function RestaurantModal({ restaurant, setShowModal, ...rest }: DietaryFilterProps) {
+const getNextOpening = (openingHours: { close: string, day: number, open: string }[], currentDay: number) => {
+  const sortedOpeningHours = openingHours.sort((a, b) => a.day - b.day);
 
-  return <Overlay overlayStyle={styles.modal} isVisible={true} onBackdropPress={() => setShowModal(undefined)}>
-    <View style={styles.formHeader}>
-      <View style={styles.flexGroup}>
-        <View style={styles.imageContainer}>
-          <Image />
-        </View>
-        <View style={styles.iconsContainer}>
-          <Icon
-            name='x'
-            type='feather'
-            iconStyle={styles.icon}
-            size={22} 
-            onPress={() => setShowModal(undefined)}/>
-          <Icon
-            name='star'
-            type='feather'
-            iconStyle={styles.icon}
-            size={22} />
-          <Icon
-            name='edit'
-            type='feather'
-            iconStyle={styles.icon}
-            size={22} />
-        </View>
-      </View>
-      {restaurant.name && <View style={styles.formHeaderContainer}>
-        <Text style={styles.formHeaderText}>{restaurant.name}</Text>
-      </View>}
-    </View>
-    <View style={styles.verticalFlexFormGroup}>
-      <View style={styles.flexFormGroup}>
-        <Badge badgeStyle={styles.filterBackground}value={'PERFECT'} textStyle={styles.filterText} />
-        <Text style={styles.formDescriptionText}>
-          {Math.round(restaurant.rating ?? 0)} out of 5</Text>
-          <Icon
-            name='star'
-            type='font-awesome'
-            iconStyle={styles.ratingIcon}
-            size={17} />
-      </View>
-      <View style={styles.flexFormGroup}>
-        <Text style={styles.formDescriptionTextBold}>
-          {capitaliseFirstLetter(restaurant.cuisine ?? '')} • {restaurant.costRating} cost • {restaurant.distance}km away</Text>
-      </View>
-      <View style={styles.flexFormGroup}>
-        <Text style={styles.formDescriptionTextBold}>
-          {restaurant.menuMatches} menu items matches your dietary filters!
-        </Text>
-      </View>
-      <View style={styles.flexFormGroup}>
-        <Icon
-          name='map-pin'
-          type='feather'
-          iconStyle={styles.icon}
-          size={16} />
-        <Text style={styles.formDescriptionText}>{restaurant.address}</Text>
-      </View>
-      <View style={styles.flexFormGroup}>
-        <Icon
-          name='clock'
-          type='feather'
-          iconStyle={styles.icon}
-          size={16} />
-        <Text style={styles.formDescriptionText}>{restaurant.openingTimes}</Text>
-      </View>
-      <View style={{ ...styles.flexFormGroup, paddingBottom: 10 }}>
-        <Text style={styles.formDescriptionTextBold}>Matching menu items: </Text>
-      </View>
-      <Button buttonStyle={styles.button} titleStyle={styles.buttonTitle} onPress={() => null} title={('view more').toUpperCase()} />
-    </View>
-    <Divider style={{ marginBottom: 10 }} />
-  </Overlay>
+  for (let i = 1; i <= 7; i++) {
+    const nextDay = (currentDay + i) % 7 + 1;
+    const nextOpening = sortedOpeningHours.find(hours => hours.day === nextDay);
+    if (nextOpening) {
+      return { day: nextOpening.day, open: nextOpening.open };
+    }
+  }
+
+  return null;
+};
+
+export function getRestaurantPhoto(restaurantPhotos?: string[], foodPhotos?: string[]) {
+  const pic = require('../assets/images/react-logo.png'); // placeholder restaurant image
+  return (foodPhotos && foodPhotos.length > 0) ? foodPhotos[0]
+    : (restaurantPhotos && restaurantPhotos.length > 0) ? restaurantPhotos[0] : pic;
 }
 
-const styles = StyleSheet.create({
-  modal: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FBF8FF',
-    borderRadius: 20,
-    width: '90%',
-    padding: 0,
-  },
-  flexFormGroup: {
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    width: '100%',
-    flexDirection: 'row',
-    gap: 15,
-  },
-  verticalFlexFormGroup: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    padding: 20,
-    flexDirection: 'column',
-    gap: 10,
-  },
-  formHeader: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5EAFF',
-    width: '100%',
-    padding: 20,
-    gap: 15,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  flexGroup: {
-    flexDirection: 'row',
-    gap: 15,
-  },
-  title: {
-    fontWeight: '600',
-    fontSize: 18,
-    color: '#281554',
-    paddingVertical: 15,
-  },
-  buttonTitle: {
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  icon: {
-    color: '#281554',
-  },
-  ratingIcon: {
-    color: '#FCBE09',
-  },
-  button: {
-    backgroundColor: '#5A428F',
-    height: 38,
-    borderRadius: 20,
-    paddingHorizontal: 40
-  },
-  image: {
-    width: 50,
-    height: 50
-  },
-  imageContainer: {
-    backgroundColor: '#BDB0CA',
-    borderRadius: 8,
-    overflow: 'hidden',
-    width: '90%',
-    height: 150,
-  },
-  iconsContainer: {
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    verticalAlign: 'top',
-    height: '100%',
-    gap: 8
-  },
-  formHeaderContainer: {
-    width: '100%',
-    justifyContent: 'flex-start',
-  },
-  formHeaderText: {
-    fontWeight: '600',
-    fontSize: 20,
-    color: '#281554',
-    justifyContent: 'flex-start',
-  },
-  formDescriptionText: {
-    fontWeight: '400',
-    fontSize: 15,
-    color: '#281554',
-    justifyContent: 'flex-start',
-  },
-  formDescriptionTextBold: {
-    fontWeight: '500',
-    fontSize: 16,
-    color: '#281554',
-    justifyContent: 'flex-start',
-  },
-  filterBackground: {
-    backgroundColor: '#16D59C',
-    height: 22,
-    marginTop: -2,
-    paddingHorizontal: 6,
-    borderStyle: 'solid',
-    borderColor: '#79747E',
-  },
-  filterText: {
-    color: 'white',
-    fontWeight: '600',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-});
+const renderStars = (rating: number) => {
+  const stars = Math.round(rating / 2); // get rating between 0 and 5
+  return (
+    <View style={{ ...styles.starContainer, marginVertical: 0 }}>
+      {Array.from({ length: 5 }).map((_, index) => (
+        <Icon
+          key={index}
+          name='star'
+          type='font-awesome'
+          iconStyle={index < stars ? styles.filledStar : styles.unfilledStar}
+          size={22}
+        />
+      ))}
+    </View>
+  );
+};
+
+export const isRestaurantOpen = (openingHours: { close: string, day: number, open: string }[]) => {
+  const now = new Date();
+  const currentDay = now.getDay() === 0 ? 7 : now.getDay(); // 1 for monday, 7 for sunday
+  const currentTime = `${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`; // e.g. convert 10:00AM to '1000'
+  const todaysHours = openingHours.filter(hours => hours.day === currentDay);
+
+  // check if the restaurant is currently open or will open later today
+  for (const period of todaysHours) {
+    const { open, close } = period;
+    if (currentTime >= open && currentTime <= close) {
+      return { isOpen: true, nextOpen: null };
+    }
+    if (currentTime < open) {
+      return { isOpen: false, nextOpen: { day: currentDay, open } };
+    }
+  }
+
+  // restaurant is closed for today, find next available opening
+  return { isOpen: false, nextOpen: getNextOpening(openingHours, currentDay) };
+};
+
+
+const getDayName = (dayNumber: number) => {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  return days[dayNumber % 7];
+};
+
+const formatTime = (time: string) => {
+  const hours = parseInt(time.substring(0, 2), 10);
+  const minutes = time.substring(2);
+  const suffix = hours >= 12 ? 'PM' : 'AM';
+  const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+  return `${formattedHours}:${minutes} ${suffix}`;
+};
+
+export const calculateCategories = (cuisineType?: string[], restaurantType?: string[]) => {
+  if (cuisineType && cuisineType.length > 0) {
+    return cuisineType.join(', ');
+  }
+  if (restaurantType && restaurantType.length > 0) {
+    return restaurantType[0].toLowerCase().includes('caf') ? 'Cafe' : restaurantType[0];
+  }
+  return undefined;
+}
+
+export function RestaurantModal({ restaurant, userLocation, username, setShowModal, currentFilters, ...rest }: RestaurantModalProps) {
+  const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
+  const [meals, setMeals] = React.useState<Meal[]>();
+  const [isOpen, setIsOpen] = React.useState<boolean>(false);
+  const [nextOpen, setNextOpen] = React.useState<{ day: number, open: string } | null>(null);
+  const [isFavourited, setIsFavourited] = React.useState(false);
+  // const [noteModalVisible, setNoteModalVisible] = React.useState<boolean>(false);
+  const [activeNote, setActiveNote] = React.useState<
+    Note | undefined
+  >();
+  const [showNoteModal, setShowNoteModal] = React.useState<boolean>(false);
+
+  const fetchFavouriteStatus = async () => {
+    try {
+      const response = await axios.get(`http://${HOST_IP}:4000/user/getFavourites/${username}`);
+      if (response.data.includes(restaurant.restaurantId)) {
+        setIsFavourited(true);
+      }
+    } catch (error) {
+      console.error('Error fetching favourite status:', error);
+    }
+  };
+
+  const fetchNote = async () => {
+    try {
+      const response = await axios.get(`http://${HOST_IP}:4000/note/getNotesRestaurant/${username}/${restaurant.restaurantId}`);
+      if (response.data.length > 0) {
+        setActiveNote(response.data[0]);
+      }
+      // else {
+      //   // Create a temporary new note (not in DB)
+      //   console.log("Creating new note")
+      //   const newNote: Note = {
+      //     noteId: "temp-" + new Date().getTime(),
+      //     date: new Date().toISOString(),
+      //     restaurantId: restaurant.restaurantId,
+      //     username: username
+      //   };
+      //   setActiveNote(newNote);
+      // }
+    } catch (error) {
+      console.error('Error fetching or creating new note:', error);
+    }
+  }
+
+  const fetchMeals = async () => {
+    try {
+      const response = await axios.get(`http://${HOST_IP}:4000/meal/getMealByMenuId/${restaurant.menuId}`);
+      setMeals(response.data);
+
+    } catch (error) {
+      console.error("Error fetching meals:", error);
+    }
+  };
+
+  const handleFavouriteToggle = async () => {
+    setIsFavourited(!isFavourited);
+
+    try {
+      if (!isFavourited) {
+        const response = await axios.put(`http://${HOST_IP}:4000/user/addFavourite/${username}/${restaurant.restaurantId}`);
+        if (response.status !== 200) {
+          console.log("Error adding favourite:", response);
+        }
+      } else {
+        const response = await axios.delete(`http://${HOST_IP}:4000/user/deleteFavourite/${username}/${restaurant.restaurantId}`);
+        if (response.status !== 200) {
+          console.log("Error deleting favourite:", response);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating favourite status:', error);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchMeals();
+  }, []);
+
+  React.useEffect(() => {
+    if (restaurant?.openingHours) {
+      const { isOpen, nextOpen } = isRestaurantOpen(restaurant.openingHours);
+      setIsOpen(isOpen);
+      setNextOpen(nextOpen);
+    }
+  }, [restaurant]);
+
+  React.useEffect(() => {
+    fetchFavouriteStatus();
+  }, [restaurant]);
+
+  // price rating out of 1: cheap, 2: average, 3: expensive, 4: very expensive 
+  const priceMap: { [key: number]: string } = {
+    1: '$',
+    2: '$$',
+    3: '$$$',
+    4: '$$$'
+  }
+
+  const calculateRestaurantDistance = (userLocation: { latitude: number, longitude: number }, latitude: string, longitude: string) => {
+    const restaurantLocation = { latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
+    const distanceInMeters = getDistance(userLocation, restaurantLocation);
+    return (distanceInMeters / 1000).toFixed(2);
+  }
+
+  return (
+    <>
+      {!showNoteModal &&
+        <Overlay overlayStyle={styles.mapModal} isVisible={true} onBackdropPress={() => setShowModal(undefined)}>
+          <View style={styles.restaurantFormHeader}>
+            <View style={styles.flexRowGroup}>
+              <View style={{ ...styles.imageContainer, height: 160, width: '90%', marginRight: 0 }}>
+                <Image
+                  source={{ uri: getRestaurantPhoto(restaurant.restaurantPhotos, restaurant.foodPhotos) }}
+                  style={{ width: '100%', height: '100%' }} />
+              </View>
+              <View style={styles.iconsContainer}>
+                <Icon
+                  name='x'
+                  type='feather'
+                  iconStyle={styles.modalIcon}
+                  size={22}
+                  onPress={() => setShowModal(undefined)} />
+                <Icon
+                  name={'star'}
+                  type='font-awesome'
+                  iconStyle={isFavourited ? styles.modalIcon : styles.unfilledStar}
+                  size={22}
+                  onPress={handleFavouriteToggle} />
+                <Icon
+                  name='edit'
+                  type='feather'
+                  iconStyle={styles.modalIcon}
+                  size={22}
+                  onPress={() => {
+                    fetchNote();
+                    // setShowModal(undefined);
+                    setShowNoteModal(true);
+                  }} />
+              </View>
+            </View>
+            {restaurant.name && <View style={styles.formHeaderContainer}>
+              <Text numberOfLines={1} style={{...styles.formHeaderText, fontSize: 22}}>{restaurant.name}</Text>
+            </View>}
+          </View>
+          <View style={{...styles.verticalFlexFormGroup, paddingTop: 15}}>
+            <View style={styles.flexFormGroup}>
+              <Text style={styles.formDescriptionTextBold}>
+                {calculateCategories(restaurant.cuisineType ? restaurant.cuisineType?.map(c => c.cuisineType) : [],
+                  restaurant.restaurantType ? restaurant.restaurantType?.map(c => c.restaurantType) : [])} • {priceMap[restaurant?.price ?? 1]} • {calculateRestaurantDistance(userLocation, restaurant.latitude, restaurant.longitude)} km away
+              </Text>
+            </View>
+            <View style={styles.flexFormGroup}>
+              {restaurant.rating && <View style={{ ...styles.flexFormGroup, gap: 7 }}>
+                {renderStars(restaurant.rating ?? 0)}
+                <Text style={{ ...styles.formDescriptionText, flexDirection: 'row', marginTop: 2, marginLeft: -4 }}>
+                  ({restaurant.total_ratings})
+                </Text>
+              </View>}
+              <View style={{ marginLeft: 'auto' }}>{restaurant.menuItemMatches && <MenuItemBadge matches={restaurant.menuItemMatches.length} />}</View>
+              <View style={{ marginLeft: 'auto' }}>{restaurant.menuItemMatches && <MenuItemBadge matches={restaurant.menuItemMatches.length} />}</View>
+            </View>
+            {restaurant.menuItemMatches && <View style={styles.flexFormGroup}>
+              <Text style={{...styles.formDescriptionText, fontWeight: '500'}}>
+                {restaurant.menuItemMatches.length} menu items matches your dietary filters!
+              </Text>
+            </View>}
+            <View style={styles.flexFormGroup}>
+              <Icon
+                name='map-pin'
+                type='feather'
+                iconStyle={styles.modalIcon}
+                size={16} />
+              <Text numberOfLines={1} style={{...styles.formDescriptionText, width: '90%'}}>{restaurant.address}</Text>
+            </View>
+            <View style={styles.flexFormGroup}>
+              <Icon
+                name='clock'
+                type='feather'
+                iconStyle={styles.modalIcon}
+                size={16} />
+              <View>{isOpen ? <Text style={styles.formDescriptionText}>Open Now</Text> :
+                nextOpen ? <Text style={styles.formDescriptionText}>Closed. Next opens at {formatTime(nextOpen.open)} {getDayName(nextOpen.day)}.</Text>
+                  : <Text style={styles.formDescriptionText}>Restaurant is closed and no future opening time available.</Text>}
+              </View>
+            </View>
+            <View style={{ paddingBottom: 10, width: '100%' }}>
+              <Text style={styles.formDescriptionTextBold}>Matching menu items </Text>
+              {restaurant.menuItemMatches && restaurant.menuItemMatches?.length > 0 && <View style={{ paddingTop: 4 }}>
+                <Text numberOfLines={2} style={{ fontSize: 14, opacity: 0.8, ...currentFont }}>{restaurant.menuItemMatches.map(meal => meals?.find(m => m.mealId === meal)?.name ?? 'No meal'.toLocaleLowerCase()).join(', ')}</Text></View>}
+            </View>
+            <Button buttonStyle={{ ...styles.button, paddingHorizontal: 25, marginTop: 0 }} titleStyle={{ ...styles.buttonTitle, fontSize: 12 }} onPress={() => { router.push({ pathname: "/restaurant", params: { restaurant: JSON.stringify(restaurant), activeFilters: JSON.stringify(currentFilters) } }); setShowModal(undefined); }} title={('view more').toUpperCase()} />
+          </View>
+        </Overlay>
+      }
+      {showNoteModal && (<NoteModal
+        setShowNoteModal={setShowNoteModal}
+        restaurant={restaurant}
+        initialNote={activeNote}
+        username={username}
+      />
+      )}
+    </>
+  );
+}

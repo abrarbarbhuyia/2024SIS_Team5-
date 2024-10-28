@@ -1,6 +1,7 @@
 import { View, Image, TouchableOpacity } from "react-native";
 import { Icon, Text, Overlay, Button, Badge, Card } from '@rneui/themed';
-import React from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useEffect, useState } from "react";
 import { currentFont, styles } from '../styles/app-styles';
 import axios from 'axios';
 import Constants from 'expo-constants';
@@ -8,8 +9,9 @@ import { getDistance } from 'geolib';
 import { router } from "expo-router";
 import { calculateCategories, isRestaurantOpen } from "@/components/RestaurantModal";
 import Layout from "@/components/Layout";
-import { Restaurant, Favourite, cuisineType } from "@/constants/interfaces";
+import { Restaurant, Favourite, cuisineType, UserPreferences } from "@/constants/interfaces";
 import useLoadUser from '@/hooks/useLoadUser';
+import { formatTextValue } from "@/utils";
 
 const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
 
@@ -18,6 +20,10 @@ export default function Favourites() {
     const [favourites, setFavourites] = React.useState<Favourite[]>([]);
     const [restaurants, setRestaurants] = React.useState<Restaurant[]>([]);
     const [favouriteToRemove, setFavouriteToRemove] = React.useState<Favourite>();
+    const [activeFilters, setActiveFilters] = useState<
+        { type: string; value: string }[]
+    >([]);
+    const [filterByDietary, setFilterByDietary] = useState<boolean>(false);
     // initial region is hardcoded to UTS Tower
     const [userLocation, setUserLocation] = React.useState<{ latitude: number, longitude: number }>({
         latitude: -33.88336558611229,
@@ -36,7 +42,54 @@ export default function Favourites() {
 
     React.useEffect(() => {
         loadUser();
+        loadSettings();
     }, [loadUser, username]);
+
+    const loadSettings = async () => {
+        try {
+            const storedFilterByDietary = await AsyncStorage.getItem(
+                "filterByDietary"
+            );
+            if (storedFilterByDietary !== null) {
+                setFilterByDietary(JSON.parse(storedFilterByDietary));
+            }
+        } catch (error) {
+            console.error("Error loading settings", error);
+        }
+    };
+    
+    const fetchUserPreferences = async (username: string) => {
+        // if a user is logged in AND has filter by dietary preferences toggleOn - we can fetch their filters - otherwise we use state
+        /* if they're logged in, grab the preferences associated with this username */
+        if (filterByDietary) {
+          try {
+            await axios
+                .get(`http://${HOST_IP}:4000/user/getUserPreference/${username}`)
+                .then((response) => {
+                    /* set the active filters to these preferences */
+                    if (response.data.length > 0) {
+                    setActiveFilters(
+                        response.data.map((p: UserPreferences) => ({
+                        type:
+                            p.type == "Cuisine"
+                            ? formatTextValue(`${p.type}`)
+                            : formatTextValue(`${p.type}s`),
+                        value: p.name,
+                        }))
+                    );
+                    }
+                });
+            } catch (error) {
+                console.error("Error fetching user preferences", error);
+            }
+        }
+    };
+    
+    useEffect(() => {
+        if (username && filterByDietary) {
+          fetchUserPreferences(username);
+        }
+    }, [filterByDietary]); 
 
     const fetchFavourites = async () => {
         const url = `http://${HOST_IP}:4000/user/getUser/${username}`;
@@ -102,7 +155,7 @@ export default function Favourites() {
                                         />
                                     </ View>
                                 </View>
-                                <TouchableOpacity style={{ minWidth: '80%', flex: 1, flexDirection: 'row', paddingTop: 5 }} onPress={() => router.push({ pathname: '/restaurant', params: { restaurant: JSON.stringify(restaurants.find(r => r.restaurantId === f.restaurantId)) }})}>
+                                <TouchableOpacity style={{ minWidth: '80%', flex: 1, flexDirection: 'row', paddingTop: 5 }} onPress={() => router.push({ pathname: '/restaurant', params: { restaurant: JSON.stringify(restaurants.find(r => r.restaurantId === f.restaurantId)), activeFilters: JSON.stringify(activeFilters)}})}>
                                     <View style={{ flex: 1.5, flexDirection: 'column' }}>
                                         <View style={{ paddingHorizontal: 10 }}>
                                             <Image source={{ uri: f ? f.imageUrl : '' }} style={{ borderRadius: 16, width: 70, height: 70 }} />

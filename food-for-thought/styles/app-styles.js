@@ -532,6 +532,7 @@ export const styles = StyleSheet.create({
   },
   body: {
       fontSize: 12,
+      ...currentFont 
   },
   galleryImageContainer: {
       marginRight: 10,
@@ -600,11 +601,13 @@ export const styles = StyleSheet.create({
   appliedFilters: {
     flexDirection: 'row',
     paddingLeft: 20,
+    overflow: 'scroll',
+    width: '100%',
+    gap: 5
   },
   clipboardLink: {
       flexDirection: 'row',
       padding: 20,
-      paddingLeft: 25,
       paddingBottom: 10,
       alignItems: 'center',
   },

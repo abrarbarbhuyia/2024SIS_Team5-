@@ -217,7 +217,7 @@ const RestaurantMap = () => {
       onPress={() => {
         router.push({
           pathname: "/restaurant",
-          params: { restaurant: JSON.stringify(item) },
+          params: { restaurant: JSON.stringify(item), activeFilters: JSON.stringify(activeFilters) },
         });
       }}
     >
@@ -473,6 +473,7 @@ const RestaurantMap = () => {
             userLocation={userLocation}
             restaurant={activeRestaurant}
             username={username}
+            currentFilters={activeFilters}
           />
         )}
       </BottomSheetModalProvider>

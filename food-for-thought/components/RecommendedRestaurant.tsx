@@ -7,17 +7,92 @@ import Constants from 'expo-constants';
 import { cuisineType, JwtPayload, Meal, Menu, Restaurant } from '@/constants/interfaces';
 import { currentFont, styles } from "@/styles/app-styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import React from "react";
 import { jwtDecode } from "jwt-decode";
+import { formatTextValue } from "@/utils";
+
+interface UserPreferences {
+    name: string;
+    type: string;
+  }
 
 export default function RecommendedRestaurant({ restaurant }: { restaurant: Restaurant }) {
     const [menu, setMenu] = useState<Menu>();
     const [meals, setMeals] = useState<Meal[]>([]);
-    const [username, setUsername] = useState<string>();
     const [favourites, setFavourites] = useState<string[]>([]);
     const item = restaurant || {};
     const restaurantId = item.restaurantId;
+    const [username, setUsername] = useState<string>();
+    const [activeFilters, setActiveFilters] = useState<
+        { type: string; value: string }[]
+    >([]);
+    const [filterByDietary, setFilterByDietary] = useState<boolean>(false);
 
     const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
+
+    const loadUser = React.useCallback(async () => {
+        const token = await AsyncStorage.getItem("token");
+        if (token) {
+          try {
+            const decodedToken: any = jwtDecode(token);
+            setUsername(decodedToken.username);
+          } catch (error) {
+            console.error("Invalid token");
+          }
+        }
+      }, []);
+    
+      //Load the filterByDietary toggle value
+      const loadSettings = async () => {
+        try {
+          const storedFilterByDietary = await AsyncStorage.getItem(
+            "filterByDietary"
+          );
+          if (storedFilterByDietary !== null) {
+            setFilterByDietary(JSON.parse(storedFilterByDietary));
+          }
+        } catch (error) {
+          console.error("Error loading settings", error);
+        }
+      };
+    
+      React.useEffect(() => {
+        loadUser();
+        loadSettings();
+      }, [loadUser]);
+    
+      const fetchUserPreferences = async (username: string) => {
+        // if a user is logged in AND has filter by dietary preferences toggleOn - we can fetch their filters - otherwise we use state
+        /* if they're logged in, grab the preferences associated with this username */
+        if (filterByDietary) {
+          try {
+            await axios
+              .get(`http://${HOST_IP}:4000/user/getUserPreference/${username}`)
+              .then((response) => {
+                /* set the active filters to these preferences */
+                if (response.data.length > 0) {
+                  setActiveFilters(
+                    response.data.map((p: UserPreferences) => ({
+                      type:
+                        p.type == "Cuisine"
+                          ? formatTextValue(`${p.type}`)
+                          : formatTextValue(`${p.type}s`),
+                      value: p.name,
+                    }))
+                  );
+                }
+              });
+          } catch (error) {
+            console.error("Error fetching user preferences", error);
+          }
+        }
+      };
+    
+      useEffect(() => {
+        if (username && filterByDietary) {
+          fetchUserPreferences(username);
+        }
+      }, [filterByDietary]);
 
     useEffect(() => {
         if (restaurantId) {
@@ -48,22 +123,6 @@ export default function RecommendedRestaurant({ restaurant }: { restaurant: Rest
             console.error("Error fetching meals:", error);
         }
     };
-
-    const loadUser = useCallback(async () => {
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
-            try {
-                const decodedToken: JwtPayload = jwtDecode<JwtPayload>(token);
-                setUsername(decodedToken.username);
-            } catch (error) {
-                console.error("Invalid token");
-            }
-        }
-    }, []);
-
-    useEffect(() => {
-        loadUser();
-    }, [loadUser]);
 
     const fetchFavourites = async () => {
         const url = `http://${HOST_IP}:4000/user/getUser/${username}`;
@@ -105,12 +164,12 @@ export default function RecommendedRestaurant({ restaurant }: { restaurant: Rest
     return (
         <TouchableOpacity
             style={{ height: '42%', padding: 3, backgroundColor: 'white', marginBottom: 5, borderRadius: 16 }}
-            onPress={() => router.push({ pathname: '/restaurant', params: { restaurant: JSON.stringify(item) } })}>
+            onPress={() => router.push({ pathname: '/restaurant', params: { restaurant: JSON.stringify(item), activeFilters: JSON.stringify(activeFilters)}})}>
             <View style={{ borderRadius: 16, flex: 1, flexDirection: 'row' }}>
                 <Image source={item.foodPhotos && item.foodPhotos.length > 0 ? { uri: item.foodPhotos[0] } : []} style={{ width: '30%', height: '100%', borderRadius: 16 }} />
                 <View style={{ flex: 1, flexDirection: 'column', paddingLeft: 10 }}>
                     <Text style={{ fontSize: 17, fontWeight: 'bold', ...currentFont }}>{item.name || 'Restaurant Title'}</Text>
-                    <Text numberOfLines={2} style={{ fontSize: 12, opacity: 0.7, ...currentFont }}>{item.cuisineType?.map((cuisine: cuisineType) => cuisine.cuisineType).join('/') || 'Delicious'} food such as {meals.length > 0 ? meals.map((meal: Meal) => meal.name).slice(0, 3).join(', ') : '<menu item>'}.</Text>
+                    <Text numberOfLines={2} style={{ fontSize: 12, opacity: 0.7, ...currentFont }}>{item.cuisineType?.map((cuisine: cuisineType) => cuisine.cuisineType).join('/') || 'Miscellaneous'} food such as {meals.length > 0 ? meals.map((meal: Meal) => meal.name).slice(0, 3).join(', ') : '<menu item>'}.</Text>
                     <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row' }}>
                         <Icon
                             name='star'

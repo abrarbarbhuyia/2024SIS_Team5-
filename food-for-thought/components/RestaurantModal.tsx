@@ -7,24 +7,16 @@ import MenuItemBadge from "./MenuItemBadge";
 import { getDistance } from "geolib";
 import axios from "axios";
 import Constants from "expo-constants";
-import { Restaurant, Meal } from "@/constants/interfaces"
+import { Restaurant, Meal, Note } from "@/constants/interfaces"
 import { NoteModal } from "@/components/NoteModal"
 
 export type RestaurantModalProps = {
   setShowModal: React.Dispatch<React.SetStateAction<Restaurant | undefined>>,
   restaurant: Restaurant,
   userLocation: { latitude: number, longitude: number },
-  username: string
-};
-
-export type Note = {
-  noteId?: string,
-  date: string,
-  content: string,
-  restaurantId: string,
   username: string,
-  rating: number,
-}
+  currentFilters: {type: string, value: string}[],
+};
 
 const getNextOpening = (openingHours: { close: string, day: number, open: string }[], currentDay: number) => {
   const sortedOpeningHours = openingHours.sort((a, b) => a.day - b.day);
@@ -108,7 +100,7 @@ export const calculateCategories = (cuisineType?: string[], restaurantType?: str
   return undefined;
 }
 
-export function RestaurantModal({ restaurant, userLocation, username, setShowModal, ...rest }: RestaurantModalProps) {
+export function RestaurantModal({ restaurant, userLocation, username, setShowModal, currentFilters, ...rest }: RestaurantModalProps) {
   const HOST_IP = Constants.expoConfig?.extra?.HOST_IP;
   const [meals, setMeals] = React.useState<Meal[]>();
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
@@ -299,7 +291,7 @@ export function RestaurantModal({ restaurant, userLocation, username, setShowMod
               {restaurant.menuItemMatches && restaurant.menuItemMatches?.length > 0 && <View style={{ paddingTop: 4 }}>
                 <Text numberOfLines={2} style={{ fontSize: 14, opacity: 0.8, ...currentFont }}>{restaurant.menuItemMatches.map(meal => meals?.find(m => m.mealId === meal)?.name ?? 'No meal'.toLocaleLowerCase()).join(', ')}</Text></View>}
             </View>
-            <Button buttonStyle={{ ...styles.button, paddingHorizontal: 25, marginTop: 0 }} titleStyle={{ ...styles.buttonTitle, fontSize: 12 }} onPress={() => { router.push({ pathname: "/restaurant", params: { restaurant: JSON.stringify(restaurant) } }); setShowModal(undefined); }} title={('view more').toUpperCase()} />
+            <Button buttonStyle={{ ...styles.button, paddingHorizontal: 25, marginTop: 0 }} titleStyle={{ ...styles.buttonTitle, fontSize: 12 }} onPress={() => { router.push({ pathname: "/restaurant", params: { restaurant: JSON.stringify(restaurant), activeFilters: JSON.stringify(currentFilters) } }); setShowModal(undefined); }} title={('view more').toUpperCase()} />
           </View>
         </Overlay>
       }

@@ -4,9 +4,10 @@ import { Text, Icon, Card } from "@rneui/themed";
 import Constants from "expo-constants";
 import axios from "axios";
 import { styles } from "@/styles/app-styles";
+import MenuItemBadge from "./MenuItemBadge";
 import { Ingredient, Meal as MealType, MealIngredient } from "@/constants/interfaces";
 
-export default function Meal({ meal }: { meal: MealType }) {
+export default function Meal({ meal, state }: { meal: MealType, state: any }) {
   const [isDropDownSelected, setIsDropDownSelected] = useState<boolean>(false);
   const [mealIngredients, setMealIngredients] = useState<MealIngredient[]>([]);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
@@ -77,6 +78,9 @@ export default function Meal({ meal }: { meal: MealType }) {
       </View>
       <View style={styles.mealFilterList}>
         <Icon name="sliders" type="font-awesome" size={20} color={"#A394B8"} />
+        <View style={{paddingLeft: 8, paddingTop: 2}}>
+            <MenuItemBadge matches={state ? 15 : 0} smallText/>  
+        </View>
       </View>
       <TouchableOpacity
         style={styles.ingredientsDropDownInteractable}

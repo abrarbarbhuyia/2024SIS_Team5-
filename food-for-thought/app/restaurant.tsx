@@ -12,14 +12,15 @@ import { currentFont } from "@/styles/app-styles";
 export default function Restaurant() {
     const [selectedIndex, setSelectedIndex] = React.useState(0);
     //need to get the restaurant data from path route - object was stringified
-    const {restaurant}: {restaurant: string} = useLocalSearchParams();
-    const restaurantData = JSON.parse(restaurant);
+    const {restaurant, activeFilters} = useLocalSearchParams();
+    const filters: {type: string, value: string}[] = activeFilters ? JSON.parse(activeFilters.toString()) : [];
+    const restaurantData = JSON.parse(restaurant.toString());
 
     // Components to load based on selected index, passes restaurant data
     const renderContent = () => {
         switch (selectedIndex) {
             case 0:
-                return <RestaurantMenu restaurant={restaurantData}/>;
+                return <RestaurantMenu restaurant={restaurantData} filters={filters}/>;
             case 1:
                 return <RestaurantDescription restaurant={restaurantData}/>;
             case 2:
@@ -31,8 +32,9 @@ export default function Restaurant() {
 
     return (
         <Layout>
+        <View style={styles.pageContainer} >
             <View style={styles.detailsContainer}>
-                <Text h4 style={{padding: 15, ...currentFont, fontWeight: '500'}}>{restaurantData.name}</Text>
+                <Text h3 style={{padding: 15, ...currentFont, fontWeight: '500'}}>{restaurantData.name}</Text>
                 <Card containerStyle={{...styles.tabContainer}}>
                 <ButtonGroup
                     buttonStyle={{  backgroundColor: '#FBF8FF' }}
@@ -51,7 +53,8 @@ export default function Restaurant() {
                 {renderContent()}
                 </Card>
             </View>
-        </Layout>
+        </View>
+    </Layout>
     )
 }
 

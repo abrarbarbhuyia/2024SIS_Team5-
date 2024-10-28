@@ -14,7 +14,7 @@ export const handleMenuItemMatches = (matches: number) => {
   }
 };
 
-const MenuItemBadge = ({ matches }: { matches: number }) => {
+const MenuItemBadge = ({ matches, smallText }: { matches: number, smallText?: boolean }) => {
   const handleBadgeColor = (matchScore: string) => {
     const colorMap: Record<string, string[]> = {
       MEH: ['#EC6C43', '#D98522'],
@@ -31,9 +31,9 @@ const MenuItemBadge = ({ matches }: { matches: number }) => {
     <Badge
       badgeStyle={{
         backgroundColor: badgeColors[0],
-        height: 22,
+        height: smallText ? 20 : 22,
         marginTop: -2,
-        paddingHorizontal: 6,
+        paddingHorizontal: smallText ? 4 : 6,
         borderStyle: 'solid',
         borderColor: badgeColors[1],
         borderWidth: 1,
@@ -41,6 +41,7 @@ const MenuItemBadge = ({ matches }: { matches: number }) => {
       value={matchScore}
       textStyle={[
         styles.badgeText, 
+        (smallText && {fontSize: 11}),
         { color: matchScore == "NO MATCHES" ? '#CAC4D0' : 'white' }
       ]}
     />

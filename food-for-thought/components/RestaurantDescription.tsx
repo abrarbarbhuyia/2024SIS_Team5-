@@ -1,9 +1,10 @@
 import { View, Linking } from "react-native";
 import { Text } from '@rneui/themed';
-import React from "react";
+import React, { useState } from "react";
 import { Icon } from "react-native-elements";
-import { styles } from "@/styles/app-styles";
+import { currentFont, styles } from "@/styles/app-styles";
 import { cuisineType, openingHours, Restaurant } from "@/constants/interfaces";
+import { getDistance } from 'geolib';
 
 // Utility function to convert 2400 time to standard time
 const formatTime = (time: string) => {
@@ -21,7 +22,6 @@ const formatTime = (time: string) => {
         return `${formattedHours}${ampm}`;
     }
 };
-
 
 // Group opening hours by day and format them
 const formatOpeningHours = (openingHours: openingHours[]) => {
@@ -49,6 +49,12 @@ const formatOpeningHours = (openingHours: openingHours[]) => {
     return groupedHours;
 };
 
+//calculate distance from user to restuarant
+const calculateRestaurantDistance = (userLocation: { latitude: number, longitude: number }, latitude: string, longitude: string) => {
+    const restaurantLocation = { latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
+    const distanceInMeters = getDistance(userLocation, restaurantLocation);
+    return (distanceInMeters / 1000).toFixed(2);
+};
 
 export default function RestaurantDescription({ restaurant }: { restaurant: Restaurant }) {
     const websiteURL = restaurant.website;
@@ -59,22 +65,32 @@ export default function RestaurantDescription({ restaurant }: { restaurant: Rest
     const openingHours: openingHours[] = restaurant.openingHours || [];
     const groupedOpeningHours = formatOpeningHours(openingHours);
 
+    // initial region is hardcoded to UTS Tower
+    const [userLocation, setUserLocation] = useState<{ latitude: number, longitude: number }>({
+        latitude: -33.88336558611229,
+        longitude: 151.2009263036271,
+    })
+
     return (
-        <View style={styles.pageContainer}>
+        <View style={{padding: 15}}>
             <View style={styles.textDetail}>
-                <Text style={{fontWeight: 'bold', fontSize: 12, flexDirection: 'row'}}>{restaurant.cuisineType?.map((cuisine : cuisineType) => cuisine.cuisineType).join('/')} Restaurant</Text>
+                <Text style={{ fontWeight: 'bold', fontSize: 12, flexDirection: 'row', ...currentFont }}>
+                    {restaurant.cuisineType && restaurant.cuisineType.length > 0 ? (
+                        restaurant.cuisineType.map((cuisine: cuisineType) => cuisine.cuisineType).join('/')
+                    ) : (
+                        <Text style={{ fontWeight: 'bold', fontSize: 12 }}>Miscellaneous</Text>
+                    )}
+                    <Text style={{ fontWeight: 'bold', fontSize: 12 }}> Restaurant</Text>
+                </Text>
                 <Icon name='dot-single' type='entypo' size={15}></Icon>
-                <Text style={styles.body}>*distance* kms</Text>
+                <Text style={styles.body}>{calculateRestaurantDistance(userLocation, restaurant.latitude, restaurant.longitude)} kms</Text>
             </View>
             <View style={styles.textDetail}>
-                <Text style={styles.body}>Mixed Asian vegetarian meals like san chow pow, in a basic space with simple seating and comfy vibe.</Text>
-            </View>
-            <View style={styles.textDetail}>
-                <Text style={styles.body}>*Count* menu items that match your dietary requirements!</Text>
+                <Text style={styles.body}>{restaurant.menuItemMatches ? restaurant.menuItemMatches.length : 0} menu items that match your dietary requirements!</Text>
             </View>
             <View style={styles.ratingsView}>
                 <Text style={styles.body}>{rating.toFixed(2)}</Text>
-                <View style={{flexDirection: 'row', paddingRight: 10, paddingLeft: 5}}>
+                <View style={{ flexDirection: 'row', paddingRight: 10, paddingLeft: 5 }}>
                     {/* Render Full Stars */}
                     {Array(fullStars).fill(0).map((_, i) => (
                         <Icon key={`full-${i}`} name='star' type='font-awesome' size={18} color='#FCBE09' />
@@ -90,23 +106,23 @@ export default function RestaurantDescription({ restaurant }: { restaurant: Rest
             </View>
             <View style={styles.contactCard}>
                 <View style={styles.contactInformation}>
-                    <Icon name='location' type='octicon' size={25} style={{paddingRight: 10}}/>
+                    <Icon name='location' type='octicon' size={25} style={{ paddingRight: 10 }} />
                     <Text style={styles.body}>{restaurant.address}</Text>
                 </View>
                 <View style={styles.contactInformation}>
-                    <Icon name='phone' type='feather' size={25} style={{paddingRight: 10}}/>
+                    <Icon name='phone' type='feather' size={25} style={{ paddingRight: 10 }} />
                     <Text style={styles.body}>{restaurant.phoneNumber}</Text>
                 </View>
                 <View style={styles.contactInformation}>
-                    <Icon name='globe' type='feather' size={25} style={{paddingRight: 10}}/>
-                    <Text style={{fontSize: 12, color: 'blue'}} onPress={() => Linking.openURL(websiteURL)}>{websiteURL}</Text>
+                    <Icon name='globe' type='feather' size={25} style={{ paddingRight: 10 }} />
+                    <Text style={{ fontSize: 12, color: 'blue', ...currentFont }} onPress={() => Linking.openURL(websiteURL)}>{websiteURL}</Text>
                 </View>
             </View>
-            <Text style={{fontSize: 12, fontWeight: 'bold', paddingTop: 5}}>Opening Hours</Text>
-            <View style={{paddingTop: 5, paddingLeft: 10}}>
+            <Text style={{ fontSize: 12, fontWeight: 'bold', paddingTop: 5, ...currentFont }}>Opening Hours</Text>
+            <View style={{ paddingTop: 5, paddingLeft: 10 }}>
                 {Object.entries(groupedOpeningHours).map(([day, times], index) => (
-                    <Text key={index} style={{ fontSize: 11, paddingTop: 1 }}>
-                        <Text style={{fontWeight: 'bold'}}>{day}: </Text> {Array.isArray(times) ? times.join(', ') : times}
+                    <Text key={index} style={{ fontSize: 11, paddingTop: 1, ...currentFont }}>
+                        <Text style={{ fontWeight: 'bold', ...currentFont }}>{day}: </Text> {Array.isArray(times) ? times.join(', ') : times}
                     </Text>
                 ))}
             </View>

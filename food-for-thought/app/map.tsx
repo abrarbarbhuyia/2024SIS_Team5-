@@ -273,7 +273,7 @@ const RestaurantMap = () => {
       <BottomSheetModalProvider>
         <Card containerStyle={styles.mapDisplayCard}>
           <View style={{ flexDirection: "column", rowGap: 2 }}>
-            <SearchBar onSearch={handleSearch} />
+            <SearchBar onSearch={handleSearch} currentPage="map" />
             <View style={styles.flexContainer}>
               <Icon
                 name="sliders"

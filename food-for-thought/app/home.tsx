@@ -1,7 +1,7 @@
 import { View, Image, FlatList } from "react-native";
 import { router } from "expo-router";
 import { Card, Text, Icon } from '@rneui/themed';
-import SearchBar from "@/components/SearchBar";
+import SearchBarComponent from "@/components/SearchBar";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import RecommendedRestaurant from "@/components/RecommendedRestaurant";
 import MapView, { Marker } from "react-native-maps";
@@ -144,12 +144,12 @@ const Home = () => {
 
   return (
     <Layout>
-      {showModal && <SafetyWarning handleNotedPress={ handleNotedPress } />} 
+      {showModal && <SafetyWarning handleNotedPress={handleNotedPress} />}
       {/* Card for the Restaurant finder */}
       <TouchableOpacity onPress={() => router.push('/map')}>
         <Card containerStyle={styles.finderCard}>
           <View>
-            <SearchBar onSearch={handleSearch} />
+            <SearchBarComponent onSearch={handleSearch} currentPage="home" />
           </View>
           <MapView
             style={styles.homeMap}

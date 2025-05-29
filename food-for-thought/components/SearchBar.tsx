@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { SearchBar } from '@rneui/themed';
 import { View, StyleSheet } from 'react-native';
-import { useRoute } from '@react-navigation/native';
 import { currentFont } from '@/styles/app-styles';
 
 type SearchBarComponentProps = {
   onSearch: (searchTerm: string) => void;
+  currentPage?: string;
 };
 
-const SearchBarComponent: React.FunctionComponent<SearchBarComponentProps> = ({ onSearch }) => {
+const SearchBarComponent: React.FunctionComponent<SearchBarComponentProps> = ({ onSearch, currentPage = 'default' }) => {
   const [search, setSearch] = useState("");
   const [placeholder, setPlaceholder] = useState("");
-  const route = useRoute();
 
   useEffect(() => {
-    const currentPage = route.name;
     switch (currentPage) {
       case 'home':
         setPlaceholder('Search by dietary requirement...');
@@ -23,7 +21,7 @@ const SearchBarComponent: React.FunctionComponent<SearchBarComponentProps> = ({ 
         setPlaceholder('Search nearby restaurants...');
         break;
     }
-  }, [route.name]);
+  }, [currentPage]);
 
   const updateSearch = (search: string) => {
     setSearch(search);

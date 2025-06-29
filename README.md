@@ -1,5 +1,5 @@
 # Food for Thought
-A unique restaurant recommendation app to help people with dietary requirements find restaurants by analyisng menu data.
+A unique restaurant recommendation app to help people with dietary requirements find restaurants by analysing menu data.
 
 Developed by Team 5, Software Innovation Studio (41129), Spring 2024.
 
